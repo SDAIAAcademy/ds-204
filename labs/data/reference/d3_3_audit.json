@@ -1,0 +1,42 @@
+{
+ "__frame__": {
+  "columns": [
+   "before",
+   "after",
+   "change",
+   "finding"
+  ],
+  "index": [
+   "1 remove weeks_attended",
+   "2 remove the copied rows",
+   "3 remove trainee_noncompletions",
+   "4 remove provider_rate"
+  ],
+  "data": [
+   [
+    1.0,
+    0.8822213985,
+    -0.1177786015,
+    "target leakage: recorded at exit"
+   ],
+   [
+    0.8822213985,
+    0.8810027774,
+    -0.0012186211,
+    "duplicate contamination: about 3 rows in 100 are copies"
+   ],
+   [
+    0.8810027774,
+    0.5032215731,
+    -0.3777812043,
+    "future information: counts this enrolment and later ones"
+   ],
+   [
+    0.5032215731,
+    0.5009441105,
+    -0.0022774627,
+    "preparation leakage: a rate fitted on all rows, validation and 2025 included"
+   ]
+  ]
+ }
+}

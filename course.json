@@ -469,11 +469,11 @@
                 "minutes": 7
               },
               {
-                "text": "Explain the grouped gap: new and returning trainees",
+                "text": "Explain the gap: new and returning trainees",
                 "minutes": 4
               },
               {
-                "text": "Explain the time gap: remove one feature and rescore",
+                "text": "What only time order shows: let the model age",
                 "minutes": 5
               },
               {
@@ -572,7 +572,7 @@
         {
           "title": "Reading someone else's notebook",
           "outcomes": [
-            "Read a notebook in the order split, preparation, tuning, metric",
+            "Read a notebook in the order rows, split, preparation, tuning, metric",
             "List the faults that make a reported score untrustworthy",
             "Measure which fault moves the score most by repairing one at a time"
           ],

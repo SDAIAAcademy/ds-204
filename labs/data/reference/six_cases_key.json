@@ -1,0 +1,44 @@
+{
+  "1": {
+    "kind": "target",
+    "scheme": "time",
+    "why_kind": "Collections staff call a borrower because a repayment was missed. The column is a consequence of the outcome and does not exist when the application is scored.",
+    "why_scheme": "Each borrower appears once, so nothing needs grouping. The model scores next quarter's applications, so it is validated on the latest loans after training on earlier ones.",
+    "question": "When is this column written, and who writes it?"
+  },
+  "2": {
+    "kind": "group",
+    "scheme": "grouped",
+    "why_kind": "Hourly rows of one pump are near copies of each other. A random split puts hours of the same pump, and of the same failure, on both sides, so the model recognises the pump.",
+    "why_scheme": "The model is used on pumps it has never seen. All rows of a pump stay on one side: the score then says how well it carries to a new pump.",
+    "question": "What is the unit the model will meet in use, and does that unit sit on both sides of the split?"
+  },
+  "3": {
+    "kind": "preparation",
+    "scheme": "random",
+    "why_kind": "The 20 measurements were chosen with the grades of all rows, the validation rows included. With 300 candidates some correlate by chance, and the chosen ones are those that fit the validation rows too.",
+    "why_scheme": "Each fruit is one independent row and the model sorts fruit of the same season and farms. A random split is right here, with the standardising and the selection inside each fold.",
+    "question": "Was any step fitted or chosen before the split?"
+  },
+  "4": {
+    "kind": "future",
+    "scheme": "time",
+    "why_kind": "The patient's rate over the whole year includes appointments later than the one being scored, and that appointment itself. Three days before an appointment only the earlier ones are known.",
+    "why_scheme": "The model scores next month's appointments, mostly for known patients, and the rules changed during the year: train on earlier months, validate on later ones, with the rate computed from past appointments only.",
+    "question": "On the day of the prediction, what would the value of this feature have been?"
+  },
+  "5": {
+    "kind": "group",
+    "scheme": "grouped",
+    "why_kind": "A claim and its copy carry the same columns and the same finding. When one is in the training part and the other in validation, the model is scored on a row it has seen.",
+    "why_scheme": "The copies are removed first, or kept together by a key built from policy, date and amount. The case describes no change over time, so the split need not be ordered.",
+    "question": "Can the same real-world event appear in the table more than once?"
+  },
+  "6": {
+    "kind": "target",
+    "scheme": "grouped",
+    "why_kind": "The antibiotic is ordered because a doctor already suspects the infection: the column records the doctor's answer to the question the model is asked. It is also taken from the whole stay, not the first six hours.",
+    "why_scheme": "The model will meet patients who are not in the data, and patients repeat in the table: all admissions of a patient stay on one side.",
+    "question": "Would a person who already knew the outcome be the one filling in this column?"
+  }
+}

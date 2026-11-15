@@ -1,0 +1,35 @@
+{
+ "__frame__": {
+  "columns": [
+   "training rows per fold",
+   "validation trainees also in training",
+   "training rows that start later",
+   "training rows not yet due to end"
+  ],
+  "index": [
+   "random",
+   "grouped",
+   "time-ordered"
+  ],
+  "data": [
+   [
+    25951.0,
+    0.3966523439,
+    0.468346539,
+    0.580479124
+   ],
+   [
+    25951.0,
+    0.0,
+    0.4683445854,
+    0.5804735942
+   ],
+   [
+    17254.0,
+    0.3008901891,
+    0.0,
+    0.0
+   ]
+  ]
+ }
+}
