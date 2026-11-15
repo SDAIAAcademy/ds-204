@@ -1,0 +1,15 @@
+{
+ "params": {
+  "n_estimators": 400,
+  "learning_rate": 0.05,
+  "num_leaves": 8,
+  "min_child_samples": 50,
+  "subsample": 0.7,
+  "colsample_bytree": 0.5,
+  "reg_lambda": 20.0,
+  "subsample_freq": 1
+ },
+ "ap_on_the_fund_folds": 0.5248116844970363,
+ "median_trial": 0.5154639250836777,
+ "worst_trial": 0.4932838958824396
+}

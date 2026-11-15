@@ -146,6 +146,7 @@ folds = U.folds(dev)
 r_base = U.score_folds(lambda: U.make_pipeline(U.logistic(), U.BASE), dev, folds, U.BASE)
 r_hist = U.score_folds(lambda: U.make_pipeline(U.logistic()), dev, folds, U.FEATURES)
 U.log_run("1.4", "logistic + history", r_hist, model="logistic regression, C=0.1", features=U.FEATURES)
+U.keep_oof("logistic", dev, r_hist["oof"])
 both = pd.DataFrame({"logistic": r_base["ap"], "logistic + history": r_hist["ap"]}, index=range(1, 6)).rename_axis("fold")
 both["difference"] = both["logistic + history"] - both["logistic"]
 U.keep("d1_4_both", both)

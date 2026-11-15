@@ -219,13 +219,13 @@
   <h2>Every rung is scored on the same five folds</h2>
   <table class="t small">
     <tr><th>Fold</th><th>Validates on</th><th class="num">Training rows</th><th class="num">Validation rows</th><th class="num">Base rate</th></tr>
-    <tr><td>1</td><td>2022, second half</td><td class="num">9,217</td><td class="num">3,902</td><td class="num">11.6%</td></tr>
-    <tr><td>2</td><td>2023, first half</td><td class="num">13,095</td><td class="num">4,266</td><td class="num">10.8%</td></tr>
-    <tr><td>3</td><td>2023, second half</td><td class="num">17,175</td><td class="num">4,326</td><td class="num">11.0%</td></tr>
-    <tr><td>4</td><td>2024, first half</td><td class="num">21,532</td><td class="num">4,649</td><td class="num">13.0%</td></tr>
-    <tr><td>5</td><td>2024, second half</td><td class="num">25,994</td><td class="num">4,627</td><td class="num">12.6%</td></tr>
+    <tr><td>1</td><td>2022, second half</td><td class="num">9,068</td><td class="num">3,902</td><td class="num">11.6%</td></tr>
+    <tr><td>2</td><td>2023, first half</td><td class="num">12,960</td><td class="num">4,266</td><td class="num">10.8%</td></tr>
+    <tr><td>3</td><td>2023, second half</td><td class="num">17,028</td><td class="num">4,326</td><td class="num">11.0%</td></tr>
+    <tr><td>4</td><td>2024, first half</td><td class="num">21,382</td><td class="num">4,649</td><td class="num">13.0%</td></tr>
+    <tr><td>5</td><td>2024, second half</td><td class="num">25,836</td><td class="num">4,627</td><td class="num">12.6%</td></tr>
   </table>
-  <div class="callout note mt"><b>Cohort 2025 is closed.</b> 10,117 rows stay untouched until Day 4. Each fold trains on outcomes known before its half-year began; Day 3 explains why.</div>
+  <div class="callout note mt"><b>Cohort 2025 is closed.</b> 10,117 rows stay untouched until Day 4. Each fold trains on programmes due to end before its half-year began; Day 3 explains why.</div>
   <aside class="notes"><p>From Lab 1.2. Do not teach validation schemes here: the folds are simply the fund's, the same for every model, from U.folds(). Point at the base rates: they differ by fold, so a score on fold 4 cannot be compared with a score on fold 2. Models are compared fold by fold.</p></aside>
 </section>
 
@@ -385,14 +385,14 @@ model = Pipeline([("prepare", prepare),
   <div class="bars">
     <div class="row"><span>Constant</span><div class="bar c-navy" style="--w:23%"></div><span class="val">0.118</span></div>
     <div class="row"><span>Three rules</span><div class="bar c-teal" style="--w:62%"></div><span class="val">0.310</span></div>
-    <div class="row"><span>Logistic regression</span><div class="bar c-cyan" style="--w:100%"></div><span class="val">0.502</span></div>
+    <div class="row"><span>Logistic regression</span><div class="bar c-cyan" style="--w:100%"></div><span class="val">0.501</span></div>
   </div>
   <ul class="bullets mt">
-    <li>Fold scores 0.477 to 0.551; spread 0.031</li>
+    <li>Fold scores 0.477 to 0.545; spread 0.028</li>
     <li>The share of non-completers on the advisers' list rises from 29% to 40%</li>
     <li>Fold 1, with the least training data, scores highest: folds differ in more than size</li>
   </ul>
-  <aside class="notes"><p>From Lab 1.3: mean average precision over the five folds. The gain over the rules, 0.19, is six times the spread and has the same sign on every fold: a real step. Ask why fold 1 is highest although it trains on 9,217 rows; keep the answer open. Day 3 comes back to it: the table changes over the years.</p></aside>
+  <aside class="notes"><p>From Lab 1.3: mean average precision over the five folds. The gain over the rules, 0.19, is seven times the spread and has the same sign on every fold: a real step. Ask why fold 1 is highest although it trains on 9,068 rows; keep the answer open. Day 3 comes back to it: the table changes over the years.</p></aside>
 </section>
 
 <section class="slide" id="regularisation" data-lo="LO2">
@@ -401,9 +401,9 @@ model = Pipeline([("prepare", prepare),
   <div class="cols cols-2">
     <table class="t">
       <tr><th>C (inverse penalty)</th><th class="num">Mean</th><th class="num">Spread</th></tr>
-      <tr><td>0.003, strong penalty</td><td class="num">0.490</td><td class="num">0.025</td></tr>
-      <tr class="hl"><td>0.1</td><td class="num">0.502</td><td class="num">0.031</td></tr>
-      <tr><td>10, weak penalty</td><td class="num">0.502</td><td class="num">0.034</td></tr>
+      <tr><td>0.003, strong penalty</td><td class="num">0.490</td><td class="num">0.023</td></tr>
+      <tr class="hl"><td>0.1</td><td class="num">0.501</td><td class="num">0.028</td></tr>
+      <tr><td>10, weak penalty</td><td class="num">0.501</td><td class="num">0.032</td></tr>
     </table>
     <ul class="bullets">
       <li><b>Regularisation</b> pulls weights towards zero</li>
@@ -420,10 +420,10 @@ model = Pipeline([("prepare", prepare),
   <h2>The harm of preparing outside the folds depends on what the step has read</h2>
   <table class="t">
     <tr><th>Preparation</th><th class="num">Mean score</th><th>Verdict</th></tr>
-    <tr><td>Imputer and scaler inside each fold</td><td class="num">0.5021</td><td>the reference</td></tr>
-    <tr><td>Imputer and scaler fitted on all rows</td><td class="num">0.5022</td><td>wrong, and almost free</td></tr>
-    <tr><td>Provider rate from training rows</td><td class="num">0.5028</td><td>honest</td></tr>
-    <tr class="hl"><td>Provider rate from all rows</td><td class="num">0.5046</td><td>the gain is false</td></tr>
+    <tr><td>Imputer and scaler inside each fold</td><td class="num">0.5013</td><td>the reference</td></tr>
+    <tr><td>Imputer and scaler fitted on all rows</td><td class="num">0.5014</td><td>wrong, and almost free</td></tr>
+    <tr><td>Provider rate from training rows</td><td class="num">0.5018</td><td>honest</td></tr>
+    <tr class="hl"><td>Provider rate from all rows</td><td class="num">0.5041</td><td>the gain is false</td></tr>
   </table>
   <div class="callout warn mt"><b>What goes wrong.</b> A step that never sees the outcome leaks little. A step built from the outcome (a rate per provider, a feature selection, a tuned setting) leaks in proportion to what it read.</div>
   <aside class="notes"><p>From Lab 1.3, step 4. Be honest about the sizes: on 30,000 rows a median read from all rows moves the fourth decimal. The principle is not "the score explodes" but "you cannot know how much without redoing it properly", and the pipeline makes the question disappear. The larger versions of the same fault are on Day 3. Sources: scikit-learn user guide, Common pitfalls and recommended practices.</p></aside>
@@ -435,9 +435,9 @@ model = Pipeline([("prepare", prepare),
   <div class="cols cols-2">
     <table class="t small">
       <tr><th>Input (fold 5)</th><th class="num">Weight</th></tr>
-      <tr><td>Provider P23</td><td class="num">+0.93</td></tr>
-      <tr><td>Provider P38</td><td class="num">−0.82</td></tr>
-      <tr><td><code>absences_w2</code></td><td class="num">+0.75</td></tr>
+      <tr><td>Provider P23</td><td class="num">+0.91</td></tr>
+      <tr><td>Provider P14</td><td class="num">−0.80</td></tr>
+      <tr><td><code>absences_w2</code></td><td class="num">+0.74</td></tr>
       <tr><td><code>aptitude_score</code></td><td class="num">−0.65</td></tr>
     </table>
     <ul class="bullets">
@@ -549,20 +549,20 @@ model = Pipeline([("prepare", prepare),
   <div class="cols cols-2">
     <table class="t small">
       <tr><th>Fold</th><th class="num">Logistic</th><th class="num">With history</th><th class="num">Gain</th></tr>
-      <tr><td>1</td><td class="num">0.551</td><td class="num">0.561</td><td class="num">+0.010</td></tr>
-      <tr><td>2</td><td class="num">0.484</td><td class="num">0.514</td><td class="num">+0.029</td></tr>
-      <tr><td>3</td><td class="num">0.514</td><td class="num">0.526</td><td class="num">+0.012</td></tr>
-      <tr><td>4</td><td class="num">0.477</td><td class="num">0.508</td><td class="num">+0.031</td></tr>
-      <tr><td>5</td><td class="num">0.485</td><td class="num">0.509</td><td class="num">+0.024</td></tr>
-      <tr class="hl"><td>Mean</td><td class="num">0.502</td><td class="num">0.523</td><td class="num">+0.021</td></tr>
+      <tr><td>1</td><td class="num">0.545</td><td class="num">0.557</td><td class="num">+0.012</td></tr>
+      <tr><td>2</td><td class="num">0.483</td><td class="num">0.514</td><td class="num">+0.031</td></tr>
+      <tr><td>3</td><td class="num">0.515</td><td class="num">0.530</td><td class="num">+0.016</td></tr>
+      <tr><td>4</td><td class="num">0.477</td><td class="num">0.509</td><td class="num">+0.031</td></tr>
+      <tr><td>5</td><td class="num">0.486</td><td class="num">0.512</td><td class="num">+0.026</td></tr>
+      <tr class="hl"><td>Mean</td><td class="num">0.501</td><td class="num">0.524</td><td class="num">+0.023</td></tr>
     </table>
     <table class="t small">
       <tr><th>Validation rows</th><th class="num">Without</th><th class="num">With</th></tr>
-      <tr><td>New to the fund: 14,455</td><td class="num">0.486</td><td class="num">0.485</td></tr>
-      <tr><td>Returning: 7,315</td><td class="num">0.522</td><td class="num">0.577</td></tr>
+      <tr><td>New to the fund: 14,455</td><td class="num">0.484</td><td class="num">0.484</td></tr>
+      <tr><td>Returning: 7,315</td><td class="num">0.523</td><td class="num">0.579</td></tr>
     </table>
   </div>
-  <aside class="notes"><p>From Lab 1.4. A gain of 0.021 is smaller than the spread of either model, 0.03, and yet it is positive on all five folds: the first example of why differences are compared as pairs. The second table is a limit for the model card: for a trainee new to the fund, the history columns are zero and the model is exactly as good as before.</p></aside>
+  <aside class="notes"><p>From Lab 1.4. A gain of 0.023 is smaller than the spread of the logistic rung, 0.028, and yet it is positive on all five folds: the first example of why differences are compared as pairs. The second table is a limit for the model card: for a trainee new to the fund, the history columns are zero and the model is exactly as good as before.</p></aside>
 </section>
 
 <section class="slide" id="check-history" data-lo="LO1">
@@ -592,7 +592,7 @@ model = Pipeline([("prepare", prepare),
   <h2>Three things to keep</h2>
   <div class="cols cols-3">
     <div class="card c-teal"><h4>The decision frames the task</h4><p class="small mb0">Target, unit, prediction time, action. They fix the rows (42,556 of 45,000) and the columns (nothing recorded at exit).</p></div>
-    <div class="card c-cyan"><h4>A ladder with a log</h4><p class="small mb0">Constant 0.118, three rules 0.310, logistic 0.502, with history 0.523. Same folds, every run logged, spread beside every mean.</p></div>
+    <div class="card c-cyan"><h4>A ladder with a log</h4><p class="small mb0">Constant 0.118, three rules 0.310, logistic 0.501, with history 0.524. Same folds, every run logged, spread beside every mean.</p></div>
     <div class="card c-coral"><h4>The past only</h4><p class="small mb0">Preparation inside the folds; history from records whose outcome was known; a test that fails when a feature reads the future.</p></div>
   </div>
   <aside class="notes"><p>Ask: which of today's four rungs would you show Dr. Haya Al-Mogren first? The three rules: she can read them, and they are the comparison that gives every later number its meaning.</p></aside>
@@ -601,10 +601,10 @@ model = Pipeline([("prepare", prepare),
 <section class="slide dark" id="next">
   <div class="kicker">Next</div>
   <h1>Day 2 · Trees and challengers</h1>
-  <p class="lead">The number to beat is 0.523. Tomorrow: boosted trees, a budget of 20 trials, an automated challenger, and an interval that says whether a gain is real.</p>
+  <p class="lead">The number to beat is 0.524. Tomorrow: boosted trees, a budget of 20 trials, an automated challenger, and an interval that says whether a gain is real.</p>
   <ul class="bullets">
     <li>Keep <code>artifacts/run_log.csv</code>: tomorrow adds three rungs</li>
-    <li>Guess now: by how much will tuned boosted trees beat 0.523?</li>
+    <li>Guess now: by how much will tuned boosted trees beat 0.524?</li>
   </ul>
   <aside class="notes"><p>Write the guesses down and keep them. Day 2 starts from the reference log, so nobody who struggled today starts behind.</p></aside>
 </section>

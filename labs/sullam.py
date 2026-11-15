@@ -208,6 +208,7 @@ def _calendar(t: pd.DataFrame) -> pd.DataFrame:
     t = t.copy()
     t["start_month"] = t.start_date.dt.month.astype(str)
     t["prediction_date"] = t.start_date + pd.Timedelta(days=14)
+    t["planned_end"] = t.start_date + pd.to_timedelta(t.programme_weeks * 7, unit="D")
     t["block"] = (t.start_date.dt.year - 2021) * 2 + (t.start_date.dt.month >= 7).astype(int)   # half-years, 0 to 9
     t["age_band"] = age_band(t.age).to_numpy()
     return t
@@ -253,17 +254,19 @@ def dev_holdout(t: pd.DataFrame):
 
 
 def folds(dev: pd.DataFrame, n: int = N_FOLDS, first: int | None = None):
-    """The fund's folds: fold k validates on one half-year and trains on the rows whose outcome was known before
-    that half-year began. Returns a list of (train positions, validation positions).
+    """The fund's folds: fold k validates on one half-year and trains on the enrolments whose programme was due to
+    end before that half-year began. Returns a list of (train positions, validation positions).
 
-    With the development cohorts the five validation half-years are 2022 H2 to 2024 H2."""
+    "Due to end", not "ended": an enrolment that is still running has no outcome yet, and keeping only the ones
+    that already ended would keep the early leavers and drop their classmates. With the development cohorts the
+    five validation half-years are 2022 H2 to 2024 H2."""
     block = dev.block.to_numpy()
     last = int(block.max())
     first = last - n + 1 if first is None else first
     out = []
     for b in range(first, last + 1):
         begins = dev.start_date[block == b].min()
-        train = np.flatnonzero((block < b) & (dev.exit_date < begins).to_numpy())
+        train = np.flatnonzero((block < b) & (dev.planned_end < begins).to_numpy())
         valid = np.flatnonzero(block == b)
         out.append((train, valid))
     return out
@@ -467,8 +470,8 @@ def wilson(k: int, n: int, level: float = 0.95) -> tuple[float, float]:
 def day4_predictions() -> pd.DataFrame:
     """The champion's probabilities for Day 4 (data/predictions.csv.gz), joined to the rows they describe.
 
-    split "validation": cohort 2024, scored by a model trained on outcomes known before 2024.
-    split "holdout": cohort 2025, scored by a model trained on outcomes known before 2025."""
+    split "validation": cohort 2024, scored by a model trained on programmes due to end before 2024.
+    split "holdout": cohort 2025, scored by a model trained on programmes due to end before 2025."""
     p = pd.read_csv(DATA / "predictions.csv.gz")
     t = modelling_table()
     return p.merge(t, on="enrolment_id", how="left")
@@ -515,3 +518,44 @@ def split_scores(make_model, table: pd.DataFrame, splits, features=None, new_tra
     per = pd.DataFrame(rows).set_index("fold")
     return {"per_fold": per, "mean": float(per.ap.mean()), "spread": float(per.ap.std(ddof=1)),
             "auc": float(per.auc.mean())}
+
+
+def matrices(table: pd.DataFrame, fold_list, features=None):
+    """For a search that fits many models on the same folds: prepare each fold once.
+
+    Returns one (X_train, y_train, X_valid, y_valid) per fold; the preparation is fitted on the training rows."""
+    features = FEATURES if features is None else list(features)
+    y = table[TARGET].to_numpy()
+    out = []
+    for tr, va in fold_list:
+        prepare = make_pipeline(boosted(), features, scale=False)[:-1]
+        out.append((prepare.fit_transform(table.iloc[tr][features]), y[tr],
+                    prepare.transform(table.iloc[va][features]), y[va]))
+    return out
+
+
+def ap(y, p) -> float:
+    """Average precision: the score of the run log."""
+    from sklearn.metrics import average_precision_score
+    return float(average_precision_score(y, p))
+
+
+def keep_oof(name: str, table: pd.DataFrame, oof) -> None:
+    """Record the validation-fold probabilities of a rung (trainer run only), for the paired bootstrap of Lab 2.4."""
+    if WRITE_REF and not QUICK:
+        REF.mkdir(parents=True, exist_ok=True)
+        seen = np.isfinite(oof)
+        frame = pd.DataFrame({"enrolment_id": table.enrolment_id[seen], "p": np.round(np.asarray(oof)[seen], 5)})
+        frame.to_csv(REF / f"oof_{name}.csv.gz", index=False, lineterminator="\n",
+                     compression={"method": "gzip", "mtime": 0})
+
+
+def oof(names=("champion", "challenger", "logistic")) -> pd.DataFrame:
+    """The reference validation-fold probabilities of the named rungs, with the outcome and the fold of each row."""
+    dev, _ = dev_holdout(modelling_table())
+    out = dev[["enrolment_id", TARGET, "block"]].copy()
+    out["fold"] = out.block - (int(out.block.max()) - N_FOLDS)
+    for n in names:
+        p = pd.read_csv(REF / f"oof_{n}.csv.gz")
+        out[n] = out.enrolment_id.map(p.set_index("enrolment_id").p)
+    return out.dropna(subset=list(names)).drop(columns="block").reset_index(drop=True)

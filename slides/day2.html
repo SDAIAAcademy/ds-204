@@ -1,158 +1,557 @@
 <section class="slide title" id="title" data-auto="title">
-  <aside class="notes">REPLACE: welcome; introduce yourself; one question to the room that calibrates the pace; the rhythm of the day</aside>
+  <aside class="notes"><p>Open with yesterday's bar: the logistic model with history scores 0.524 on the fund's five folds. Read out the guesses the room wrote down for tuned boosted trees and keep them visible until Lab 2.2. Same rhythm: concepts, one checkpoint, a 25-minute lab. Breaks are yours: press B.</p></aside>
 </section>
 
-<section class="slide" id="agenda" data-auto="agenda"></section>
+<section class="slide" id="agenda" data-auto="agenda">
+  <aside class="notes"><p>Three more rungs today, then the question that decides between rungs. Every lab starts from the reference run log, so nobody needs yesterday's files.</p></aside>
+</section>
+
+<section class="slide" id="review-day1" data-lo="LO2">
+  <div class="kicker">Review of Day 1</div>
+  <h2>What did history add, and how do you know?</h2>
+  <div class="quiz" data-type="single" data-lo="LO2">
+    <p class="lead">Two history features lifted the logistic rung from 0.501 to 0.524. The fold spread of that rung is 0.028. Why is the gain still believable?</p>
+    <div class="opts">
+      <div class="opt" data-why="Compares the gain with the base rate, which says nothing about whether the gain is noise">Because 0.023 is large compared with the base rate of 0.12</div>
+      <div class="opt" data-why="Trusts the size of the table: many rows shrink noise but do not show that this difference is outside it">Because the table has 32,000 development rows</div>
+      <div class="opt" data-ok>Because the gain has the same sign on all five folds, where both models met the same rows</div>
+      <div class="opt" data-why="Takes passing the time-travel test as proof of usefulness: the test shows the features read the past only">Because the features passed the time-travel test</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A difference is judged fold by fold. Five gains of +0.012 to +0.031 on the same rows say more than two means and a spread.</div>
+  </div>
+  <aside class="notes"><p>Answer: the third option. Two minutes at most. This is the idea of session 4 in one question: the folds pair the two models, and the pairing removes most of the spread.</p></aside>
+</section>
+
+<section class="slide" id="where-we-are">
+  <div class="kicker">Today</div>
+  <h2>The features are fixed; today the model changes</h2>
+  <div class="ladder" style="--n:4">
+    <div class="rung c-teal off"><b>Frame and baseline</b>Constant 0.118, rules 0.310, logistic 0.524<small>Day 1</small></div>
+    <div class="rung c-cyan on"><b>Trees and challengers</b>Boosted trees, a tuning budget, a paired decision<small>Day 2</small></div>
+    <div class="rung c-coral off"><b>Validation and leakage</b>Three splits, four kinds of leak, an audit<small>Day 3</small></div>
+    <div class="rung c-purple off"><b>Errors and documentation</b>Threshold, calibration, subgroups, model card<small>Day 4</small></div>
+  </div>
+  <aside class="notes"><p>The same 17 features, the same five folds, the same log. Anything that changes a score today is the model or its settings, which is what makes the comparisons clean.</p></aside>
+</section>
 
 <!-- Session 1 -->
 
-<section class="slide section" id="s1" data-auto="section" data-session="1"></section>
-
-<section class="slide" id="s1-idea" data-lo="LO2">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
-  </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+<section class="slide section" id="s1" data-auto="section" data-session="1">
+  <aside class="notes"><p>Participants met trees in FN-105. This session gives boosting in one picture and spends its time on what the defaults do to this table.</p></aside>
 </section>
 
-<section class="slide" id="s1-steps" data-lo="LO2">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
+<section class="slide" id="one-tree" data-lo="LO2">
+  <div class="kicker">The building block</div>
+  <h2>A tree splits the trainees into groups and predicts each group's rate</h2>
   <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+    <div class="step c-teal"><b>Absent 2 days or more?</b>The first question splits all trainees</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>Sponsored by an employer?</b>Asked only inside the "absent" group</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>A leaf</b>The share that did not complete among the trainees who land here</div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <ul class="bullets mt">
+    <li>Every question is "is this column above or below a value?"</li>
+    <li>A second question inside one branch is an <b>interaction</b>, found without anyone writing it</li>
+    <li>Scaling changes nothing: trees only compare</li>
+  </ul>
+  <aside class="notes"><p>The example is not arbitrary. In this table early absence is a strong sign for most trainees and means much less for those sponsored by an employer, who miss days for work and finish anyway. A linear model adds one weight for absence; a tree can ask the second question. That is the stretch of Lab 1.3 answered.</p></aside>
+</section>
+
+<section class="slide" id="boosting" data-lo="LO2">
+  <div class="kicker">Many small trees</div>
+  <h2>Boosting adds one small tree at a time, each correcting the sum so far</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Start from the base rate</li>
+      <li>Fit a small tree to what the current model still gets wrong</li>
+      <li>Add a fraction of it: the <b>learning rate</b></li>
+      <li>Repeat a few hundred times</li>
+      <li>The prediction is the sum of all the trees</li>
+    </ul>
+    <div class="card c-teal"><h4>Why it leads on tables</h4><p class="small mb0">It handles mixed columns, missing values and interactions with little preparation, and it runs on a laptop processor. On medium-sized tables, tuned tree ensembles have matched or beaten deep networks in published comparisons.</p></div>
+  </div>
+  <aside class="notes"><p>LightGBM, XGBoost and CatBoost are three implementations of the same idea; the labs use LightGBM because it is fast on a processor. Sources: Grinsztajn, Oyallon and Varoquaux (2022), a benchmark on 45 tabular datasets of medium size.</p></aside>
+</section>
+
+<section class="slide" id="defaults" data-lo="LO2">
+  <div class="kicker">What ships in the box</div>
+  <h2>Defaults are one setting among thousands, chosen for nobody's table</h2>
+  <table class="t">
+    <tr><th>Setting</th><th>LightGBM default</th><th>What it controls</th></tr>
+    <tr><td>Trees</td><td class="num">100</td><td>How long the sum grows</td></tr>
+    <tr><td>Leaves per tree</td><td class="num">31</td><td>How many interactions one tree can hold</td></tr>
+    <tr><td>Learning rate</td><td class="num">0.1</td><td>How much each tree may correct</td></tr>
+    <tr><td>Rows per leaf, at least</td><td class="num">20</td><td>How small a group may be</td></tr>
+  </table>
+  <div class="callout note mt"><b>31 leaves with 20 rows each.</b> A tree may isolate a group of 20 trainees. With 9,000 training rows and a 12% outcome, that is two or three non-completers per leaf.</div>
+  <aside class="notes"><p>The defaults are sensible starting points for large tables. The point for the lab: a default is a decision somebody else made without seeing your data, so it belongs in the log as its own rung, not as "the boosted model".</p></aside>
+</section>
+
+<section class="slide" id="train-vs-valid" data-lo="LO2">
+  <div class="kicker">Lab 2.1, fold by fold</div>
+  <h2>The training score measures memory; the gap shrinks as the rows grow</h2>
+  <table class="t small">
+    <tr><th>Fold</th><th class="num">Training rows</th><th class="num">Score on training rows</th><th class="num">Score on validation rows</th></tr>
+    <tr><td>1</td><td class="num">9,068</td><td class="num">0.849</td><td class="num">0.501</td></tr>
+    <tr><td>2</td><td class="num">12,960</td><td class="num">0.786</td><td class="num">0.473</td></tr>
+    <tr><td>3</td><td class="num">17,028</td><td class="num">0.739</td><td class="num">0.521</td></tr>
+    <tr><td>4</td><td class="num">21,382</td><td class="num">0.707</td><td class="num">0.507</td></tr>
+    <tr><td>5</td><td class="num">25,836</td><td class="num">0.685</td><td class="num">0.515</td></tr>
+  </table>
+  <div class="callout warn mt"><b>What goes wrong.</b> A report quotes 0.85. It is the model's score on rows it has already seen. Only the validation column goes into the log.</div>
+  <aside class="notes"><p>From Lab 2.1, boosted trees with defaults, average precision. Ask the room what the gap would be with 100,000 training rows: smaller still. Overfitting is not a property of the model alone but of the model and the amount of data together.</p></aside>
+</section>
+
+<section class="slide" id="more-trees" data-lo="LO2">
+  <div class="kicker">Follow the trees</div>
+  <h2>Past 50 trees, each new tree helps the training rows and hurts the others</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th class="num">Trees</th><th class="num">Training</th><th class="num">Validation</th></tr>
+      <tr><td class="num">10</td><td class="num">0.519</td><td class="num">0.492</td></tr>
+      <tr><td class="num">25</td><td class="num">0.559</td><td class="num">0.507</td></tr>
+      <tr class="hl"><td class="num">50</td><td class="num">0.615</td><td class="num">0.517</td></tr>
+      <tr><td class="num">100</td><td class="num">0.685</td><td class="num">0.515</td></tr>
+      <tr><td class="num">200</td><td class="num">0.775</td><td class="num">0.508</td></tr>
+      <tr><td class="num">400</td><td class="num">0.897</td><td class="num">0.500</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>Fold 5, default trees of 31 leaves</li>
+      <li>The training score never stops rising</li>
+      <li>The validation score peaks early and declines</li>
+      <li>The peak depends on the other settings: smaller trees peak later</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 2.1, step 3. The tempting move is to pick 50 trees because the validation score is best there. That is tuning on the validation fold, and it is the subject of the next session. The stretch of the lab does it properly, on a part of the training rows.</p></aside>
+</section>
+
+<section class="slide" id="defaults-vs-logistic" data-lo="LO2">
+  <div class="kicker">The rung, measured</div>
+  <h2>With defaults, boosted trees score below the logistic model</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Fold</th><th class="num">Logistic + history</th><th class="num">Boosted, defaults</th><th class="num">Difference</th></tr>
+      <tr><td>1</td><td class="num">0.557</td><td class="num">0.501</td><td class="num">−0.056</td></tr>
+      <tr><td>2</td><td class="num">0.514</td><td class="num">0.473</td><td class="num">−0.041</td></tr>
+      <tr><td>3</td><td class="num">0.530</td><td class="num">0.521</td><td class="num">−0.009</td></tr>
+      <tr><td>4</td><td class="num">0.509</td><td class="num">0.507</td><td class="num">−0.002</td></tr>
+      <tr><td>5</td><td class="num">0.512</td><td class="num">0.515</td><td class="num">+0.004</td></tr>
+      <tr class="hl"><td>Mean</td><td class="num">0.524</td><td class="num">0.503</td><td class="num">−0.021</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>A more flexible model is not automatically a rung up</li>
+      <li>The loss is largest where training rows are fewest</li>
+      <li>It goes into the log as it is</li>
+      <li>The honest next step: tune, under a budget</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 2.1. This is the slide to dwell on: most participants expect the trees to win. The pattern down the folds, from −0.056 to +0.004, says the defaults are too flexible for 9,000 rows and about right for 26,000.</p></aside>
+</section>
+
+<section class="slide" id="importance" data-lo="LO2 LO1">
+  <div class="kicker">What does the model use?</div>
+  <h2>Two importance scores, two different answers for the same column</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Column</th><th class="num">Share of gain</th><th class="num">Score lost when shuffled</th></tr>
+      <tr><td><code>absences_w2</code></td><td class="num">39%</td><td class="num">0.251</td></tr>
+      <tr><td><code>aptitude_score</code></td><td class="num">16%</td><td class="num">0.076</td></tr>
+      <tr><td><code>prior_noncompletions</code></td><td class="num">5%</td><td class="num">0.041</td></tr>
+      <tr class="hl"><td><code>provider_id</code></td><td class="num">11%</td><td class="num">0.029</td></tr>
+      <tr class="hl"><td><code>distance_km</code></td><td class="num">8%</td><td class="num">0.007</td></tr>
+    </table>
+    <ul class="bullets">
+      <li><b>Gain</b> is counted on training rows: it rewards columns with many values</li>
+      <li><b>Permutation</b> is measured on validation rows, one column at a time</li>
+      <li>Columns that carry the same information share the credit</li>
+      <li>Neither gives a direction or a cause</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 2.1, fold 5. Distance takes 8% of the gain and costs 0.007 when shuffled: many splits on a continuous column, little that generalises. Importance has one more use, tomorrow: a column that carries far more of the score than it should is the first suspect in a leakage audit. Sources: scikit-learn user guide, Permutation feature importance.</p></aside>
+</section>
+
+<section class="slide" id="check-training-score" data-lo="LO2">
+  <div class="kicker">Checkpoint</div>
+  <h2>What does a high training score tell you?</h2>
+  <div class="quiz" data-type="single" data-lo="LO2">
+    <p class="lead">A boosted model scores 0.85 on its 9,068 training rows and 0.50 on the validation rows of the same fold. What do you conclude?</p>
+    <div class="opts">
+      <div class="opt" data-ok>The model has memorised part of the training rows; 0.50 is the number to log</div>
+      <div class="opt" data-why="Averages memory and generalisation: the training score is not an estimate of anything the advisers will see">The true score is about halfway, near 0.67</div>
+      <div class="opt" data-why="Reads a large gap as a leak: leakage inflates the validation score, and here it is the training score that is high">The validation rows must contain a leak</div>
+      <div class="opt" data-why="Blames the validation fold: its rows are simply the ones the model has not seen, which is their purpose">The validation fold is unusually hard and should be replaced</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A training score measures how flexible the model is. Only rows the model has not seen estimate how it will do.</div>
+  </div>
+  <aside class="notes"><p>Answer: the first option. If the room picks the leak: good instinct, wrong direction. A leak makes a validation score too good. A high training score with an ordinary validation score is plain overfitting.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-2-1" data-auto="lab" data-lab="2.1">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-tutor. Two short exercises. Typical problems: scoring the pipeline on prepared arrays in task 1 (pass the raw rows to U.predict), and forgetting num_iteration in task 3. The permutation step takes about half a minute. The lab reads the logistic fold scores from the reference log; no earlier lab is needed.</p></aside>
 </section>
 
 <!-- Session 2 -->
 
-<section class="slide section" id="s2" data-auto="section" data-session="2"></section>
-
-<section class="slide" id="s2-idea" data-lo="LO2">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
-  </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+<section class="slide section" id="s2" data-auto="section" data-session="2">
+  <aside class="notes"><p>The idea that carries the session: a score that was used to choose something is no longer a clean estimate. Nested folds are the answer, and a stated budget is its companion.</p></aside>
 </section>
 
-<section class="slide" id="s2-steps" data-lo="LO2">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="settings-that-matter" data-lo="LO2">
+  <div class="kicker">What to tune</div>
+  <h2>A few settings trade flexibility against stability</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>How much is learnt</h4><p class="small mb0">The number of trees and the learning rate. They work as a pair: a smaller rate needs more trees.</p></div>
+    <div class="card c-cyan"><h4>How complex each tree is</h4><p class="small mb0">Leaves per tree, and the fewest rows a leaf may hold. Fewer leaves and larger leaves: less to memorise.</p></div>
+    <div class="card c-coral"><h4>How much is held back</h4><p class="small mb0">Each tree sees a share of the rows and of the inputs; a penalty shrinks the leaf values.</p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <p class="lead mt">Lab 2.2 searches seven settings with 2,592 combinations. The budget is 20 of them.</p>
+  <aside class="notes"><p>The search space is in the notebook: 100 to 400 trees, a rate of 0.02 to 0.1, 4 to 31 leaves, 20 to 200 rows per leaf, two sampling shares and a penalty. Sources: LightGBM documentation, Parameters tuning.</p></aside>
+</section>
+
+<section class="slide" id="budget" data-lo="LO2">
+  <div class="kicker">The rule</div>
+  <h2>State the budget before the search, and draw the trials at random</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>A <b>budget</b>: 20 trials, fixed in advance, with a seed</li>
+      <li><b>Random search</b>: each trial draws every setting independently</li>
+      <li>With a few settings that matter and several that hardly do, random draws cover the important ones better than a grid</li>
+      <li>Every trial is kept, the poor ones too</li>
+    </ul>
+    <div class="card c-purple"><h4>Why a budget is about honesty</h4><p class="small mb0">Each trial is another look at the validation rows. A search that stops "when the score looks good" has no defined number of looks, and its best score cannot be interpreted.</p></div>
+  </div>
+  <aside class="notes"><p>Smarter searches exist (Bayesian optimisation, successive halving) and automated tools use them. They change how the budget is spent, not the need for one. Sources: Bergstra and Bengio (2012).</p></aside>
+</section>
+
+<section class="slide" id="choosing-flatters" data-lo="LO2 LO1">
+  <div class="kicker">Why tuning needs its own rows</div>
+  <h2>A score that chose the winner flatters the winner</h2>
+  <table class="t">
+    <tr><th>Rows used to choose among 20 trials</th><th class="num">Winner's score there</th><th class="num">Same model, fresh rows</th><th class="num">Flattery</th></tr>
+    <tr><td>10,885</td><td class="num">0.521</td><td class="num">0.522</td><td class="num">−0.001</td></tr>
+    <tr><td>2,000</td><td class="num">0.529</td><td class="num">0.519</td><td class="num">+0.010</td></tr>
+    <tr class="hl"><td>500</td><td class="num">0.540</td><td class="num">0.515</td><td class="num">+0.025</td></tr>
+  </table>
+  <div class="callout warn mt"><b>What goes wrong.</b> The best of 20 is partly the best and partly the luckiest. The fewer rows choose, and the more trials compete, the larger the lucky part.</div>
+  <aside class="notes"><p>From Lab 2.2, step 5: the 20 trials of the final search, the winner picked on a random part of the validation rows, averaged over 40 repeats. With ten thousand rows the effect vanishes; with 500 it is twice the fold spread of the champion. You cannot know in advance which case you are in, which is why the choice and the report use different rows.</p></aside>
+</section>
+
+<section class="slide" id="nested" data-lo="LO2 LO3">
+  <div class="kicker">Nested validation</div>
+  <h2>Inner folds choose, the outer fold reports</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · Outer fold</b>Set its validation half-year aside</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>2 · Inner folds</b>Inside the training part, score 20 trials on two later half-years</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>3 · Refit</b>The best settings, on the whole training part</div>
+    <div class="arrow">→</div>
+    <div class="step c-purple"><b>4 · Report</b>One score on the half-year no trial has seen</div>
+  </div>
+  <ul class="bullets mt">
+    <li>Repeated for each of the five outer folds: five searches, five scores</li>
+    <li>What is validated is the <b>procedure</b> "search 20 trials, then fit"</li>
+    <li>The inner folds are built like the outer ones: later half-years</li>
+  </ul>
+  <aside class="notes"><p>This costs five searches in place of one: 140 seconds on a laptop for this table. The inner score and the outer score sit on different rows, so they are not compared as numbers: one chooses, the other reports. Sources: scikit-learn example, Nested versus non-nested cross-validation.</p></aside>
+</section>
+
+<section class="slide" id="nested-result" data-lo="LO2">
+  <div class="kicker">Lab 2.2, measured</div>
+  <h2>Twenty trials gain 0.026 over defaults, on every fold</h2>
+  <table class="t small">
+    <tr><th>Fold</th><th class="num">Defaults</th><th class="num">Tuned (nested)</th><th class="num">Gain</th><th>Settings chosen: trees · leaves · rate</th></tr>
+    <tr><td>1</td><td class="num">0.501</td><td class="num">0.542</td><td class="num">+0.041</td><td>200 · 8 · 0.05</td></tr>
+    <tr><td>2</td><td class="num">0.473</td><td class="num">0.517</td><td class="num">+0.044</td><td>400 · 4 · 0.05</td></tr>
+    <tr><td>3</td><td class="num">0.521</td><td class="num">0.540</td><td class="num">+0.019</td><td>400 · 4 · 0.05</td></tr>
+    <tr><td>4</td><td class="num">0.507</td><td class="num">0.519</td><td class="num">+0.013</td><td>400 · 8 · 0.05</td></tr>
+    <tr><td>5</td><td class="num">0.515</td><td class="num">0.526</td><td class="num">+0.011</td><td>400 · 4 · 0.10</td></tr>
+    <tr class="hl"><td>Mean · spread</td><td class="num">0.503 · 0.019</td><td class="num">0.529 · 0.012</td><td class="num">+0.026</td><td>small trees, every time</td></tr>
+  </table>
+  <p class="lead mt">Every fold chose trees of 4 or 8 leaves. The default is 31.</p>
+  <aside class="notes"><p>From Lab 2.2. The folds chose different settings and the same kind: small trees, more of them. Nobody should ask "which of the five is the model": the nested score describes the procedure. The fund's settings come from one more search on all development rows: 400 trees, 8 leaves, rate 0.05, at least 50 rows per leaf. That model is the champion from here on.</p></aside>
+</section>
+
+<section class="slide" id="tuned-vs-logistic" data-lo="LO2 LO4">
+  <div class="kicker">The ladder so far</div>
+  <h2>The tuned trees are 0.005 above the logistic model</h2>
+  <div class="bars">
+    <div class="row"><span>Three rules</span><div class="bar c-navy" style="--w:59%"></div><span class="val">0.310</span></div>
+    <div class="row"><span>Logistic + history</span><div class="bar c-teal" style="--w:99%"></div><span class="val">0.524</span></div>
+    <div class="row"><span>Boosted, defaults</span><div class="bar c-coral" style="--w:95%"></div><span class="val">0.503</span></div>
+    <div class="row"><span>Boosted, 20 trials</span><div class="bar c-purple" style="--w:100%"></div><span class="val">0.529</span></div>
+  </div>
+  <ul class="bullets mt">
+    <li>Against the logistic rung: ahead on four folds, behind by 0.015 on fold 1</li>
+    <li>A mean gain of 0.005 with fold spreads of 0.012 and 0.020</li>
+    <li>Is that a gain? Session 4 gives the tool to answer</li>
+  </ul>
+  <aside class="notes"><p>From Lab 2.2. Return to the guesses of yesterday evening: most rooms guess a gain of 0.05 or more. This table is mostly additive, with a handful of interactions, and the logistic model with history captures most of what there is. Do not resolve the question here; let it stand until the paired comparison.</p></aside>
+</section>
+
+<section class="slide" id="check-nested" data-lo="LO1">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which score may be reported?</h2>
+  <div class="quiz" data-type="single" data-lo="LO1">
+    <p class="lead">An analyst tries 200 settings, scores each on the same five folds and reports the highest mean, 0.547. What is wrong with the number?</p>
+    <div class="opts">
+      <div class="opt" data-why="Blames the amount of search: more trials are fine when the choice and the report use different rows">200 trials are too many for a table of this size</div>
+      <div class="opt" data-why="Blames the method of search: a grid would have the same fault, because the fault is where the winner is scored">Random search is unreliable; a grid would give the true score</div>
+      <div class="opt" data-why="Expects the folds themselves to be at fault: they are fine for scoring one model fixed in advance">Five folds are too few to score any model</div>
+      <div class="opt" data-ok>The folds that chose the winner also score it, so part of 0.547 is luck</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The best of 200 on a set of rows is biased upward on those rows. Choose on inner folds; report on rows no trial has seen.</div>
+  </div>
+  <aside class="notes"><p>Answer: the fourth option. Name the kind of fault: it is preparation leakage in the wide sense, a choice fitted on the rows later used to score. Tomorrow's taxonomy has a box for it.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-2-2" data-auto="lab" data-lab="2.2">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-tutor. One exercise: the body of the trial loop. The nested run takes two to three minutes on a laptop and longer on a small hosted runtime: start it, then discuss the trial table of task 2 while it runs. Quick mode (DS204_QUICK=1) uses 4 trials. The lab reads the defaults and the logistic fold scores from the reference log.</p></aside>
 </section>
 
 <!-- Session 3 -->
 
-<section class="slide section" id="s3" data-auto="section" data-session="3"></section>
-
-<section class="slide" id="s3-idea" data-lo="LO4">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
-  </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+<section class="slide section" id="s3" data-auto="section" data-session="3">
+  <aside class="notes"><p>The champion needs an opponent it did not choose itself. Two kinds exist today: tools that automate what you did in Lab 2.2, and models pretrained on other tables.</p></aside>
 </section>
 
-<section class="slide" id="s3-steps" data-lo="LO4">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="two-challengers" data-lo="LO4">
+  <div class="kicker">Two kinds of challenger</div>
+  <h2>One automates the search; the other arrives already trained</h2>
+  <div class="cols cols-2">
+    <div class="card c-teal"><h4>Automated machine learning</h4><p class="small mb0">You give the training rows, a metric and a time limit. The tool prepares the columns, trains several model families, tunes them and blends the best. Example: AutoGluon Tabular. It trains on your machine, on your rows only.</p></div>
+    <div class="card c-purple"><h4>A tabular foundation model</h4><p class="small mb0">A network pretrained on millions of synthetic tables. It reads your training rows as context and predicts the new rows in one pass, with no tuning. Example: TabPFN. Published results are strongest on small tables.</p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <div class="callout note mt"><b>Both are challengers, not shortcuts.</b> Each has to stand on the same folds as the champion, in the same log.</div>
+  <aside class="notes"><p>The lab runs the first kind. The second kind is discussed and not run: its weights are a download of a pretrained model, which the labs of this course avoid, and its licence needs the reading of the next slide. Sources: AutoGluon documentation, Tabular essentials; Hollmann and others (2025).</p></aside>
+</section>
+
+<section class="slide" id="licence-check" data-lo="LO4">
+  <div class="kicker">Before any score</div>
+  <h2>Three questions decide whether a challenger may be used at all</h2>
+  <table class="t small">
+    <tr><th>Question</th><th>AutoGluon Tabular</th><th>TabPFN (checked November 2026)</th></tr>
+    <tr><td><b>Licence of the code</b></td><td>Apache 2.0</td><td>Apache 2.0</td></tr>
+    <tr><td><b>Licence of the weights</b></td><td>None: it trains from your rows</td><td>Separate from the code; recent versions are released for non-commercial use</td></tr>
+    <tr><td><b>Where do the rows go?</b></td><td>Nowhere</td><td>Nowhere when run locally; to the provider when its hosted service is used</td></tr>
+  </table>
+  <div class="callout warn mt"><b>What goes wrong.</b> A pretrained model wins the contest, and three weeks later someone reads the licence of its weights. Read it first, on the official page, on the day you use it.</div>
+  <aside class="notes"><p>The facts in the third column come from the project's own repository and change with every release: this is the kind of slide to re-verify each time the course runs. For the fund, the second question is also a data protection question: trainee records may not leave the fund's machines without Maram Al-Rasheed's agreement, whatever the score. Sources: TabPFN repository, licence section; AutoGluon package metadata.</p></aside>
+</section>
+
+<section class="slide" id="fair-contest" data-lo="LO4">
+  <div class="kicker">A fair contest</div>
+  <h2>Same folds, same features, same time, written down first</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li><b>Folds:</b> the fund's five, forward in time</li>
+      <li><b>Features:</b> the champion's 17, no others</li>
+      <li><b>Time:</b> what the champion's search used, 140 seconds for five folds, so 28 seconds a fold</li>
+      <li><b>Metric:</b> average precision, told to the tool</li>
+      <li><b>Configuration:</b> one preset, fixed before the run</li>
+    </ul>
+    <div class="card c-coral"><h4>What a contest without rules measures</h4><p class="small mb0">Give one side an hour and the other a minute, or let one side see a column the other did not, and the result says who was favoured, not which approach is better.</p></div>
+  </div>
+  <aside class="notes"><p>The configuration is the first cell of Lab 2.3 and it is saved with the result. In the capstone, the rubric line "models and comparison" asks for exactly this: identical folds and a stated budget.</p></aside>
+</section>
+
+<section class="slide" id="tool-own-score" data-lo="LO4 LO3">
+  <div class="kicker">Read what it built</div>
+  <h2>The tool's own score comes from a split it chose by itself</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Built on fold 5</th><th class="num">Its own validation score</th></tr>
+      <tr class="hl"><td>Weighted blend</td><td class="num">0.491</td></tr>
+      <tr><td>LightGBM, three variants</td><td class="num">0.483 to 0.484</td></tr>
+      <tr><td>Random forests, two</td><td class="num">0.447 to 0.455</td></tr>
+      <tr><td>Extra trees, two</td><td class="num">0.443 to 0.445</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>It set aside a <b>random</b> part of the training rows to choose and weight its models</li>
+      <li>The fund validates forward in time</li>
+      <li>On the fund's fold 5 the same blend scores 0.518</li>
+      <li>Log your score, never the tool's</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 2.3. The two numbers differ because they sit on different rows, not because one is wrong. The stretch hands the tool the fund's inner split in place of its own. Tomorrow's first session is about exactly this: a tool cannot know that your rows have an order and that trainees repeat unless you tell it.</p></aside>
+</section>
+
+<section class="slide" id="challenger-result" data-lo="LO4">
+  <div class="kicker">Lab 2.3, measured</div>
+  <h2>On equal terms the challenger lands close to the champion</h2>
+  <table class="t small">
+    <tr><th>Fold</th><th class="num">Champion</th><th class="num">Challenger</th><th class="num">Challenger − champion</th></tr>
+    <tr><td>1</td><td class="num">0.542</td><td class="num">0.534</td><td class="num">−0.009</td></tr>
+    <tr><td>2</td><td class="num">0.517</td><td class="num">0.497</td><td class="num">−0.021</td></tr>
+    <tr><td>3</td><td class="num">0.540</td><td class="num">0.541</td><td class="num">+0.001</td></tr>
+    <tr><td>4</td><td class="num">0.519</td><td class="num">0.521</td><td class="num">+0.001</td></tr>
+    <tr><td>5</td><td class="num">0.526</td><td class="num">0.518</td><td class="num">−0.008</td></tr>
+    <tr class="hl"><td>Mean</td><td class="num">0.529</td><td class="num">0.522</td><td class="num">−0.007</td></tr>
+  </table>
+  <p class="lead mt">Ahead on two folds, behind on three. Not yet a decision.</p>
+  <aside class="notes"><p>From Lab 2.3: AutoGluon Tabular, preset medium_quality, 28 seconds a fold, tree models only because no neural network library is installed in the lab environment. With a longer limit or a larger preset the result may differ, and that would be a different contest with a different budget for the champion too.</p></aside>
+</section>
+
+<section class="slide" id="check-contest" data-lo="LO4">
+  <div class="kicker">Checkpoint</div>
+  <h2>What makes this contest unfair?</h2>
+  <div class="quiz" data-type="single" data-lo="LO4">
+    <p class="lead">A team reports that an automated tool beats their tuned model, 0.561 to 0.529. Which detail makes the comparison worthless?</p>
+    <div class="opts">
+      <div class="opt" data-why="Objects to a difference in kind: a challenger is allowed to be a blend, that is the point of testing it">The tool blends several models and the champion is one model</div>
+      <div class="opt" data-ok>The tool's 0.561 is its own internal validation score; the champion's 0.529 is on the fund's folds</div>
+      <div class="opt" data-why="Objects to the metric being shared: both sides should be optimised for the metric that is reported">The tool was told to optimise average precision</div>
+      <div class="opt" data-why="Objects to equal budgets: the same time limit is what makes the contest fair">Both ran with a limit of 28 seconds a fold</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Two scores compare only on the same rows. The tool's own number sits on a random split it made inside the training rows.</div>
+  </div>
+  <aside class="notes"><p>Answer: the second option. The three wrong options are all things that are fine, which is the point: the only thing that is not negotiable is that both sides are scored on the same rows.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-2-3" data-auto="lab" data-lab="2.3">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-tutor. The five folds take about two and a half minutes at 28 seconds each. If the tool is not installed, or on a runtime where it does not import, the notebook continues on the trainer's reference run and says so. The tool reports model families that are not installed; the notebook silences those lines. Quick mode uses 12 seconds a fold.</p></aside>
 </section>
 
 <!-- Session 4 -->
 
-<section class="slide section" id="s4" data-auto="section" data-session="4"></section>
-
-<section class="slide" id="s4-idea" data-lo="LO4">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
-  </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+<section class="slide section" id="s4" data-auto="section" data-session="4">
+  <aside class="notes"><p>DS-201 taught intervals and the bootstrap on survey and repair data. This session uses both for one purpose: deciding between two models.</p></aside>
 </section>
 
-<section class="slide" id="s4-steps" data-lo="LO4">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="pairs" data-lo="LO4">
+  <div class="kicker">The key idea</div>
+  <h2>Two models on the same folds give pairs, and pairs are compared by their differences</h2>
+  <div class="cols cols-2 mid">
+    <div class="bars">
+      <div class="row"><span>Spread of the champion's folds</span><div class="bar c-teal" style="--w:69%"></div><span class="val">0.012</span></div>
+      <div class="row"><span>Spread of the challenger's folds</span><div class="bar c-coral" style="--w:100%"></div><span class="val">0.017</span></div>
+      <div class="row"><span>Spread of the five differences</span><div class="bar c-purple" style="--w:52%"></div><span class="val">0.009</span></div>
+    </div>
+    <ul class="bullets">
+      <li>A hard half-year lowers both models</li>
+      <li>The difference within a fold removes that shared part</li>
+      <li>So the differences vary less than either score</li>
+      <li>Compare two means with their spreads and you throw the pairing away</li>
+    </ul>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>From Lab 2.4. Yesterday's history features were the cleaner example: a gain of 0.023 inside a spread of 0.028, and positive on every fold. The pairing only exists because both models were scored on identical folds, which is why the ladder insisted on them from the first rung.</p></aside>
+</section>
+
+<section class="slide" id="t-interval" data-lo="LO4">
+  <div class="kicker">An interval on the mean difference</div>
+  <h2>Five differences give an honest, wide interval</h2>
+  <div class="cols cols-2 mid">
+    <div class="stat center"><div class="big">−0.007</div><div class="lbl">mean difference, challenger minus champion; 95% interval −0.018 to +0.004</div></div>
+    <ul class="bullets">
+      <li>Mean ± <i>t</i> × (spread of the differences ÷ √5)</li>
+      <li>With 5 folds the multiplier is 2.78, not 1.96</li>
+      <li>The interval contains zero: no difference is shown</li>
+      <li>The folds share training rows, so the true uncertainty is, if anything, larger</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 2.4: differences −0.009, −0.021, +0.001, +0.001, −0.008. The t interval treats the five folds as a sample of the half-years the model might meet. It is the simplest defensible interval and the one the course outcome asks for.</p></aside>
+</section>
+
+<section class="slide" id="paired-bootstrap" data-lo="LO4">
+  <div class="kicker">A second opinion</div>
+  <h2>The paired bootstrap resamples trainees, not folds</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Both models scored the same 21,770 validation rows</li>
+      <li>Draw rows again with replacement, inside each fold</li>
+      <li>Score <b>both</b> models on the same draw</li>
+      <li>Keep the difference; repeat 1,000 times</li>
+    </ul>
+    <table class="t small">
+      <tr><th>Method</th><th>95% interval of the difference</th></tr>
+      <tr><td><i>t</i> over five folds</td><td>−0.018 to +0.004</td></tr>
+      <tr><td>Paired bootstrap over rows</td><td>−0.013 to −0.002</td></tr>
+    </table>
+  </div>
+  <div class="callout note mt"><b>Two questions.</b> The first asks what other half-years would show, the second what other trainees in these half-years would show. Report both when they differ.</div>
+  <aside class="notes"><p>From Lab 2.4. Here they differ, mildly: the bootstrap is narrower and excludes zero, the t interval does not. Within these five half-years the champion is slightly ahead; whether that holds for another half-year, five folds cannot say. Neither interval comes near the minimum effect, so the decision is the same. This is the bootstrap of DS-201, with the one new idea that both models are scored on the same draw.</p></aside>
+</section>
+
+<section class="slide" id="minimum-effect" data-lo="LO4">
+  <div class="kicker">The decision rule</div>
+  <h2>State the smallest gain worth having before you look</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>Adopt the challenger</h4><p class="small mb0">The whole interval lies above the minimum effect.</p></div>
+    <div class="card c-coral"><h4>Keep the champion</h4><p class="small mb0">The whole interval lies below the minimum effect.</p></div>
+    <div class="card c-purple"><h4>Not shown</h4><p class="small mb0">The interval straddles it. The rule says what happens then: the simpler model stays.</p></div>
+  </div>
+  <p class="lead mt">For the fund: +0.01 average precision, agreed with Dr. Haya Al-Mogren before the contest.</p>
+  <aside class="notes"><p>The minimum effect is a business judgment, not a statistical one: a blend of seven models costs more to explain, to serve and to maintain than one model, and a gain below 0.01 changes almost nobody's place on a list of 800. Stated after the result, a minimum effect tends to land just below whatever was measured.</p></aside>
+</section>
+
+<section class="slide" id="decision-line" data-lo="LO4">
+  <div class="kicker">The one-line decision</div>
+  <h2>Difference, interval, minimum effect, decision</h2>
+  <div class="callout tip"><b>The line of Lab 2.4.</b> On the same five folds the challenger differs from the champion by −0.007 average precision (95% interval −0.018 to +0.004; paired bootstrap −0.013 to −0.002). Minimum effect stated in advance: +0.01. Decision: keep the champion.</div>
+  <ul class="bullets mt">
+    <li>Four parts, in this order, in the capstone README</li>
+    <li>"Keep the champion" is shown here: the whole interval is below +0.01</li>
+    <li>It is a statement about this contest: 28 seconds a fold, one preset</li>
+  </ul>
+  <aside class="notes"><p>From Lab 2.4. A reviewer can check each part: the difference from the log, the interval from five numbers, the minimum effect from the note written before the run.</p></aside>
+</section>
+
+<section class="slide" id="champion-vs-logistic" data-lo="LO2 LO4">
+  <div class="kicker">The same tool, pointed at our own ladder</div>
+  <h2>The tuned trees are not shown to beat the logistic model</h2>
+  <div class="cols cols-2 mid">
+    <div class="stat center"><div class="big">+0.005</div><div class="lbl">champion minus logistic with history; 95% interval −0.010 to +0.019</div></div>
+    <ul class="bullets">
+      <li>The interval contains zero and the minimum effect</li>
+      <li>Verdict by the rule: <b>not shown</b></li>
+      <li>The fund keeps both in view; Day 4 compares what else they offer</li>
+      <li>A result worth reporting, not hiding</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From the stretch of Lab 2.4. Ask the room what they would tell the director. A fair answer: the boosted model is the champion of the ladder by 0.005, which five folds cannot distinguish from nothing; the logistic model is simpler to read and to explain to an adviser; the course continues with the boosted model because the entry's remaining labs are about it, and the model card says plainly that a linear model does as well within the uncertainty.</p></aside>
+</section>
+
+<section class="slide" id="check-interval" data-lo="LO4">
+  <div class="kicker">Checkpoint</div>
+  <h2>What does this interval decide?</h2>
+  <div class="quiz" data-type="single" data-lo="LO4">
+    <p class="lead">A challenger's mean paired difference is +0.006, with a 95% interval from −0.004 to +0.016. The minimum effect stated in advance is +0.01. What is the decision?</p>
+    <div class="opts">
+      <div class="opt" data-why="Reads the mean alone: +0.006 is positive, but the interval reaches below zero and below the minimum effect">Adopt the challenger: its mean difference is positive</div>
+      <div class="opt" data-why="Reads an interval containing zero as proof of equality: the data are also compatible with a gain of +0.016">The two models are shown to be equal</div>
+      <div class="opt" data-ok>Not shown: the interval straddles the minimum effect, so the champion stays</div>
+      <div class="opt" data-why="Lowers the bar after seeing the result: a minimum effect moved to fit the data is no longer a rule">Adopt it, with the minimum effect lowered to +0.005</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The interval holds values on both sides of +0.01. The rule fixed in advance says the simpler model stays until more folds or more rows settle it.</div>
+  </div>
+  <aside class="notes"><p>Answer: the third option. Spend a moment on the second option: "not shown to differ" and "shown to be equal" are different statements, and only a narrow interval around zero supports the second.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-2-4" data-auto="lab" data-lab="2.4">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-tutor. Three short exercises: the differences, the t interval, the decision rule. The bootstrap runs 1,000 draws in under a minute. The lab is the evidence for the fourth course outcome: a paired comparison with an interval and a one-line decision. It starts from the reference log and reference probabilities, so nobody needs Labs 2.2 or 2.3.</p></aside>
 </section>
+
+<!-- Close -->
 
 <section class="slide" id="wrap-up">
-  <div class="kicker">Day 2 · wrap-up</div>
+  <div class="kicker">Day 2</div>
   <h2>Three things to keep</h2>
   <div class="cols cols-3">
-    <div class="card c-teal"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-coral"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-purple"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
+    <div class="card c-teal"><h4>Defaults are a rung, not the model</h4><p class="small mb0">Boosted trees with defaults scored 0.503, below the logistic rung at 0.524. Twenty trials in nested folds reached 0.529.</p></div>
+    <div class="card c-cyan"><h4>Choose and report on different rows</h4><p class="small mb0">A winner picked on 500 rows was flattered by 0.025. Inner folds choose; the outer fold reports.</p></div>
+    <div class="card c-coral"><h4>A difference needs an interval</h4><p class="small mb0">Challenger −0.007 (−0.018 to +0.004): keep the champion. Champion over logistic +0.005 (−0.010 to +0.019): not shown.</p></div>
   </div>
+  <aside class="notes"><p>Ask: which line of today's log surprised you most? Usually the defaults. Then: which sentence would you be least comfortable saying to the director? Usually the last one, and it is the most useful.</p></aside>
 </section>
 
-<section class="slide dark" id="next" data-label="Next">
+<section class="slide dark" id="next">
   <div class="kicker">Next</div>
-  <h2>Day 3: Validation and leakage</h2>
-  <p class="lead">REPLACE: what participants prepare before then; unfinished labs can be finished at home</p>
-  <aside class="notes">REPLACE: accounts, installs or reading participants need before the next unit</aside>
+  <h1>Day 3 · Validation and leakage</h1>
+  <p class="lead">Every score so far used the fund's folds. Tomorrow you find out why they are built that way, what a random split would have told you, and how to audit a score that is too good.</p>
+  <ul class="bullets">
+    <li>Loay Al-Kadi's notebook reports a score above 0.9 on this table</li>
+    <li>Tomorrow's first attempts at the split and the leak hunt are without AI assistance</li>
+  </ul>
+  <aside class="notes"><p>Day 3 runs on supplied tables and the champion's saved settings, so nobody who struggled today starts behind.</p></aside>
 </section>
