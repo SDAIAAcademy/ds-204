@@ -1,0 +1,451 @@
+{
+  "$schema": "https://sdaiaacademy.github.io/engine/schemas/course.schema.json",
+  "engine": "1",
+  "id": "ds-204",
+  "code": "DS-204",
+  "version": "2027.1.0",
+  "lang": "en",
+  "title": {
+    "en": "Machine Learning for Tabular Data: Baselines and Validation",
+    "ar": "تعلم الآلة للبيانات الجدولية: خطوط الأساس والتحقق من الصحة"
+  },
+  "tagline": "REPLACE: one line under the title: what participants can do after the course",
+  "description": "Participants predict which trainees of a fictional vocational training fund are likely not to complete, so that advisers can offer support early. On synthetic enrolment data with repeated trainees and cohorts, they climb a baseline ladder to tuned gradient-boosted trees, test an automated or pretrained challenger, choose validation that mirrors use, audit for leakage, set a threshold, break errors down by subgroup and write a model card. Deployment is left to AE-205 and AE-305.",
+  "track": "data-science",
+  "level": 200,
+  "badge": {
+    "name": "Data Science",
+    "level": "Assistant"
+  },
+  "audience": "Practitioners. Graduates and early-career analysts who have completed the FN courses or passed the placement test, and analysts moving into data science.",
+  "prerequisites": [
+    "FN-101 Python for Data and AI Work",
+    "FN-103 Mathematics for Machine Learning: Vectors, Gradients and Probability",
+    "FN-105 How Machine Learning and Language Models Work",
+    "DS-201 Statistical Inference by Simulation",
+    "Joins and groups tables with a dataframe library",
+    "Explains overfitting and the purpose of a held-out set"
+  ],
+  "site": {
+    "url": "https://sdaiaacademy.github.io/ds-204/",
+    "repo": "SDAIAAcademy/ds-204"
+  },
+  "outcomes": [
+    {
+      "id": "LO1",
+      "text": "Identify the leakage type and the fitting validation scheme in short tabular modelling cases, given six described problems and their data-collection process",
+      "level": "Awareness",
+      "evidence": "a table naming the leak and the scheme for each, at least five of six correct"
+    },
+    {
+      "id": "LO2",
+      "text": "Apply a baseline ladder from a constant predictor to tuned gradient-boosted trees, logging every run, given identical folds and a fixed tuning budget",
+      "level": "Applied",
+      "evidence": "a run log with score and fold spread per rung"
+    },
+    {
+      "id": "LO3",
+      "text": "Implement validation that matches the data structure and measure how far a random split overstates performance, given repeated trainees across five yearly cohorts",
+      "level": "Applied",
+      "evidence": "random, grouped and time-ordered scores with the gap explained"
+    },
+    {
+      "id": "LO4",
+      "text": "Test an automated or pretrained challenger against the tuned model under identical folds and time budget, given the champion model and a challenger configuration",
+      "level": "Applied",
+      "evidence": "a paired comparison over folds with an interval and a one-line decision"
+    },
+    {
+      "id": "LO5",
+      "text": "Analyse calibration, the decision threshold and held-out errors by subgroup, with intervals that reflect slice size, given predictions joined to region, gender, age band and provider, and adviser capacity",
+      "level": "Applied",
+      "evidence": "a calibration plot, a threshold with its precision and recall, and a subgroup error table"
+    },
+    {
+      "id": "LO6",
+      "text": "Build a validated tabular model from framing to model card and defend its validation scheme and limits, given a synthetic case or an approved public tabular problem",
+      "level": "Performance",
+      "evidence": "a public repository with run log, leakage audit, subgroup results and model card, defended live"
+    }
+  ],
+  "case_study": {
+    "name": "REPLACE: the name of the fictional organisation every lab works on",
+    "summary": "REPLACE: two sentences on the case study and its synthetic data"
+  },
+  "format": "intensive",
+  "format_note": "Intensive: 4 teaching days of four sessions and a capstone day, with guided pre-work and a tracked follow-up task",
+  "hours": {
+    "instruction": 6,
+    "lab": 7,
+    "guided_self_study": 6,
+    "assessment": 1,
+    "capstone": 6
+  },
+  "unit": "day",
+  "days": [
+    {
+      "id": "day1",
+      "kind": "day",
+      "title": "Frame and baseline",
+      "deck": "slides/day1.html",
+      "sessions": [
+        {
+          "title": "A prediction serves a decision",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO6"
+          ],
+          "lab": {
+            "id": "1.1",
+            "title": "Write target, unit, prediction time and adviser action for the question",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D1_1_write_target_unit.ipynb"
+          }
+        },
+        {
+          "title": "The baseline ladder",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO2"
+          ],
+          "lab": {
+            "id": "1.2",
+            "title": "Score a constant predictor and a three-rule baseline; log both",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D1_2_score_constant_predictor.ipynb"
+          }
+        },
+        {
+          "title": "Linear models first",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO2"
+          ],
+          "lab": {
+            "id": "1.3",
+            "title": "Fit a regularised logistic model in a pipeline; log score and spread",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D1_3_fit_regularised_logistic.ipynb"
+          }
+        },
+        {
+          "title": "Features from history",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO2"
+          ],
+          "lab": {
+            "id": "1.4",
+            "title": "Add two history features from past records only; pass a time-travel test",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D1_4_add_two_history.ipynb"
+          }
+        }
+      ]
+    },
+    {
+      "id": "day2",
+      "kind": "day",
+      "title": "Trees and challengers",
+      "deck": "slides/day2.html",
+      "sessions": [
+        {
+          "title": "Gradient-boosted trees",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO2"
+          ],
+          "lab": {
+            "id": "2.1",
+            "title": "Train boosted trees with defaults; compare training and validation scores",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D2_1_train_boosted_trees.ipynb"
+          }
+        },
+        {
+          "title": "Tuning under a budget",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO2"
+          ],
+          "lab": {
+            "id": "2.2",
+            "title": "Run a 20-trial search in nested folds and record the gain",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D2_2_run_20_trial.ipynb"
+          }
+        },
+        {
+          "title": "Automated and pretrained challengers",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO4"
+          ],
+          "lab": {
+            "id": "2.3",
+            "title": "Run a challenger on the same folds and time budget",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D2_3_run_challenger_same.ipynb"
+          }
+        },
+        {
+          "title": "Is the challenger better",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO4"
+          ],
+          "lab": {
+            "id": "2.4",
+            "title": "Compute the paired fold difference with an interval and decide",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D2_4_compute_paired_fold.ipynb"
+          }
+        }
+      ]
+    },
+    {
+      "id": "day3",
+      "kind": "day",
+      "title": "Validation and leakage",
+      "deck": "slides/day3.html",
+      "sessions": [
+        {
+          "title": "The split decides the score",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO3"
+          ],
+          "lab": {
+            "id": "3.1",
+            "title": "Score one model under random, grouped and time-ordered splits",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D3_1_score_one_model.ipynb"
+          }
+        },
+        {
+          "title": "Kinds of leakage",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO1"
+          ],
+          "lab": {
+            "id": "3.2",
+            "title": "Classify six leaks from other projects by type",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D3_2_classify_six_leaks.ipynb"
+          }
+        },
+        {
+          "title": "Hunting planted leaks",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO1"
+          ],
+          "lab": {
+            "id": "3.3",
+            "title": "Find four planted leaks with timestamps, duplicates and importance scores",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D3_3_find_four_planted.ipynb"
+          }
+        },
+        {
+          "title": "Reading someone else's notebook",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO1"
+          ],
+          "lab": {
+            "id": "3.4",
+            "title": "List what makes a colleague's notebook score untrustworthy",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D3_4_list_what_makes.ipynb"
+          }
+        }
+      ]
+    },
+    {
+      "id": "day4",
+      "kind": "day",
+      "title": "Errors, groups and documentation",
+      "deck": "slides/day4.html",
+      "sessions": [
+        {
+          "title": "Thresholds for rare outcomes",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO5"
+          ],
+          "lab": {
+            "id": "4.1",
+            "title": "Pick a threshold on the precision-recall curve that fits adviser capacity",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D4_1_pick_threshold_precision.ipynb"
+          }
+        },
+        {
+          "title": "Calibration",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO5"
+          ],
+          "lab": {
+            "id": "4.2",
+            "title": "Calibrate the boosted model; compare expected and observed by decile",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D4_2_calibrate_boosted_model.ipynb"
+          }
+        },
+        {
+          "title": "Errors by subgroup",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO5"
+          ],
+          "lab": {
+            "id": "4.3",
+            "title": "Break errors down by region, gender and age band with intervals",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D4_3_break_errors_down.ipynb"
+          }
+        },
+        {
+          "title": "The model card",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO6"
+          ],
+          "lab": {
+            "id": "4.4",
+            "title": "Draft the model card and choose the capstone problem",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D4_4_draft_model_card.ipynb"
+          }
+        }
+      ]
+    },
+    {
+      "id": "capstone",
+      "kind": "capstone",
+      "title": "Capstone project presentations",
+      "deck": "slides/capstone.html",
+      "subtitle": "REPLACE: the catalog gives 8 minutes for each presentation and nothing about questions; decide whether the questions are inside those minutes, set capstone.talk_minutes and capstone.qa_minutes in course.json and the timers of the now-presenting slide, and remove this line"
+    }
+  ],
+  "capstone": {
+    "summary": "A tabular problem from a shortlist of synthetic and public cases taken from framing to model card, in a public repository whose README reports the baseline ladder, validation, leakage audit, threshold, subgroup errors and a paired comparison; eight-minute defence",
+    "submission": "REPLACE: what participants submit and how: a public repository link, or a shared folder for a course without code",
+    "talk_minutes": 8,
+    "rubric": [
+      {
+        "criterion": "Framing and baseline",
+        "weight": 15
+      },
+      {
+        "criterion": "Validation and leakage",
+        "weight": 25
+      },
+      {
+        "criterion": "Models and comparison",
+        "weight": 20
+      },
+      {
+        "criterion": "Threshold, calibration and subgroup errors",
+        "weight": 25
+      },
+      {
+        "criterion": "Model card and reproducibility",
+        "weight": 15
+      }
+    ]
+  },
+  "labs": {
+    "kind": "notebooks",
+    "base": "labs/"
+  },
+  "tools": [
+    {
+      "slot": "Analysis environment and notebooks",
+      "examples": [
+        "Python with uv and JupyterLab or marimo",
+        "R with Quarto"
+      ]
+    },
+    {
+      "slot": "Machine learning library with splitters and pipelines",
+      "examples": [
+        "scikit-learn",
+        "tidymodels"
+      ]
+    },
+    {
+      "slot": "Gradient-boosted trees",
+      "examples": [
+        "LightGBM",
+        "XGBoost",
+        "CatBoost"
+      ]
+    },
+    {
+      "slot": "Automated or pretrained challenger",
+      "examples": [
+        "AutoGluon",
+        "a tabular foundation model used within its licence"
+      ]
+    },
+    {
+      "slot": "Subgroup metrics",
+      "examples": [
+        "Fairlearn",
+        "grouped metrics written in pandas"
+      ]
+    }
+  ]
+}
