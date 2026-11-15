@@ -1,0 +1,8 @@
+{
+ "test_rows": 15017,
+ "non_completers_in_test": 0.5012985283345541,
+ "accuracy": 0.9475261370446827,
+ "accuracy_of_always_completes": 0.4987014716654459,
+ "auc": 0.9853173070414717,
+ "average_precision": 0.9801031029573838
+}

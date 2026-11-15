@@ -1,0 +1,20 @@
+attribute,value,eligible_share
+region,Riyadh,0.235
+region,Makkah,0.225
+region,Eastern Province,0.14
+region,Madinah,0.068
+region,Asir,0.072
+region,Qassim,0.045
+region,Jazan,0.068
+region,Tabuk,0.03
+region,Hail,0.025
+region,Najran,0.036
+region,Al-Jouf,0.022
+region,Al-Baha,0.018
+region,Northern Borders,0.016
+age_band,17-19,0.16
+age_band,20-24,0.31
+age_band,25-34,0.33
+age_band,35+,0.2
+gender,F,0.52
+gender,M,0.48

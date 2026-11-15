@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-ax="page" data-track="data-science">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Machine Learning for Tabular Data: Baselines and Validation · SDAIA Academy</title>
+<meta name="generator" content="SDAIA Academy engine 1.0.0">
+<meta name="description" content="Take a tabular prediction from the decision it serves to a model card: a logged baseline ladder, validation that mirrors use, a leakage audit, a threshold that fits capacity and errors by subgroup with intervals">
+<link rel="icon" href="_engine/icon.svg">
+<link rel="alternate" type="text/markdown" href="index.md">
+<link rel="describedby" href="llms.txt">
+<link rel="stylesheet" href="_engine/academy.css">
+</head>
+<body>
+<header>
+<div class="wrap">
+<div class="top"><div class="logo" id="logo"></div><nav><a href="slides/day1.html">Slides</a><a href="practice.html">Practice</a><a href="index.md" type="text/markdown">Markdown</a></nav></div>
+<div class="kicker">Data Science Track · SDAIA Academy · DS-204</div>
+<h1>Machine Learning for Tabular Data: Baselines and Validation<span class="sub ar" lang="ar" dir="rtl">تعلم الآلة للبيانات الجدولية: خطوط الأساس والتحقق من الصحة</span></h1>
+<p>Take a tabular prediction from the decision it serves to a model card: a logged baseline ladder, validation that mirrors use, a leakage audit, a threshold that fits capacity and errors by subgroup with intervals</p>
+<div class="meta"><span class="track">Data Science Track</span><span>4 teaching days + capstone day</span><span>26 hours</span><span>Level 200</span><span>Data Science · Assistant badge</span></div>
+</div>
+</header>
+<main class="wrap">
+<h2>About the course</h2>
+<p>Participants predict which trainees of a fictional vocational training fund are likely not to complete, so that advisers can offer support early. On synthetic enrolment data with repeated trainees and cohorts, they climb a baseline ladder to tuned gradient-boosted trees, test an automated or pretrained challenger, choose validation that mirrors use, audit for leakage, set a threshold, break errors down by subgroup and write a model card. Deployment is left to AE-205 and AE-305.</p>
+<p><b>Who it is for:</b> Practitioners. Graduates and early-career analysts who have completed the FN courses or passed the placement test, and analysts moving into data science.</p>
+<p><b>Format:</b> Intensive: 4 teaching days of four sessions and a capstone day, with guided pre-work and a tracked follow-up task</p>
+<h2>The case study</h2>
+<div class="note info"><b>Sullam Vocational Training Fund.</b> Sullam Vocational Training Fund is a fictional fund that pays for vocational programmes at 60 training providers in 13 regions. Participants work on 45,000 synthetic enrolments of 30,000 trainees over five yearly cohorts to build Mubakkir, a score that at the end of week 2 puts the trainees most likely not to complete on an adviser's list. All data are synthetic, written with a fixed seed, with repeated trainees, cohort drift, four planted leaks and registers that under-record absence in two regions.</div>
+<h2>The course</h2>
+<div class="day">
+<div class="day-head c-teal"><div><div class="t">Day 1 · 4 sessions · 4 labs</div><h3>Frame and baseline</h3></div><a class="btn" href="slides/day1.html">Open the slides</a></div>
+<div class="scroll"><table>
+<tr><th>Session</th><th>Topic</th><th>Lab</th></tr>
+<tr><td>1</td><td><b>A prediction serves a decision</b><br>The decision comes first: target, unit, prediction time, the action a score triggers and what each error costs.<ul><li>State the target, the unit and the prediction time from the decision a score serves</li><li>Separate the columns known at the prediction time from those recorded at exit</li><li>Compute the break-even probability from the cost of each error</li></ul></td><td><a href="labs/D1_1_frame.ipynb">Lab 1.1 · Frame the non-completion question</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D1_1_frame.ipynb">Open in Colab</a></td></tr>
+<tr><td>2</td><td><b>The baseline ladder</b><br>A ladder of models on identical folds, with a log: the constant predictor, then rules an adviser could write.<ul><li>Explain why every model is scored on the same folds and logged</li><li>Score a constant predictor and say what its average precision is</li><li>Write a three-rule baseline and read its score and fold spread</li></ul></td><td><a href="labs/D1_2_baselines.ipynb">Lab 1.2 · A constant and three rules</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D1_2_baselines.ipynb">Open in Colab</a></td></tr>
+<tr><td>3</td><td><b>Linear models first</b><br>The first model that learns: a regularised logistic model inside a pipeline fitted on training rows only.<ul><li>Build a pipeline that imputes, encodes and scales inside each fold</li><li>Fit a regularised logistic model and log its score and fold spread</li><li>Read the largest coefficients and say what they do not prove</li></ul></td><td><a href="labs/D1_3_logistic_pipeline.ipynb">Lab 1.3 · A logistic model in a pipeline</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D1_3_logistic_pipeline.ipynb">Open in Colab</a></td></tr>
+<tr><td>4</td><td><b>Features from history</b><br>A trainee's earlier enrolments are the strongest new information, if they are read from the past only.<ul><li>Explain why an earlier enrolment counts only when its outcome was known</li><li>Build two history features from records that ended before the prediction time</li><li>Run a time-travel test that fails when a feature reads the future</li></ul></td><td><a href="labs/D1_4_history_features.ipynb">Lab 1.4 · Two history features</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D1_4_history_features.ipynb">Open in Colab</a></td></tr>
+</table></div>
+</div>
+<div class="day">
+<div class="day-head c-cyan"><div><div class="t">Day 2 · 4 sessions · 4 labs</div><h3>Trees and challengers</h3></div><a class="btn" href="slides/day2.html">Open the slides</a></div>
+<div class="scroll"><table>
+<tr><th>Session</th><th>Topic</th><th>Lab</th></tr>
+<tr><td>1</td><td><b>Gradient-boosted trees</b><br>Boosted trees with the library's defaults: what they fit, what they memorise, and what importance scores can and cannot say.<ul><li>Describe how boosting adds small trees to correct the errors so far</li><li>Compare training and validation scores and read the gap</li><li>Read importance scores and name two of their limits</li></ul></td><td><a href="labs/D2_1_boosted_defaults.ipynb">Lab 2.1 · Boosted trees with defaults</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D2_1_boosted_defaults.ipynb">Open in Colab</a></td></tr>
+<tr><td>2</td><td><b>Tuning under a budget</b><br>A budget of 20 trials, spent inside each training part so that the reported score is not the one that chose the settings.<ul><li>Name the settings of boosted trees that are worth a budget</li><li>Run a random search whose choices are made on inner folds</li><li>Report the gain over defaults with its fold spread and its cost in time</li></ul></td><td><a href="labs/D2_2_nested_search.ipynb">Lab 2.2 · Twenty trials in nested folds</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D2_2_nested_search.ipynb">Open in Colab</a></td></tr>
+<tr><td>3</td><td><b>Automated and pretrained challengers</b><br>An automated challenger, and what to check before a pretrained one: its licence, where the data goes, and a contest on equal terms.<ul><li>Describe what an automated tabular tool and a tabular foundation model each do</li><li>Check a challenger's licence and where the data would be sent before using it</li><li>Run a challenger on the same folds and the same time budget as the champion</li></ul></td><td><a href="labs/D2_3_challenger.ipynb">Lab 2.3 · A challenger on equal terms</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D2_3_challenger.ipynb">Open in Colab</a></td></tr>
+<tr><td>4</td><td><b>Is the challenger better</b><br>Two models scored on the same folds give paired differences: an interval on their mean, and a decision stated before looking.<ul><li>Explain why fold scores of two models are compared as pairs</li><li>Compute the mean paired difference with an interval</li><li>Decide against a minimum effect stated in advance, in one line</li></ul></td><td><a href="labs/D2_4_paired_difference.ipynb">Lab 2.4 · The paired difference and the decision</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D2_4_paired_difference.ipynb">Open in Colab</a></td></tr>
+</table></div>
+</div>
+<div class="day">
+<div class="day-head c-coral"><div><div class="t">Day 3 · 4 sessions · 4 labs</div><h3>Validation and leakage</h3></div><a class="btn" href="slides/day3.html">Open the slides</a></div>
+<div class="scroll"><table>
+<tr><th>Session</th><th>Topic</th><th>Lab</th></tr>
+<tr><td>1</td><td><b>The split decides the score</b><br>The same model scores differently under random, grouped and time-ordered splits, and each gap has a cause you can name.<ul><li>Choose the split that mirrors how a model will be used</li><li>Implement random, grouped and time-ordered splits on the same rows</li><li>Explain each gap between the three scores from the structure of the data</li></ul></td><td><a href="labs/D3_1_three_splits.ipynb">Lab 3.1 · One model, three splits</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D3_1_three_splits.ipynb">Open in Colab</a></td></tr>
+<tr><td>2</td><td><b>Kinds of leakage</b><br>Four kinds of leakage, each with the question that catches it, practised on cases from other sectors.<ul><li>Distinguish target leakage, future information, group or duplicate contamination and preparation leakage</li><li>Identify the kind of leak from a description of how the data were collected</li><li>Match each case to the validation scheme its use requires</li></ul></td><td><a href="labs/D3_2_six_leaks.ipynb">Lab 3.2 · Six leaks from other projects</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D3_2_six_leaks.ipynb">Open in Colab</a></td></tr>
+<tr><td>3</td><td><b>Hunting planted leaks</b><br>Three instruments for an audit: when each column is written, whether rows repeat, and which features carry the score.<ul><li>Use the time each column is recorded to find features written after the outcome</li><li>Find duplicated rows that sit on both sides of a split</li><li>Use importance scores to choose which features to question first</li></ul></td><td><a href="labs/D3_3_leak_hunt.ipynb">Lab 3.3 · Four planted leaks</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D3_3_leak_hunt.ipynb">Open in Colab</a></td></tr>
+<tr><td>4</td><td><b>Reading someone else's notebook</b><br>Reviewing a notebook you did not write: an order to read it in, and the things that make its headline number untrustworthy.<ul><li>Read a notebook in the order rows, split, preparation, tuning, metric</li><li>List the faults that make a reported score untrustworthy</li><li>Measure which fault moves the score most by repairing one at a time</li></ul></td><td><a href="labs/D3_4_colleague_notebook.ipynb">Lab 3.4 · A colleague's notebook</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D3_4_colleague_notebook.ipynb">Open in Colab</a></td></tr>
+</table></div>
+</div>
+<div class="day">
+<div class="day-head c-purple"><div><div class="t">Day 4 · 4 sessions · 4 labs</div><h3>Errors, groups and documentation</h3></div><a class="btn" href="slides/day4.html">Open the slides</a></div>
+<div class="scroll"><table>
+<tr><th>Session</th><th>Topic</th><th>Lab</th></tr>
+<tr><td>1</td><td><b>Thresholds for rare outcomes</b><br>A score becomes a decision at a threshold, and the threshold comes from capacity and costs, never from 0.5.<ul><li>Read precision and recall off a precision-recall curve for a rare outcome</li><li>Choose a threshold that fits the advisers' capacity and report its precision and recall</li><li>Explain what happens to a fixed threshold when the next cohort differs</li></ul></td><td><a href="labs/D4_1_threshold_capacity.ipynb">Lab 4.1 · A threshold that fits capacity</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D4_1_threshold_capacity.ipynb">Open in Colab</a></td></tr>
+<tr><td>2</td><td><b>Calibration</b><br>Calibration: measured by decile, repaired on unseen rows, lost again under drift.<ul><li>Compare expected and observed rates by decile and read a reliability plot</li><li>Calibrate a model on rows it was not trained on, with sigmoid and isotonic methods</li><li>Explain why a weighted model ranks well and still cannot be read as a probability</li></ul></td><td><a href="labs/D4_2_calibration.ipynb">Lab 4.2 · Calibrate and compare by decile</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D4_2_calibration.ipynb">Open in Colab</a></td></tr>
+<tr><td>3</td><td><b>Errors by subgroup</b><br>Errors are harms to people: who is represented, who is missed, and how sure a small slice lets you be.<ul><li>Compare the training data with the eligible population by region, age band and gender</li><li>Report held-out error rates by subgroup with intervals that reflect slice size</li><li>Relate each finding to a bias type of the SDAIA AI Bias Reference Guide and to one action</li></ul></td><td><a href="labs/D4_3_subgroup_errors.ipynb">Lab 4.3 · Errors by region, gender and age band</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D4_3_subgroup_errors.ipynb">Open in Colab</a></td></tr>
+<tr><td>4</td><td><b>The model card</b><br>The model card is the hand-over: what the model is for, how it was validated, where it fails and what it must never decide.<ul><li>Assemble a model card from measured results</li><li>State the limits of the validation and the uses the model is not for</li><li>Prepare the hand-over a deployment team needs and frame the capstone problem</li></ul></td><td><a href="labs/D4_4_model_card.ipynb">Lab 4.4 · The model card and the capstone problem</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-204/blob/main/labs/D4_4_model_card.ipynb">Open in Colab</a></td></tr>
+</table></div>
+</div>
+<div class="day">
+<div class="day-head c-amber"><div><div class="t">Capstone</div><h3>Capstone: a validated tabular model and its defence</h3></div><a class="btn" href="slides/capstone.html">Open the slides</a></div>
+<div class="scroll"><table><tr><td>Each participant defends a tabular model from framing to model card in eight minutes, including one change the assessor asks for</td></tr></table></div>
+</div>
+<h2>Capstone</h2>
+<div class="two">
+<div><p>A tabular problem from a shortlist of synthetic and public cases taken from framing to model card, in a public repository whose README reports the baseline ladder, validation, leakage audit, threshold, subgroup errors and a paired comparison; eight-minute defence</p><p><b>What you submit:</b> A link to a public GitHub repository: the code with a fixed seed and a lock file, the run log, the leakage audit, the subgroup results and the model card, and a README that reports the baseline ladder, the validation scheme, the leakage audit, the threshold, errors by subgroup and a paired comparison; prompts and agent transcripts are committed with it</p><p><b>Format:</b> 8 min talk and demo</p></div>
+<div><h3>Rubric</h3><div class="bar c-teal"><span>Framing and baseline<i style="--w:60%"></i></span><b>15%</b></div><div class="bar c-cyan"><span>Validation and leakage<i style="--w:100%"></i></span><b>25%</b></div><div class="bar c-coral"><span>Models and comparison<i style="--w:80%"></i></span><b>20%</b></div><div class="bar c-purple"><span>Threshold, calibration and subgroup errors<i style="--w:100%"></i></span><b>25%</b></div><div class="bar c-amber"><span>Model card and reproducibility<i style="--w:60%"></i></span><b>15%</b></div></div>
+</div>
+<h2>Outcomes</h2>
+<p>By the end of the course, participants can:</p>
+<div class="day"><div class="scroll"><table>
+<tr><th></th><th>Outcomes</th><th>Level</th><th>Evidence</th></tr>
+<tr><td><b>LO1</b></td><td>Identify the leakage type and the fitting validation scheme in short tabular modelling cases, given six described problems and their data-collection process</td><td>Awareness</td><td>a table naming the leak and the scheme for each, at least five of six correct</td></tr>
+<tr><td><b>LO2</b></td><td>Apply a baseline ladder from a constant predictor to tuned gradient-boosted trees, logging every run, given identical folds and a fixed tuning budget</td><td>Applied</td><td>a run log with score and fold spread per rung</td></tr>
+<tr><td><b>LO3</b></td><td>Implement validation that matches the data structure and measure how far a random split overstates performance, given repeated trainees across five yearly cohorts</td><td>Applied</td><td>random, grouped and time-ordered scores with the gap explained</td></tr>
+<tr><td><b>LO4</b></td><td>Test an automated or pretrained challenger against the tuned model under identical folds and time budget, given the champion model and a challenger configuration</td><td>Applied</td><td>a paired comparison over folds with an interval and a one-line decision</td></tr>
+<tr><td><b>LO5</b></td><td>Analyse calibration, the decision threshold and held-out errors by subgroup, with intervals that reflect slice size, given predictions joined to region, gender, age band and provider, and adviser capacity</td><td>Applied</td><td>a calibration plot, a threshold with its precision and recall, and a subgroup error table</td></tr>
+<tr><td><b>LO6</b></td><td>Build a validated tabular model from framing to model card and defend its validation scheme and limits, given a synthetic case or an approved public tabular problem</td><td>Performance</td><td>a public repository with run log, leakage audit, subgroup results and model card, defended live</td></tr>
+</table></div></div>
+<h2>Tools</h2>
+<div class="grid">
+<div class="card c-teal"><h3>Analysis environment and notebooks</h3><p>Python with uv and JupyterLab or marimo · R with Quarto</p></div>
+<div class="card c-cyan"><h3>Machine learning library with splitters and pipelines</h3><p>scikit-learn · tidymodels</p></div>
+<div class="card c-coral"><h3>Gradient-boosted trees</h3><p>LightGBM · XGBoost · CatBoost</p></div>
+<div class="card c-purple"><h3>Automated or pretrained challenger</h3><p>AutoGluon · a tabular foundation model used within its licence</p></div>
+<div class="card c-green"><h3>Subgroup metrics</h3><p>Fairlearn · grouped metrics written in pandas</p></div>
+</div>
+<h2>Before you start</h2>
+<h3>Prerequisites</h3>
+<ul><li>FN-101 Python for Data and AI Work</li><li>FN-103 Mathematics for Machine Learning: Vectors, Gradients and Probability</li><li>FN-105 How Machine Learning and Language Models Work</li><li>DS-201 Statistical Inference by Simulation</li><li>Joins and groups tables with a dataframe library</li><li>Explains overfitting and the purpose of a held-out set</li></ul>
+<div class="note tip">The labs are notebooks. Open each one in Google Colab from the table above, or clone the repository and run them locally.</div>
+<h2>Sources</h2>
+<h3>National references</h3>
+<ul><li><a href="https://sdaia.gov.sa/en/SDAIA/about/Documents/ai-principles.pdf">Principles of AI Ethics (SDAIA)</a></li><li><a href="https://sdaia.gov.sa/en/MediaCenter/KnowledgeCenter/ResearchLibrary/EN-AI-BIAS.pdf">AI Bias Reference Guide, first edition (SDAIA, May 2026)</a></li><li><a href="https://sdaia.gov.sa/en/SDAIA/about/Documents/PersonalDataProtectionLaw.pdf">Personal Data Protection Law (SDAIA)</a></li><li><a href="https://sdaia.gov.sa/en/SDAIA/about/Documents/ImplementingRegulationPersonalDataProtectionLaw.pdf">Implementing Regulation of the Personal Data Protection Law (SDAIA)</a></li></ul>
+<h3>Validation, pipelines and leakage</h3>
+<ul><li><a href="https://scikit-learn.org/stable/modules/cross_validation.html">scikit-learn user guide: Cross-validation: evaluating estimator performance</a></li><li><a href="https://scikit-learn.org/stable/common_pitfalls.html">scikit-learn user guide: Common pitfalls and recommended practices</a></li><li><a href="https://scikit-learn.org/stable/modules/compose.html">scikit-learn user guide: Pipelines and composite estimators</a></li><li><a href="https://scikit-learn.org/stable/auto_examples/model_selection/plot_nested_cross_validation_iris.html">scikit-learn example: Nested versus non-nested cross-validation</a></li><li><a href="https://arxiv.org/abs/2207.07048">Kapoor and Narayanan (2023). Leakage and the reproducibility crisis in machine-learning-based science</a></li></ul>
+<h3>Models and challengers</h3>
+<ul><li><a href="https://lightgbm.readthedocs.io/en/stable/Parameters-Tuning.html">LightGBM documentation: Parameters tuning</a></li><li><a href="https://arxiv.org/abs/2207.08815">Grinsztajn, Oyallon and Varoquaux (2022). Why do tree-based models still outperform deep learning on tabular data?</a></li><li><a href="https://www.jmlr.org/papers/v13/bergstra12a.html">Bergstra and Bengio (2012). Random search for hyper-parameter optimization</a></li><li><a href="https://auto.gluon.ai/stable/tutorials/tabular/tabular-essentials.html">AutoGluon documentation: Tabular essentials</a></li><li><a href="https://www.nature.com/articles/s41586-024-08328-6">Hollmann and others (2025). Accurate predictions on small data with a tabular foundation model</a></li><li><a href="https://github.com/PriorLabs/TabPFN">TabPFN repository: licence and usage terms (Prior Labs)</a></li></ul>
+<h3>Thresholds, calibration and importance</h3>
+<ul><li><a href="https://scikit-learn.org/stable/modules/calibration.html">scikit-learn user guide: Probability calibration</a></li><li><a href="https://scikit-learn.org/stable/modules/classification_threshold.html">scikit-learn user guide: Tuning the decision threshold for class prediction</a></li><li><a href="https://scikit-learn.org/stable/modules/permutation_importance.html">scikit-learn user guide: Permutation feature importance</a></li><li><a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0118432">Saito and Rehmsmeier (2015). The precision-recall plot is more informative than the ROC plot when evaluating binary classifiers on imbalanced datasets</a></li></ul>
+<h3>Subgroups and documentation</h3>
+<ul><li><a href="https://arxiv.org/abs/1810.03993">Mitchell and others (2019). Model cards for model reporting</a></li><li><a href="https://fairlearn.org/main/user_guide/assessment/index.html">Fairlearn user guide: Assessment (MetricFrame)</a></li><li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats._result_classes.BinomTestResult.proportion_ci.html">SciPy manual: proportion_ci, confidence intervals for a proportion (Wilson method)</a></li></ul>
+<h3>Public tables for the capstone</h3>
+<ul><li><a href="https://archive.ics.uci.edu/dataset/697/predict+students+dropout+and+academic+success">UCI Machine Learning Repository: Predict Students' Dropout and Academic Success</a></li><li><a href="https://archive.ics.uci.edu/dataset/222/bank+marketing">UCI Machine Learning Repository: Bank Marketing</a></li><li><a href="https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients">UCI Machine Learning Repository: Default of Credit Card Clients</a></li></ul>
+<h2>Files and links</h2>
+<div class="files">
+<a href="practice.html"><b>practice.html</b><span>Practice questions with feedback</span></a>
+<a href="index.md"><b>index.md</b><span>This page as Markdown, for an AI assistant</span></a>
+<a href="llms.txt"><b>llms.txt</b><span>The course for AI assistants (llms.txt)</span></a>
+<a href="https://github.com/SDAIAAcademy/ds-204"><b>SDAIAAcademy/ds-204</b><span>The course repository</span></a>
+</div>
+</main>
+<footer><div class="wrap">SDAIA Academy · Data Science Track · Machine Learning for Tabular Data: Baselines and Validation<br><span class="muted">Course version 2027.1.0 · engine 1.0.0 · built 2026-11-15 · commit 6acdecd</span></div></footer>
+<script type="application/json" id="academy-data">{"v":1,"engine":"1.0.0","build":{"at":"2026-11-15T16:02:38Z","version":"2027.1.0","commit":"6acdecd"},"course":{"id":"ds-204","code":"DS-204","title":"Machine Learning for Tabular Data: Baselines and Validation","track":"data-science","lang":"en","dir":"ltr","url":"https://sdaiaacademy.github.io/ds-204/","repo":"SDAIAAcademy/ds-204","home":"index.html"},"ai":{"context":{"course":"context/course.md","courseJs":"context/course.js","day":null,"llms":"llms.txt"},"tasks":[],"tools":[]},"features":{},"strings":{}}</script>
+<script src="_engine/academy.js"></script>
+</body>
+</html>

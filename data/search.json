@@ -1,0 +1,1705 @@
+{
+  "v": 1,
+  "engine": "1.0.0",
+  "build": {
+    "at": "2026-11-15T16:02:38Z",
+    "version": "2027.1.0",
+    "commit": "6acdecd"
+  },
+  "lang": "en",
+  "dir": "ltr",
+  "slides": [
+    {
+      "deck": "day1",
+      "id": "title",
+      "n": 1,
+      "session": 0,
+      "title": "Frame and baseline",
+      "text": "SDAIA Academy · Machine Learning for Tabular Data: Baselines and Validation Frame and baseline Day 1: From the advisers' question to a number every later model has to beat Data Science Track4 teaching days + capstone day4 sessions · 4 labsDS-204",
+      "href": "../slides/day1.html#title"
+    },
+    {
+      "deck": "day1",
+      "id": "agenda",
+      "n": 2,
+      "session": 0,
+      "title": "Frame and baseline",
+      "text": "Today Frame and baseline Session 1 · A prediction serves a decision The decision comes first: target, unit, prediction time, the action a score triggers and what each error costs. Session 2 · The baseline ladder A ladder of models on identical folds, with a log: the constant predictor, then rules an adviser could write. Session 3 · Linear models first The first model that learns: a regularised logistic model inside a pipeline fitted on training rows only. Session 4 · Features from history A trainee's earlier enrolments are the strongest new information, if they are read from the past only.",
+      "href": "../slides/day1.html#agenda"
+    },
+    {
+      "deck": "day1",
+      "id": "four-days",
+      "n": 3,
+      "session": 0,
+      "title": "Four days from an adviser's question to a model card",
+      "text": "The course Four days from an adviser's question to a model card Frame and baseline Decision, constant, rules, linear, history Day 1 Trees and challengers Boosted trees, a tuning budget, a paired decision Day 2 Validation and leakage Three splits, four kinds of leak, an audit Day 3 Errors and documentation Threshold, calibration, subgroups, model card Day 4 Day 5 is yours: a tabular problem taken from framing to model card, defended live.",
+      "href": "../slides/day1.html#four-days"
+    },
+    {
+      "deck": "day1",
+      "id": "case-sullam",
+      "n": 4,
+      "session": 0,
+      "title": "Sullam Vocational Training Fund wants to offer support early",
+      "text": "The case study Sullam Vocational Training Fund wants to offer support early The fund A fictional fund that pays for programmes at 60 providers in 13 regions. 45,000 synthetic enrolments, 30,000 trainees, cohorts 2021 to 2025. The problem One enrolment in six ends without completion. A lost place costs SAR 9,000. The advisers can run 800 support plans a year. The model Mubakkir ranks trainees at the end of week 2 by the risk of not completing. You are Razan Al-Angari, the data scientist who builds it and defends its numbers. Synthetic, and treated as personal data. No row describes a real person or provider. Every lab handles the table as if it did.",
+      "href": "../slides/day1.html#case-sullam"
+    },
+    {
+      "deck": "day1",
+      "id": "setup-check",
+      "n": 5,
+      "session": 0,
+      "title": "One notebook proves your setup",
+      "text": "Before session 1 One notebook proves your setup In Colab: open 00_setup_check.ipynb from the course page and run all cells On a laptop: in labs/, run uv sync, then uv run jupyter lab It imports every library, reads the enrolments and prints its check marks No key, no graphics processor, no model download The pre-work 00_prework_pipelines_cv.ipynb: two hours on pipelines and cross-validation with self-check questions. The supervised entry quiz follows it, without AI assistance.",
+      "href": "../slides/day1.html#setup-check"
+    },
+    {
+      "deck": "day1",
+      "id": "s1",
+      "n": 6,
+      "session": 1,
+      "title": "A prediction serves a decision",
+      "text": "Session 1 A prediction serves a decision State the target, the unit and the prediction time from the decision a score serves Separate the columns known at the prediction time from those recorded at exit Compute the break-even probability from the cost of each error 01",
+      "href": "../slides/day1.html#s1"
+    },
+    {
+      "deck": "day1",
+      "id": "decision-first",
+      "n": 7,
+      "session": 1,
+      "title": "A prediction is worth what the decision it changes is worth",
+      "text": "Start at the end A prediction is worth what the decision it changes is worth 1 · The decision Which trainees does an adviser contact in week 3? → 2 · The prediction How likely is each trainee not to complete? → 3 · The data What is known about each enrolment at that moment? What goes wrong. Teams start at step 3: \"we have a table, let us predict a column\". The model then answers a question nobody asked, at a moment when nobody decides anything.",
+      "href": "../slides/day1.html#decision-first"
+    },
+    {
+      "deck": "day1",
+      "id": "four-lines",
+      "n": 8,
+      "session": 1,
+      "title": "Four lines fix the task before any code",
+      "text": "The framing Four lines fix the task before any code Line For Mubakkir What it rules out Target not_completed: left without completing A vague \"risk\" Unit One enrolment One row per trainee Prediction time The end of week 2 Anything recorded later Action An adviser agrees a support plan in week 3 Removing a place Change one line and you have a different project with different data.",
+      "href": "../slides/day1.html#four-lines"
+    },
+    {
+      "deck": "day1",
+      "id": "recorded-when",
+      "n": 9,
+      "session": 1,
+      "title": "Every column has a time at which it starts to exist",
+      "text": "The moment decides the columns Every column has a time at which it starts to exist Recorded Columns in the export At the end of week 2 At registration region, gender, education, aptitude_score, has_dependants known At enrolment provider_id, programme, start_date, age, distance_km, stipend, … known At the end of week 2 absences_w2 known, just At exit not_completed, weeks_attended, exit_date, exit_reason does not exist yet Ask for the data dictionary first. If nobody can say when a column is written, treat it as written at exit until proven otherwise.",
+      "href": "../slides/day1.html#recorded-when"
+    },
+    {
+      "deck": "day1",
+      "id": "too-good-column",
+      "n": 10,
+      "session": 1,
+      "title": "Weeks attended is the outcome, written in another unit",
+      "text": "One column to distrust Weeks attended is the outcome, written in another unit 21.9 · 7.7 mean weeks attended: those who completed, and those who did not weeks_attended separates the classes almost by itself A model given it would look brilliant on old data At the end of week 2 it reads \"2\" for everyone This is target leakage: Day 3 hunts four planted leaks",
+      "href": "../slides/day1.html#too-good-column"
+    },
+    {
+      "deck": "day1",
+      "id": "population",
+      "n": 11,
+      "session": 1,
+      "title": "A third of the non-completers leave before the model can see them",
+      "text": "Which rows A third of the non-completers leave before the model can see them All 45,000 enrolments 16.7% Still enrolled after week 2: 42,556 11.9% Left in weeks 1 and 2: 2,444 100% No support plan in week 3 can reach a trainee who has left They leave the model's population Every score in the course is about the 42,556 scorable rows The 2,444 are a limit to state, not to hide",
+      "href": "../slides/day1.html#population"
+    },
+    {
+      "deck": "day1",
+      "id": "cost-of-errors",
+      "n": 12,
+      "session": 1,
+      "title": "The two errors do not cost the same",
+      "text": "Two ways to be wrong The two errors do not cost the same Error What happens Cost to the fund Missed non-completer Nobody called; the place is lost SAR 9,000 Needless support plan An adviser's time went to a trainee who would have completed SAR 450 Support is not a cure One supported non-completer in four then completes (the advisers' own figure). Break-even A plan pays when p × 0.25 × 9,000 > 450: when the probability of not completing is above 0.20.",
+      "href": "../slides/day1.html#cost-of-errors"
+    },
+    {
+      "deck": "day1",
+      "id": "capacity",
+      "n": 13,
+      "session": 1,
+      "title": "Capacity turns a probability into a list of 800 names",
+      "text": "The action has a size Capacity turns a probability into a list of 800 names 8 in 100 scorable enrolments can get a support plan in the largest cohort: 800 plans for 10,100. Smaller cohorts, from 6,800, reach 12 in 100; the run log scores the top 8% The advisers do not ask \"who is above 0.5?\" They ask \"which 800 first?\" So the course scores rankings: average precision, and the share of non-completers on the list Accuracy is never reported",
+      "href": "../slides/day1.html#capacity"
+    },
+    {
+      "deck": "day1",
+      "id": "minimisation",
+      "n": 14,
+      "session": 1,
+      "title": "Known is not the same as justified",
+      "text": "Responsible use Known is not the same as justified The purpose is narrow: decide whom to offer support Data minimisation: use only the personal data that purpose needs gender is known and left out of the model It stays in the table to check the errors by group on Day 4 trainee_id joins a history; it is never a feature Who decides The data scientist proposes, with a reason per column. Maram Al-Rasheed, the data protection officer, signs. The framing sheet of Lab 1.1 is what she reads.",
+      "href": "../slides/day1.html#minimisation"
+    },
+    {
+      "deck": "day1",
+      "id": "check-framing",
+      "n": 15,
+      "session": 1,
+      "title": "Which framing serves the advisers?",
+      "text": "Checkpoint Which framing serves the advisers? The advisers can agree 800 support plans a year, starting in week 3 of a programme. Which framing fits? One row per trainee: will this trainee ever leave a programme? One row per enrolment, at exit: did the trainee complete? One row per provider and year: how many trainees will leave? One row per enrolment, at the end of week 2: will the trainee not complete?",
+      "href": "../slides/day1.html#check-framing"
+    },
+    {
+      "deck": "day1",
+      "id": "lab-1-1",
+      "n": 16,
+      "session": 1,
+      "title": "Frame the non-completion question",
+      "text": "Lab 1.1 · 25 min Frame the non-completion question Write target, unit, prediction time and adviser action for the question, keep the rows that can be scored, mark the columns known at that time and price the two errors. D1_1_frame.ipynb Read the export and its data dictionary 4 min Write target, unit, prediction time and adviser action 6 min Keep the rows that can be scored 4 min Mark the columns known at the end of week 2 6 min Price the two errors: the break-even probability 5 min ✱ Stretch: Frame the same question on the enrolment day: what is gained and what is lost",
+      "href": "../slides/day1.html#lab-1-1"
+    },
+    {
+      "deck": "day1",
+      "id": "s2",
+      "n": 17,
+      "session": 2,
+      "title": "The baseline ladder",
+      "text": "Session 2 The baseline ladder Explain why every model is scored on the same folds and logged Score a constant predictor and say what its average precision is Write a three-rule baseline and read its score and fold spread 02",
+      "href": "../slides/day1.html#s2"
+    },
+    {
+      "deck": "day1",
+      "id": "why-ladder",
+      "n": 18,
+      "session": 2,
+      "title": "A score means nothing until you know what no model scores",
+      "text": "Before any model A score means nothing until you know what no model scores Constant The same score for everyone Lab 1.2 Rules Three lines an adviser could write Lab 1.2 Linear A regularised logistic model Labs 1.3, 1.4 Boosted trees Defaults, then 20 trials Labs 2.1, 2.2 Challenger An automated tool Lab 2.3 Each rung has to earn its extra complexity against the rung below.",
+      "href": "../slides/day1.html#why-ladder"
+    },
+    {
+      "deck": "day1",
+      "id": "identical-folds",
+      "n": 19,
+      "session": 2,
+      "title": "Every rung is scored on the same five folds",
+      "text": "The rule of the ladder Every rung is scored on the same five folds Fold Validates on Training rows Validation rows Base rate 1 2022, second half 9,068 3,902 11.6% 2 2023, first half 12,960 4,266 10.8% 3 2023, second half 17,028 4,326 11.0% 4 2024, first half 21,382 4,649 13.0% 5 2024, second half 25,836 4,627 12.6% Cohort 2025 is closed. 10,117 rows stay untouched until Day 4. Each fold trains on programmes due to end before its half-year began; Day 3 explains why.",
+      "href": "../slides/day1.html#identical-folds"
+    },
+    {
+      "deck": "day1",
+      "id": "run-log",
+      "n": 20,
+      "session": 2,
+      "title": "One line per run, never edited afterwards",
+      "text": "The habit One line per run, never edited afterwards lab rung folds mean_ap spread min_fold max_fold recall_at_capacity 1.2 constant 5 0.1181 0.0098 0.1076 0.1301 0.0759 1.2 three rules 5 0.3099 0.0125 0.2899 0.3233 0.2922 Mean over the folds, and the spread between them The five fold scores themselves, for the paired comparison of Day 2 Seconds, features and a note: what a reviewer asks first",
+      "href": "../slides/day1.html#run-log"
+    },
+    {
+      "deck": "day1",
+      "id": "constant-floor",
+      "n": 21,
+      "session": 2,
+      "title": "The floor of average precision is the base rate, not 0.5",
+      "text": "Rung 1 The floor of average precision is the base rate, not 0.5 0.118 average precision of the same score for everyone, mean of five folds Average precision: precision averaged over every position where a non-completer is found A ranking with no information has the base rate as its precision everywhere ROC AUC is the score whose floor is 0.5 For a rare outcome and a short list, average precision is the stricter judge",
+      "href": "../slides/day1.html#constant-floor"
+    },
+    {
+      "deck": "day1",
+      "id": "three-rules",
+      "n": 22,
+      "session": 2,
+      "title": "Three rules on a card already sort the trainees",
+      "text": "Rung 2 Three rules on a card already sort the trainees No rule met: 25,487 6.1% One rule: 5,767 24.4% Two rules: 1,097 62.0% Three rules: 88 78.4% Absent two days or more in the first two weeks Aged 19 or under Entry test below 38 Score: the number of rules met Average precision 0.310. With no learning, 29% of non-completers are on the advisers' list.",
+      "href": "../slides/day1.html#three-rules"
+    },
+    {
+      "deck": "day1",
+      "id": "spread",
+      "n": 23,
+      "session": 2,
+      "title": "The spread between folds is the yardstick for every gain",
+      "text": "Reading a rung The spread between folds is the yardstick for every gain Fold Constant Three rules 1 0.116 0.310 2 0.108 0.290 3 0.110 0.316 4 0.130 0.323 5 0.126 0.311 Mean · spread 0.118 · 0.010 0.310 · 0.012 The rules win on all five folds The gain, 0.19, is fifteen times the spread A gain inside the spread is a question, not a result Lab 2.4 answers such questions with an interval",
+      "href": "../slides/day1.html#spread"
+    },
+    {
+      "deck": "day1",
+      "id": "check-ladder",
+      "n": 24,
+      "session": 2,
+      "title": "What does 0.30 mean?",
+      "text": "Checkpoint What does 0.30 mean? Loay reports that his model reaches an average precision of 0.30 on a split of his own. What is the right reply? It is poor: the model is wrong 70% of the time It cannot be judged until it stands beside the constant and the rules on the same folds It is good: it is well above the base rate of 0.12 It is slightly worse than the rules, which score 0.31",
+      "href": "../slides/day1.html#check-ladder"
+    },
+    {
+      "deck": "day1",
+      "id": "lab-1-2",
+      "n": 25,
+      "session": 2,
+      "title": "A constant and three rules",
+      "text": "Lab 1.2 · 25 min A constant and three rules Score a constant predictor and a three-rule baseline on the fund's five folds and log both: the first two rungs of the ladder. D1_2_baselines.ipynb Load the folds; read the base rate of each 4 min Score the constant predictor 5 min Write the three-rule baseline and score it 8 min Log both runs 4 min Read the log: the number to beat 4 min ✱ Stretch: A fourth rule from the provider's past non-completion rate",
+      "href": "../slides/day1.html#lab-1-2"
+    },
+    {
+      "deck": "day1",
+      "id": "s3",
+      "n": 26,
+      "session": 3,
+      "title": "Linear models first",
+      "text": "Session 3 Linear models first Build a pipeline that imputes, encodes and scales inside each fold Fit a regularised logistic model and log its score and fold spread Read the largest coefficients and say what they do not prove 03",
+      "href": "../slides/day1.html#s3"
+    },
+    {
+      "deck": "day1",
+      "id": "linear-first",
+      "n": 27,
+      "session": 3,
+      "title": "A linear model is the first model worth beating",
+      "text": "Rung 3 A linear model is the first model worth beating Logistic regression: a weighted sum of the inputs, turned into a probability Fits in seconds, on a laptop Its probabilities are usually close to observed rates Each weight can be read, with care On tables with mostly additive effects it is hard to beat by much What it cannot do alone It adds effects. \"Absence matters, except for employer-sponsored trainees\" is an interaction: someone has to write it in, or a tree has to find it. That is Day 2.",
+      "href": "../slides/day1.html#linear-first"
+    },
+    {
+      "deck": "day1",
+      "id": "pipeline",
+      "n": 28,
+      "session": 3,
+      "title": "A pipeline fits every preparation step on training rows only",
+      "text": "Preparation is part of the model A pipeline fits every preparation step on training rows only Impute Median, plus a \"was missing\" column → Encode One column per category; rare ones share one → Scale Mean 0, spread 1 → Model Logistic regression In each fold, fit sees the training rows; the validation rows only pass through transform 15 columns become 101 model inputs The entry test is missing for 14.2% of rows, and not at random: walk-in registrations skip it",
+      "href": "../slides/day1.html#pipeline"
+    },
+    {
+      "deck": "day1",
+      "id": "pipeline-code",
+      "n": 29,
+      "session": 3,
+      "title": "The whole rung is one object that can be fitted and scored",
+      "text": "In code The whole rung is one object that can be fitted and scored numeric = Pipeline([(\"impute\", SimpleImputer(strategy=\"median\", add_indicator=True)), (\"scale\", StandardScaler())]) categories = Pipeline([(\"fill\", SimpleImputer(strategy=\"constant\", fill_value=\"not recorded\")), (\"onehot\", OneHotEncoder(handle_unknown=\"infrequent_if_exist\", min_frequency=30, sparse_output=False))]) prepare = ColumnTransformer([(\"num\", numeric, NUM), (\"cat\", categories, CAT)]) model = Pipeline([(\"prepare\", prepare), (\"model\", LogisticRegression(C=0.1, max_iter=2000))]) One object, one rule. Whatever is inside the pipeline is refitted in every fold. Whatever you compute before it has seen every row.",
+      "href": "../slides/day1.html#pipeline-code"
+    },
+    {
+      "deck": "day1",
+      "id": "logistic-score",
+      "n": 30,
+      "session": 3,
+      "title": "The logistic model wins on every fold, by far more than the spread",
+      "text": "The rung, measured The logistic model wins on every fold, by far more than the spread Constant 0.118 Three rules 0.310 Logistic regression 0.501 Fold scores 0.477 to 0.545; spread 0.028 The share of non-completers on the advisers' list rises from 29% to 40% Fold 1, with the least training data, scores highest: folds differ in more than size",
+      "href": "../slides/day1.html#logistic-score"
+    },
+    {
+      "deck": "day1",
+      "id": "regularisation",
+      "n": 31,
+      "session": 3,
+      "title": "The penalty hardly matters here, and choosing it has a price",
+      "text": "One setting The penalty hardly matters here, and choosing it has a price C (inverse penalty) Mean Spread 0.003, strong penalty 0.490 0.023 0.1 0.501 0.028 10, weak penalty 0.501 0.032 Regularisation pulls weights towards zero With 20,000 rows and 101 inputs, only a very strong penalty costs anything Picking C by these scores is tuning on the validation rows Harmless for three values; Lab 2.2 does it properly for twenty",
+      "href": "../slides/day1.html#regularisation"
+    },
+    {
+      "deck": "day1",
+      "id": "what-pipeline-protects",
+      "n": 32,
+      "session": 3,
+      "title": "The harm of preparing outside the folds depends on what the step has read",
+      "text": "What the pipeline protects The harm of preparing outside the folds depends on what the step has read Preparation Mean score Verdict Imputer and scaler inside each fold 0.5013 the reference Imputer and scaler fitted on all rows 0.5014 wrong, and almost free Provider rate from training rows 0.5018 honest Provider rate from all rows 0.5041 the gain is false What goes wrong. A step that never sees the outcome leaks little. A step built from the outcome (a rate per provider, a feature selection, a tuned setting) leaks in proportion to what it read.",
+      "href": "../slides/day1.html#what-pipeline-protects"
+    },
+    {
+      "deck": "day1",
+      "id": "coefficients",
+      "n": 33,
+      "session": 3,
+      "title": "A weight ranks what the model leans on, and proves nothing about causes",
+      "text": "Reading the model A weight ranks what the model leans on, and proves nothing about causes Input (fold 5) Weight Provider P23 +0.91 Provider P14 −0.80 absences_w2 +0.74 aptitude_score −0.65 Per standard deviation of a scaled column, or per category, others held fixed Providers differ a great deal: a finding for Hamza Al-Babtain, not a verdict \"Absence predicts leaving\" is not \"reducing absence prevents leaving\"",
+      "href": "../slides/day1.html#coefficients"
+    },
+    {
+      "deck": "day1",
+      "id": "check-pipeline",
+      "n": 34,
+      "session": 3,
+      "title": "Where may the scaler be fitted?",
+      "text": "Checkpoint Where may the scaler be fitted? You score a logistic model on five folds. On which rows is the scaler of fold 3 fitted? On the training rows of fold 3 only, each time the pipeline is fitted On all development rows, once, before the folds are made On the validation rows of fold 3, so that they are scaled correctly On the 2025 cohort, because it is the most recent",
+      "href": "../slides/day1.html#check-pipeline"
+    },
+    {
+      "deck": "day1",
+      "id": "lab-1-3",
+      "n": 35,
+      "session": 3,
+      "title": "A logistic model in a pipeline",
+      "text": "Lab 1.3 · 25 min A logistic model in a pipeline Fit a regularised logistic model in a pipeline on the same folds, log score and spread, try three strengths and see what the pipeline protects. D1_3_logistic_pipeline.ipynb Build the pipeline: impute, encode, scale, model 7 min Score it on the five folds and log the run 5 min Try three regularisation strengths; log each 5 min Prepare outside the folds and compare 5 min Read the largest coefficients 3 min ✱ Stretch: Add one interaction by hand and log it",
+      "href": "../slides/day1.html#lab-1-3"
+    },
+    {
+      "deck": "day1",
+      "id": "s4",
+      "n": 36,
+      "session": 4,
+      "title": "Features from history",
+      "text": "Session 4 Features from history Explain why an earlier enrolment counts only when its outcome was known Build two history features from records that ended before the prediction time Run a time-travel test that fails when a feature reads the future 04",
+      "href": "../slides/day1.html#s4"
+    },
+    {
+      "deck": "day1",
+      "id": "repeated-trainees",
+      "n": 37,
+      "session": 4,
+      "title": "One trainee in three has more than one enrolment",
+      "text": "The structure of the table One trainee in three has more than one enrolment One enrolment 19,500 Two 7,000 Three 2,500 Four 1,000 30,000 trainees, 45,000 enrolments The rows are not independent: a trainee carries habits and circumstances from one enrolment to the next That is information for the model today And a trap for validation on Day 3",
+      "href": "../slides/day1.html#repeated-trainees"
+    },
+    {
+      "deck": "day1",
+      "id": "history-signal",
+      "n": 38,
+      "session": 4,
+      "title": "An earlier non-completion more than triples the rate",
+      "text": "What history says An earlier non-completion more than triples the rate No earlier non-completion: 40,262 rows 10.3% One: 1,937 rows 38.9% Two or more: 357 rows 54.3% prior_enrolments: earlier enrolments whose outcome was known prior_noncompletions: how many of those ended without completion No rule of Lab 1.2 moves the rate as much as this one column",
+      "href": "../slides/day1.html#history-signal"
+    },
+    {
+      "deck": "day1",
+      "id": "known-outcome",
+      "n": 39,
+      "session": 4,
+      "title": "An earlier enrolment counts only once its outcome is known",
+      "text": "The rule An earlier enrolment counts only once its outcome is known One trainee Starts Ends Outcome Known when the April 2025 row is scored? Culinary arts January 2021 June 2021 completed yes Culinary arts July 2021 July 2021 left yes Culinary arts July 2024 July 2024 left yes Electrical installation April 2025 September 2025 ? this is the row to score What goes wrong. \"Earlier\" is read as \"started earlier\". 1,423 scorable rows have an earlier enrolment that was still running at the prediction time: its outcome is in the table and did not exist that day.",
+      "href": "../slides/day1.html#known-outcome"
+    },
+    {
+      "deck": "day1",
+      "id": "time-travel-test",
+      "n": 40,
+      "session": 4,
+      "title": "The time-travel test hides the future and checks that nothing changes",
+      "text": "A test, not a promise The time-travel test hides the future and checks that nothing changes 1 · Pick a past date For example 1 March 2023 → 2 · Compute twice From all records, and from the records ended by that date → 3 · Compare For every row predicted before that date A feature that reads the past only gives the same value both times The \"started earlier\" version changes for about 90 rows at each date: it fails The test checks the features, not the model, and takes seconds",
+      "href": "../slides/day1.html#time-travel-test"
+    },
+    {
+      "deck": "day1",
+      "id": "history-gain",
+      "n": 41,
+      "session": 4,
+      "title": "History helps on every fold, and only for those who have one",
+      "text": "Rung 3, with history History helps on every fold, and only for those who have one Fold Logistic With history Gain 1 0.545 0.557 +0.012 2 0.483 0.514 +0.031 3 0.515 0.530 +0.016 4 0.477 0.509 +0.031 5 0.486 0.512 +0.026 Mean 0.501 0.524 +0.023 Validation rows Without With New to the fund: 14,455 0.484 0.484 Returning: 7,315 0.523 0.579",
+      "href": "../slides/day1.html#history-gain"
+    },
+    {
+      "deck": "day1",
+      "id": "check-history",
+      "n": 42,
+      "session": 4,
+      "title": "Which history feature reads the future?",
+      "text": "Checkpoint Which history feature reads the future? Four candidate features for a row scored at the end of week 2. Which one fails the time-travel test? The number of the trainee's enrolments that ended before the prediction date The trainee's entry test score The trainee's non-completion rate over all of their enrolments in the table The trainee's days absent in the first two weeks of this programme",
+      "href": "../slides/day1.html#check-history"
+    },
+    {
+      "deck": "day1",
+      "id": "lab-1-4",
+      "n": 43,
+      "session": 4,
+      "title": "Two history features",
+      "text": "Lab 1.4 · 25 min Two history features Add two history features from past records only, pass a time-travel test and log what they add to the logistic rung. D1_4_history_features.ipynb Follow one trainee through the records 3 min Write the two history features from past records only 9 min Run the time-travel test 5 min Rescore the logistic model with them; log the run 5 min Compare new and returning trainees 3 min ✱ Stretch: A third feature: days since the last exit",
+      "href": "../slides/day1.html#lab-1-4"
+    },
+    {
+      "deck": "day1",
+      "id": "wrap-up",
+      "n": 44,
+      "session": 4,
+      "title": "Three things to keep",
+      "text": "Day 1 Three things to keep The decision frames the task Target, unit, prediction time, action. They fix the rows (42,556 of 45,000) and the columns (nothing recorded at exit). A ladder with a log Constant 0.118, three rules 0.310, logistic 0.501, with history 0.524. Same folds, every run logged, spread beside every mean. The past only Preparation inside the folds; history from records whose outcome was known; a test that fails when a feature reads the future.",
+      "href": "../slides/day1.html#wrap-up"
+    },
+    {
+      "deck": "day1",
+      "id": "next",
+      "n": 45,
+      "session": 4,
+      "title": "Day 2 · Trees and challengers",
+      "text": "Next Day 2 · Trees and challengers The number to beat is 0.524. Tomorrow: boosted trees, a budget of 20 trials, an automated challenger, and an interval that says whether a gain is real. Keep artifacts/run_log.csv: tomorrow adds three rungs Guess now: by how much will tuned boosted trees beat 0.524?",
+      "href": "../slides/day1.html#next"
+    },
+    {
+      "deck": "day2",
+      "id": "title",
+      "n": 1,
+      "session": 0,
+      "title": "Trees and challengers",
+      "text": "SDAIA Academy · Machine Learning for Tabular Data: Baselines and Validation Trees and challengers Day 2: Boosted trees, a fixed tuning budget, an automated challenger and a paired decision Data Science Track4 teaching days + capstone day4 sessions · 4 labsDS-204",
+      "href": "../slides/day2.html#title"
+    },
+    {
+      "deck": "day2",
+      "id": "agenda",
+      "n": 2,
+      "session": 0,
+      "title": "Trees and challengers",
+      "text": "Today Trees and challengers Session 1 · Gradient-boosted trees Boosted trees with the library's defaults: what they fit, what they memorise, and what importance scores can and cannot say. Session 2 · Tuning under a budget A budget of 20 trials, spent inside each training part so that the reported score is not the one that chose the settings. Session 3 · Automated and pretrained challengers An automated challenger, and what to check before a pretrained one: its licence, where the data goes, and a contest on equal terms. Session 4 · Is the challenger better Two models scored on the same folds give paired differences: an interval on their mean, and a decision stated before looking.",
+      "href": "../slides/day2.html#agenda"
+    },
+    {
+      "deck": "day2",
+      "id": "review-day1",
+      "n": 3,
+      "session": 0,
+      "title": "What did history add, and how do you know?",
+      "text": "Review of Day 1 What did history add, and how do you know? Two history features lifted the logistic rung from 0.501 to 0.524. The fold spread of that rung is 0.028. Why is the gain still believable? Because 0.023 is large compared with the base rate of 0.12 Because the table has 32,000 development rows Because the gain has the same sign on all five folds, where both models met the same rows Because the features passed the time-travel test",
+      "href": "../slides/day2.html#review-day1"
+    },
+    {
+      "deck": "day2",
+      "id": "where-we-are",
+      "n": 4,
+      "session": 0,
+      "title": "The features are fixed; today the model changes",
+      "text": "Today The features are fixed; today the model changes Frame and baseline Constant 0.118, rules 0.310, logistic 0.524 Day 1 Trees and challengers Boosted trees, a tuning budget, a paired decision Day 2 Validation and leakage Three splits, four kinds of leak, an audit Day 3 Errors and documentation Threshold, calibration, subgroups, model card Day 4",
+      "href": "../slides/day2.html#where-we-are"
+    },
+    {
+      "deck": "day2",
+      "id": "s1",
+      "n": 5,
+      "session": 1,
+      "title": "Gradient-boosted trees",
+      "text": "Session 1 Gradient-boosted trees Describe how boosting adds small trees to correct the errors so far Compare training and validation scores and read the gap Read importance scores and name two of their limits 01",
+      "href": "../slides/day2.html#s1"
+    },
+    {
+      "deck": "day2",
+      "id": "one-tree",
+      "n": 6,
+      "session": 1,
+      "title": "A tree splits the trainees into groups and predicts each group's rate",
+      "text": "The building block A tree splits the trainees into groups and predicts each group's rate Absent 2 days or more? The first question splits all trainees → Sponsored by an employer? Asked only inside the \"absent\" group → A leaf The share that did not complete among the trainees who land here Every question is \"is this column above or below a value?\" A second question inside one branch is an interaction, found without anyone writing it Scaling changes nothing: trees only compare",
+      "href": "../slides/day2.html#one-tree"
+    },
+    {
+      "deck": "day2",
+      "id": "boosting",
+      "n": 7,
+      "session": 1,
+      "title": "Boosting adds one small tree at a time, each correcting the sum so far",
+      "text": "Many small trees Boosting adds one small tree at a time, each correcting the sum so far Start from the base rate Fit a small tree to what the current model still gets wrong Add a fraction of it: the learning rate Repeat a few hundred times The prediction is the sum of all the trees Why it leads on tables It handles mixed columns, missing values and interactions with little preparation, and it runs on a laptop processor. On medium-sized tables, tuned tree ensembles have matched or beaten deep networks in published comparisons.",
+      "href": "../slides/day2.html#boosting"
+    },
+    {
+      "deck": "day2",
+      "id": "defaults",
+      "n": 8,
+      "session": 1,
+      "title": "Defaults are one setting among thousands, chosen for nobody's table",
+      "text": "What ships in the box Defaults are one setting among thousands, chosen for nobody's table Setting LightGBM default What it controls Trees 100 How long the sum grows Leaves per tree 31 How many interactions one tree can hold Learning rate 0.1 How much each tree may correct Rows per leaf, at least 20 How small a group may be 31 leaves with 20 rows each. A tree may isolate a group of 20 trainees. With 9,000 training rows and a 12% outcome, that is two or three non-completers per leaf.",
+      "href": "../slides/day2.html#defaults"
+    },
+    {
+      "deck": "day2",
+      "id": "train-vs-valid",
+      "n": 9,
+      "session": 1,
+      "title": "The training score measures memory; the gap shrinks as the rows grow",
+      "text": "Lab 2.1, fold by fold The training score measures memory; the gap shrinks as the rows grow Fold Training rows Score on training rows Score on validation rows 1 9,068 0.849 0.501 2 12,960 0.786 0.473 3 17,028 0.739 0.521 4 21,382 0.707 0.507 5 25,836 0.685 0.515 What goes wrong. A report quotes 0.85. It is the model's score on rows it has already seen. Only the validation column goes into the log.",
+      "href": "../slides/day2.html#train-vs-valid"
+    },
+    {
+      "deck": "day2",
+      "id": "more-trees",
+      "n": 10,
+      "session": 1,
+      "title": "Past 50 trees, each new tree helps the training rows and hurts the others",
+      "text": "Follow the trees Past 50 trees, each new tree helps the training rows and hurts the others Trees Training Validation 10 0.519 0.492 25 0.559 0.507 50 0.615 0.517 100 0.685 0.515 200 0.775 0.508 400 0.897 0.500 Fold 5, default trees of 31 leaves The training score never stops rising The validation score peaks early and declines The peak depends on the other settings: smaller trees peak later",
+      "href": "../slides/day2.html#more-trees"
+    },
+    {
+      "deck": "day2",
+      "id": "defaults-vs-logistic",
+      "n": 11,
+      "session": 1,
+      "title": "With defaults, boosted trees score below the logistic model",
+      "text": "The rung, measured With defaults, boosted trees score below the logistic model Fold Logistic + history Boosted, defaults Difference 1 0.557 0.501 −0.056 2 0.514 0.473 −0.041 3 0.530 0.521 −0.009 4 0.509 0.507 −0.002 5 0.512 0.515 +0.004 Mean 0.524 0.503 −0.021 A more flexible model is not automatically a rung up The loss is largest where training rows are fewest It goes into the log as it is The honest next step: tune, under a budget",
+      "href": "../slides/day2.html#defaults-vs-logistic"
+    },
+    {
+      "deck": "day2",
+      "id": "importance",
+      "n": 12,
+      "session": 1,
+      "title": "Two importance scores, two different answers for the same column",
+      "text": "What does the model use? Two importance scores, two different answers for the same column Column Share of gain Score lost when shuffled absences_w2 39% 0.251 aptitude_score 16% 0.076 prior_noncompletions 5% 0.041 provider_id 11% 0.029 distance_km 8% 0.007 Gain is counted on training rows: it rewards columns with many values Permutation is measured on validation rows, one column at a time Columns that carry the same information share the credit Neither gives a direction or a cause",
+      "href": "../slides/day2.html#importance"
+    },
+    {
+      "deck": "day2",
+      "id": "check-training-score",
+      "n": 13,
+      "session": 1,
+      "title": "What does a high training score tell you?",
+      "text": "Checkpoint What does a high training score tell you? A boosted model scores 0.85 on its 9,068 training rows and 0.50 on the validation rows of the same fold. What do you conclude? The model has memorised part of the training rows; 0.50 is the number to log The true score is about halfway, near 0.67 The validation rows must contain a leak The validation fold is unusually hard and should be replaced",
+      "href": "../slides/day2.html#check-training-score"
+    },
+    {
+      "deck": "day2",
+      "id": "lab-2-1",
+      "n": 14,
+      "session": 1,
+      "title": "Boosted trees with defaults",
+      "text": "Lab 2.1 · 25 min Boosted trees with defaults Train boosted trees with defaults, compare training and validation scores on the fund's folds and log the rung. D2_1_boosted_defaults.ipynb Fit with defaults on one fold: training against validation 5 min Score the five folds and log the run 5 min Follow both scores as trees are added 7 min Set the rung beside the logistic model 4 min Read two kinds of importance 4 min ✱ Stretch: Stop adding trees early, without touching the validation fold",
+      "href": "../slides/day2.html#lab-2-1"
+    },
+    {
+      "deck": "day2",
+      "id": "s2",
+      "n": 15,
+      "session": 2,
+      "title": "Tuning under a budget",
+      "text": "Session 2 Tuning under a budget Name the settings of boosted trees that are worth a budget Run a random search whose choices are made on inner folds Report the gain over defaults with its fold spread and its cost in time 02",
+      "href": "../slides/day2.html#s2"
+    },
+    {
+      "deck": "day2",
+      "id": "settings-that-matter",
+      "n": 16,
+      "session": 2,
+      "title": "A few settings trade flexibility against stability",
+      "text": "What to tune A few settings trade flexibility against stability How much is learnt The number of trees and the learning rate. They work as a pair: a smaller rate needs more trees. How complex each tree is Leaves per tree, and the fewest rows a leaf may hold. Fewer leaves and larger leaves: less to memorise. How much is held back Each tree sees a share of the rows and of the inputs; a penalty shrinks the leaf values. Lab 2.2 searches seven settings with 2,592 combinations. The budget is 20 of them.",
+      "href": "../slides/day2.html#settings-that-matter"
+    },
+    {
+      "deck": "day2",
+      "id": "budget",
+      "n": 17,
+      "session": 2,
+      "title": "State the budget before the search, and draw the trials at random",
+      "text": "The rule State the budget before the search, and draw the trials at random A budget: 20 trials, fixed in advance, with a seed Random search : each trial draws every setting independently With a few settings that matter and several that hardly do, random draws cover the important ones better than a grid Every trial is kept, the poor ones too Why a budget is about honesty Each trial is another look at the validation rows. A search that stops \"when the score looks good\" has no defined number of looks, and its best score cannot be interpreted.",
+      "href": "../slides/day2.html#budget"
+    },
+    {
+      "deck": "day2",
+      "id": "choosing-flatters",
+      "n": 18,
+      "session": 2,
+      "title": "A score that chose the winner flatters the winner",
+      "text": "Why tuning needs its own rows A score that chose the winner flatters the winner Rows used to choose among 20 trials Winner's score there Same model, fresh rows Flattery 10,885 0.521 0.522 −0.001 2,000 0.529 0.519 +0.010 500 0.540 0.515 +0.025 What goes wrong. The best of 20 is partly the best and partly the luckiest. The fewer rows choose, and the more trials compete, the larger the lucky part.",
+      "href": "../slides/day2.html#choosing-flatters"
+    },
+    {
+      "deck": "day2",
+      "id": "nested",
+      "n": 19,
+      "session": 2,
+      "title": "Inner folds choose, the outer fold reports",
+      "text": "Nested validation Inner folds choose, the outer fold reports 1 · Outer fold Set its validation half-year aside → 2 · Inner folds Inside the training part, score 20 trials on two later half-years → 3 · Refit The best settings, on the whole training part → 4 · Report One score on the half-year no trial has seen Repeated for each of the five outer folds: five searches, five scores What is validated is the procedure \"search 20 trials, then fit\" The inner folds are built like the outer ones: later half-years",
+      "href": "../slides/day2.html#nested"
+    },
+    {
+      "deck": "day2",
+      "id": "nested-result",
+      "n": 20,
+      "session": 2,
+      "title": "Twenty trials gain 0.026 over defaults, on every fold",
+      "text": "Lab 2.2, measured Twenty trials gain 0.026 over defaults, on every fold Fold Defaults Tuned (nested) Gain Settings chosen: trees · leaves · rate 1 0.501 0.542 +0.041 200 · 8 · 0.05 2 0.473 0.517 +0.044 400 · 4 · 0.05 3 0.521 0.540 +0.019 400 · 4 · 0.05 4 0.507 0.519 +0.013 400 · 8 · 0.05 5 0.515 0.526 +0.011 400 · 4 · 0.10 Mean · spread 0.503 · 0.019 0.529 · 0.012 +0.026 small trees, every time Every fold chose trees of 4 or 8 leaves. The default is 31.",
+      "href": "../slides/day2.html#nested-result"
+    },
+    {
+      "deck": "day2",
+      "id": "tuned-vs-logistic",
+      "n": 21,
+      "session": 2,
+      "title": "The tuned trees are 0.005 above the logistic model",
+      "text": "The ladder so far The tuned trees are 0.005 above the logistic model Three rules 0.310 Logistic + history 0.524 Boosted, defaults 0.503 Boosted, 20 trials 0.529 Against the logistic rung: ahead on four folds, behind by 0.015 on fold 1 A mean gain of 0.005 with fold spreads of 0.012 and 0.020 Is that a gain? Session 4 gives the tool to answer",
+      "href": "../slides/day2.html#tuned-vs-logistic"
+    },
+    {
+      "deck": "day2",
+      "id": "check-nested",
+      "n": 22,
+      "session": 2,
+      "title": "Which score may be reported?",
+      "text": "Checkpoint Which score may be reported? An analyst tries 200 settings, scores each on the same five folds and reports the highest mean, 0.547. What is wrong with the number? 200 trials are too many for a table of this size Random search is unreliable; a grid would give the true score Five folds are too few to score any model The folds that chose the winner also score it, so part of 0.547 is luck",
+      "href": "../slides/day2.html#check-nested"
+    },
+    {
+      "deck": "day2",
+      "id": "lab-2-2",
+      "n": 23,
+      "session": 2,
+      "title": "Twenty trials in nested folds",
+      "text": "Lab 2.2 · 25 min Twenty trials in nested folds Run a 20-trial search in nested folds, record the gain over defaults and see how far the inner score flatters the choice. D2_2_nested_search.ipynb Read the search space and the budget 3 min Write the search over inner folds 8 min Run it inside each outer fold 6 min Log the tuned rung; record the gain 4 min Compare inner and outer scores 4 min ✱ Stretch: Spend 40 trials: what does the second half of the budget buy?",
+      "href": "../slides/day2.html#lab-2-2"
+    },
+    {
+      "deck": "day2",
+      "id": "s3",
+      "n": 24,
+      "session": 3,
+      "title": "Automated and pretrained challengers",
+      "text": "Session 3 Automated and pretrained challengers Describe what an automated tabular tool and a tabular foundation model each do Check a challenger's licence and where the data would be sent before using it Run a challenger on the same folds and the same time budget as the champion 03",
+      "href": "../slides/day2.html#s3"
+    },
+    {
+      "deck": "day2",
+      "id": "two-challengers",
+      "n": 25,
+      "session": 3,
+      "title": "One automates the search; the other arrives already trained",
+      "text": "Two kinds of challenger One automates the search; the other arrives already trained Automated machine learning You give the training rows, a metric and a time limit. The tool prepares the columns, trains several model families, tunes them and blends the best. Example: AutoGluon Tabular. It trains on your machine, on your rows only. A tabular foundation model A network pretrained on millions of synthetic tables. It reads your training rows as context and predicts the new rows in one pass, with no tuning. Example: TabPFN. Published results are strongest on small tables. Both are challengers, not shortcuts. Each has to stand on the same folds as the champion, in the same log.",
+      "href": "../slides/day2.html#two-challengers"
+    },
+    {
+      "deck": "day2",
+      "id": "licence-check",
+      "n": 26,
+      "session": 3,
+      "title": "Three questions decide whether a challenger may be used at all",
+      "text": "Before any score Three questions decide whether a challenger may be used at all Question AutoGluon Tabular TabPFN (checked November 2026) Licence of the code Apache 2.0 Apache 2.0 Licence of the weights None: it trains from your rows Separate from the code; recent versions are released for non-commercial use Where do the rows go? Nowhere Nowhere when run locally; to the provider when its hosted service is used What goes wrong. A pretrained model wins the contest, and three weeks later someone reads the licence of its weights. Read it first, on the official page, on the day you use it.",
+      "href": "../slides/day2.html#licence-check"
+    },
+    {
+      "deck": "day2",
+      "id": "fair-contest",
+      "n": 27,
+      "session": 3,
+      "title": "Same folds, same features, same time, written down first",
+      "text": "A fair contest Same folds, same features, same time, written down first Folds: the fund's five, forward in time Features: the champion's 17, no others Time: what the champion's search used, 140 seconds for five folds, so 28 seconds a fold Metric: average precision, told to the tool Configuration: one preset, fixed before the run What a contest without rules measures Give one side an hour and the other a minute, or let one side see a column the other did not, and the result says who was favoured, not which approach is better.",
+      "href": "../slides/day2.html#fair-contest"
+    },
+    {
+      "deck": "day2",
+      "id": "tool-own-score",
+      "n": 28,
+      "session": 3,
+      "title": "The tool's own score comes from a split it chose by itself",
+      "text": "Read what it built The tool's own score comes from a split it chose by itself Built on fold 5 Its own validation score Weighted blend 0.491 LightGBM, three variants 0.483 to 0.484 Random forests, two 0.447 to 0.455 Extra trees, two 0.443 to 0.445 It set aside a random part of the training rows to choose and weight its models The fund validates forward in time On the fund's fold 5 the same blend scores 0.518 Log your score, never the tool's",
+      "href": "../slides/day2.html#tool-own-score"
+    },
+    {
+      "deck": "day2",
+      "id": "challenger-result",
+      "n": 29,
+      "session": 3,
+      "title": "On equal terms the challenger lands close to the champion",
+      "text": "Lab 2.3, measured On equal terms the challenger lands close to the champion Fold Champion Challenger Challenger − champion 1 0.542 0.534 −0.009 2 0.517 0.497 −0.021 3 0.540 0.541 +0.001 4 0.519 0.521 +0.001 5 0.526 0.518 −0.008 Mean 0.529 0.522 −0.007 Ahead on two folds, behind on three. Not yet a decision.",
+      "href": "../slides/day2.html#challenger-result"
+    },
+    {
+      "deck": "day2",
+      "id": "check-contest",
+      "n": 30,
+      "session": 3,
+      "title": "What makes this contest unfair?",
+      "text": "Checkpoint What makes this contest unfair? A team reports that an automated tool beats their tuned model, 0.561 to 0.529. Which detail makes the comparison worthless? The tool blends several models and the champion is one model The tool's 0.561 is its own internal validation score; the champion's 0.529 is on the fund's folds The tool was told to optimise average precision Both ran with a limit of 28 seconds a fold",
+      "href": "../slides/day2.html#check-contest"
+    },
+    {
+      "deck": "day2",
+      "id": "lab-2-3",
+      "n": 31,
+      "session": 3,
+      "title": "A challenger on equal terms",
+      "text": "Lab 2.3 · 25 min A challenger on equal terms Run an automated challenger on the same five folds with the time budget the tuned search used, and log it beside the champion. D2_3_challenger.ipynb Read the challenger configuration and its licence 3 min Write the function that runs it on one fold 8 min Run the five folds on the same time budget 7 min Log the run; read what it built 4 min Set the two rows of the log side by side 3 min ✱ Stretch: Give the challenger the fund's inner split in place of its own",
+      "href": "../slides/day2.html#lab-2-3"
+    },
+    {
+      "deck": "day2",
+      "id": "s4",
+      "n": 32,
+      "session": 4,
+      "title": "Is the challenger better",
+      "text": "Session 4 Is the challenger better Explain why fold scores of two models are compared as pairs Compute the mean paired difference with an interval Decide against a minimum effect stated in advance, in one line 04",
+      "href": "../slides/day2.html#s4"
+    },
+    {
+      "deck": "day2",
+      "id": "pairs",
+      "n": 33,
+      "session": 4,
+      "title": "Two models on the same folds give pairs, and pairs are compared by their differences",
+      "text": "The key idea Two models on the same folds give pairs, and pairs are compared by their differences Spread of the champion's folds 0.012 Spread of the challenger's folds 0.017 Spread of the five differences 0.009 A hard half-year lowers both models The difference within a fold removes that shared part So the differences vary less than either score Compare two means with their spreads and you throw the pairing away",
+      "href": "../slides/day2.html#pairs"
+    },
+    {
+      "deck": "day2",
+      "id": "t-interval",
+      "n": 34,
+      "session": 4,
+      "title": "Five differences give an honest, wide interval",
+      "text": "An interval on the mean difference Five differences give an honest, wide interval −0.007 mean difference, challenger minus champion; 95% interval −0.018 to +0.004 Mean ± t × (spread of the differences ÷ √5) With 5 folds the multiplier is 2.78, not 1.96 The interval contains zero: no difference is shown The folds share training rows, so the true uncertainty is, if anything, larger",
+      "href": "../slides/day2.html#t-interval"
+    },
+    {
+      "deck": "day2",
+      "id": "paired-bootstrap",
+      "n": 35,
+      "session": 4,
+      "title": "The paired bootstrap resamples validation rows, not folds",
+      "text": "A second opinion The paired bootstrap resamples validation rows, not folds Both models scored the same 21,770 validation rows Draw rows again with replacement, inside each fold Score both models on the same draw Keep the difference; repeat 1,000 times Method 95% interval of the difference t over five folds −0.018 to +0.004 Paired bootstrap over rows −0.013 to −0.002 Two questions. The first asks what other half-years would show, the second what other trainees in these half-years would show. Report both when they differ.",
+      "href": "../slides/day2.html#paired-bootstrap"
+    },
+    {
+      "deck": "day2",
+      "id": "minimum-effect",
+      "n": 36,
+      "session": 4,
+      "title": "State the smallest gain worth having before you look",
+      "text": "The decision rule State the smallest gain worth having before you look Adopt the challenger The whole interval lies above the minimum effect. Keep the champion The whole interval lies below the minimum effect. Not shown The interval straddles it. The rule says what happens then: the simpler model stays. For the fund: +0.01 average precision, agreed with Dr. Haya Al-Mogren before the contest.",
+      "href": "../slides/day2.html#minimum-effect"
+    },
+    {
+      "deck": "day2",
+      "id": "decision-line",
+      "n": 37,
+      "session": 4,
+      "title": "Difference, interval, minimum effect, decision",
+      "text": "The one-line decision Difference, interval, minimum effect, decision The line of Lab 2.4. On the same five folds the challenger differs from the champion by −0.007 average precision (95% interval −0.018 to +0.004; paired bootstrap −0.013 to −0.002). Minimum effect stated in advance: +0.01. Decision: keep the champion. Four parts, in this order, in the capstone README \"Keep the champion\" is shown here: the whole interval is below +0.01 It is a statement about this contest: 28 seconds a fold, one preset",
+      "href": "../slides/day2.html#decision-line"
+    },
+    {
+      "deck": "day2",
+      "id": "champion-vs-logistic",
+      "n": 38,
+      "session": 4,
+      "title": "The tuned trees are not shown to beat the logistic model",
+      "text": "The same tool, pointed at our own ladder The tuned trees are not shown to beat the logistic model +0.005 champion minus logistic with history; 95% interval −0.010 to +0.019 The interval contains zero and the minimum effect Verdict by the rule: not shown The course carries the trees forward; the model card says a linear model does as well A result worth reporting, not hiding",
+      "href": "../slides/day2.html#champion-vs-logistic"
+    },
+    {
+      "deck": "day2",
+      "id": "check-interval",
+      "n": 39,
+      "session": 4,
+      "title": "What does this interval decide?",
+      "text": "Checkpoint What does this interval decide? A challenger's mean paired difference is +0.006, with a 95% interval from −0.004 to +0.016. The minimum effect stated in advance is +0.01. What is the decision? Adopt the challenger: its mean difference is positive The two models are shown to be equal Not shown: the interval straddles the minimum effect, so the champion stays Adopt it, with the minimum effect lowered to +0.005",
+      "href": "../slides/day2.html#check-interval"
+    },
+    {
+      "deck": "day2",
+      "id": "lab-2-4",
+      "n": 40,
+      "session": 4,
+      "title": "The paired difference and the decision",
+      "text": "Lab 2.4 · 25 min The paired difference and the decision Compute the paired fold difference between champion and challenger with an interval, check it with a paired bootstrap and write the one-line decision. D2_4_paired_difference.ipynb Line up the fold scores of the two models 3 min Compute the paired differences and their mean 4 min Put a t interval on the mean difference 6 min Check it with a paired bootstrap over rows 7 min Write the decision in one line 5 min ✱ Stretch: The same comparison between the champion and the logistic rung",
+      "href": "../slides/day2.html#lab-2-4"
+    },
+    {
+      "deck": "day2",
+      "id": "wrap-up",
+      "n": 41,
+      "session": 4,
+      "title": "Three things to keep",
+      "text": "Day 2 Three things to keep Defaults are a rung, not the model Boosted trees with defaults scored 0.503, below the logistic rung at 0.524. Twenty trials in nested folds reached 0.529. Choose and report on different rows A winner picked on 500 rows was flattered by 0.025. Inner folds choose; the outer fold reports. A difference needs an interval Challenger −0.007 (−0.018 to +0.004): keep the champion. Champion over logistic +0.005 (−0.010 to +0.019): not shown.",
+      "href": "../slides/day2.html#wrap-up"
+    },
+    {
+      "deck": "day2",
+      "id": "next",
+      "n": 42,
+      "session": 4,
+      "title": "Day 3 · Validation and leakage",
+      "text": "Next Day 3 · Validation and leakage Every score so far used the fund's folds. Tomorrow you find out why they are built that way, what a random split would have told you, and how to audit a score that is too good. Loay Al-Kadi's notebook reports a score above 0.9 on this table Tomorrow's first attempts at the split and the leak hunt are without AI assistance",
+      "href": "../slides/day2.html#next"
+    },
+    {
+      "deck": "day3",
+      "id": "title",
+      "n": 1,
+      "session": 0,
+      "title": "Validation and leakage",
+      "text": "SDAIA Academy · Machine Learning for Tabular Data: Baselines and Validation Validation and leakage Day 3: The split that mirrors use, the four kinds of leakage and how to audit a score Data Science Track4 teaching days + capstone day4 sessions · 4 labsDS-204",
+      "href": "../slides/day3.html#title"
+    },
+    {
+      "deck": "day3",
+      "id": "agenda",
+      "n": 2,
+      "session": 0,
+      "title": "Validation and leakage",
+      "text": "Today Validation and leakage Session 1 · The split decides the score The same model scores differently under random, grouped and time-ordered splits, and each gap has a cause you can name. Session 2 · Kinds of leakage Four kinds of leakage, each with the question that catches it, practised on cases from other sectors. Session 3 · Hunting planted leaks Three instruments for an audit: when each column is written, whether rows repeat, and which features carry the score. Session 4 · Reading someone else's notebook Reviewing a notebook you did not write: an order to read it in, and the things that make its headline number untrustworthy.",
+      "href": "../slides/day3.html#agenda"
+    },
+    {
+      "deck": "day3",
+      "id": "review-day2",
+      "n": 3,
+      "session": 0,
+      "title": "What did the challenger's interval decide?",
+      "text": "Review of Day 2 What did the challenger's interval decide? The challenger differed from the champion by −0.007 (95% interval −0.018 to +0.004). The minimum effect was +0.01. Why was the decision \"keep the champion\" and not \"not shown\"? Because the mean difference is negative Because the whole interval lies below the minimum effect Because the interval excludes zero Because the champion won on three of the five folds",
+      "href": "../slides/day3.html#review-day2"
+    },
+    {
+      "deck": "day3",
+      "id": "where-we-are",
+      "n": 4,
+      "session": 0,
+      "title": "The model is fixed; today the score itself is questioned",
+      "text": "Today The model is fixed; today the score itself is questioned Frame and baseline The decision, the rows, three baselines Day 1 Trees and challengers Champion 0.529; challenger not adopted Day 2 Validation and leakage Three splits, four kinds of leak, an audit Day 3 Errors and documentation Threshold, calibration, subgroups, model card Day 4",
+      "href": "../slides/day3.html#where-we-are"
+    },
+    {
+      "deck": "day3",
+      "id": "s1",
+      "n": 5,
+      "session": 1,
+      "title": "The split decides the score",
+      "text": "Session 1 The split decides the score Choose the split that mirrors how a model will be used Implement random, grouped and time-ordered splits on the same rows Explain each gap between the three scores from the structure of the data 01",
+      "href": "../slides/day3.html#s1"
+    },
+    {
+      "deck": "day3",
+      "id": "rehearsal",
+      "n": 6,
+      "session": 1,
+      "title": "A validation split is a rehearsal of how the model will be used",
+      "text": "The principle A validation split is a rehearsal of how the model will be used Who is new in use? New rows of known people, or people the model has never seen? If people are new, they must be new in validation. What is later in use? The model is trained once and scores what comes afterwards. Then validation rows come after training rows. What is known on that day? An outcome that does not exist yet cannot train a model. Training rows are those whose outcome was known. The split is chosen from the use, before any score is seen.",
+      "href": "../slides/day3.html#rehearsal"
+    },
+    {
+      "deck": "day3",
+      "id": "three-splits",
+      "n": 7,
+      "session": 1,
+      "title": "Random, grouped and time-ordered splits answer different questions",
+      "text": "Three ways to cut the same rows Random, grouped and time-ordered splits answer different questions Split How it cuts The question it answers Random Each row lands in a fold by chance How well does the model do on more rows like these, from the same period? Grouped All rows of one trainee stay on one side How well does it do on a trainee it has never seen? Time-ordered Train on the past, validate on a later half-year How well does it do on the next intake? None is wrong in itself. A split is wrong for a use. A random split is right when rows are independent and the model is used on rows like them.",
+      "href": "../slides/day3.html#three-splits"
+    },
+    {
+      "deck": "day3",
+      "id": "what-training-knows",
+      "n": 8,
+      "session": 1,
+      "title": "A random split trains on the future and on outcomes nobody knew yet",
+      "text": "Lab 3.1, before any score A random split trains on the future and on outcomes nobody knew yet For the day a validation row is scored Random Grouped Time-ordered Validation trainees who also have a training row 40% 0% 30% Training rows that start later than that day 47% 47% 0% Training rows whose programme was not yet due to end 58% 58% 0% Training rows per fold 25,951 25,951 17,254 What goes wrong. A split is judged by its score only. Describe first what the training part knows; the table costs ten lines and no model.",
+      "href": "../slides/day3.html#what-training-knows"
+    },
+    {
+      "deck": "day3",
+      "id": "due-to-end",
+      "n": 9,
+      "session": 1,
+      "title": "Train on programmes that were due to end, not on those that had ended",
+      "text": "A detail that decides the folds Train on programmes that were due to end, not on those that had ended On 1 July 2024 a 36-week programme that began in March is still running Its early leavers already have an outcome; its other trainees have none \"Every row with a known outcome\" keeps the leavers and drops their classmates The model then learns that recent long programmes always fail The fund's rule A row trains a fold only when its programme's planned end lies before the validation half-year begins. The whole class enters together, or not at all.",
+      "href": "../slides/day3.html#due-to-end"
+    },
+    {
+      "deck": "day3",
+      "id": "three-scores",
+      "n": 10,
+      "session": 1,
+      "title": "For the champion, the random split does not overstate; hiding the history does",
+      "text": "Lab 3.1, measured For the champion, the random split does not overstate; hiding the history does Random 0.521 Grouped 0.520 Grouped, history hidden 0.500 Time-ordered 0.525 Random against time-ordered: −0.004, inside the fold spreads of 0.021 and 0.012 Grouping alone changes nothing: the champion does not recognise a trainee A trainee the fund has never seen has no history: −0.020",
+      "href": "../slides/day3.html#three-scores"
+    },
+    {
+      "deck": "day3",
+      "id": "new-and-returning",
+      "n": 11,
+      "session": 1,
+      "title": "One score averages two kinds of trainees",
+      "text": "The grouped gap, explained One score averages two kinds of trainees In the fund's validation folds Share of rows Average precision New to the fund 66% 0.491 Returning 34% 0.578 The 0.529 of the ladder is partly earned on returning trainees For a programme where nobody has a history, quote the grouped score with history hidden: 0.500 Both numbers go into the model card",
+      "href": "../slides/day3.html#new-and-returning"
+    },
+    {
+      "deck": "day3",
+      "id": "ageing",
+      "n": 12,
+      "session": 1,
+      "title": "A model one year old scores 0.016 below a fresh one",
+      "text": "What only time order can show A model one year old scores 0.016 below a fresh one Age of the model Against a fresh model Pairs Fresh 0.000 5 Half a year −0.006 4 One year −0.016 3 One and a half years −0.020 2 Each fold's model, scored on the later half-years too A random split trains and validates on one period: its model never ages The older model also had fewer rows: both are what \"not retraining\" means The number sets the retraining interval",
+      "href": "../slides/day3.html#ageing"
+    },
+    {
+      "deck": "day3",
+      "id": "when-random-overstates",
+      "n": 13,
+      "session": 1,
+      "title": "When does a random split overstate badly?",
+      "text": "Beyond this table When does a random split overstate badly? Many rows per unit Thousands of readings per machine, dozens of visits per patient. The model recognises the unit. Here: at most four rows per trainee. Features built from other rows A rate or a count that read the validation rows or the future. The next three sessions. A world that moves fast Prices, fraud patterns, policies. The faster the change, the more a model's age costs. The habit. Choose the split from the use. Then measure the other splits once, and write the gaps down with their causes.",
+      "href": "../slides/day3.html#when-random-overstates"
+    },
+    {
+      "deck": "day3",
+      "id": "check-split",
+      "n": 14,
+      "session": 1,
+      "title": "Which split for which use?",
+      "text": "Checkpoint Which split for which use? The fund wants to offer Mubakkir to a partner fund in another country. None of its trainees has ever enrolled with Sullam. Which score from Lab 3.1 comes closest to what the partner should expect? The time-ordered score, 0.525 The random score, 0.521 The grouped score with history hidden, 0.500, and even that with caution The score of returning trainees, 0.578",
+      "href": "../slides/day3.html#check-split"
+    },
+    {
+      "deck": "day3",
+      "id": "lab-3-1",
+      "n": 15,
+      "session": 1,
+      "title": "One model, three splits",
+      "text": "Lab 3.1 · 25 min One model, three splits Score one model under random, grouped and time-ordered splits, measure how far the random split overstates and explain each gap. D3_1_three_splits.ipynb Build the three splits on the same rows 5 min Score the same model under each 7 min Explain the gap: new and returning trainees 4 min What only time order shows: let the model age 5 min Write the gap table with one sentence per gap 4 min ✱ Stretch: A model that memorises: does the grouped gap grow?",
+      "href": "../slides/day3.html#lab-3-1"
+    },
+    {
+      "deck": "day3",
+      "id": "s2",
+      "n": 16,
+      "session": 2,
+      "title": "Kinds of leakage",
+      "text": "Session 2 Kinds of leakage Distinguish target leakage, future information, group or duplicate contamination and preparation leakage Identify the kind of leak from a description of how the data were collected Match each case to the validation scheme its use requires 02",
+      "href": "../slides/day3.html#s2"
+    },
+    {
+      "deck": "day3",
+      "id": "four-kinds",
+      "n": 17,
+      "session": 2,
+      "title": "Leakage comes in four kinds",
+      "text": "A taxonomy Leakage comes in four kinds Target leakage A column written because of the outcome, or together with it. Future information A value computed from records later than the prediction time. Group or duplicate contamination The same person, machine or row on both sides of the split. Preparation leakage A step fitted or chosen on rows that later score the model. All four give a score in validation that the model cannot repeat in use.",
+      "href": "../slides/day3.html#four-kinds"
+    },
+    {
+      "deck": "day3",
+      "id": "target-leak",
+      "n": 18,
+      "session": 2,
+      "title": "Target leakage: the column knows the answer",
+      "text": "Kind 1 Target leakage: the column knows the answer Recorded when the outcome happens: exit_reason, weeks_attended A consequence of the outcome: calls from the collections team after a missed payment Someone's answer to the same question: an antibiotic ordered because the doctor suspects the infection The question When is this column written, and by whom? Would a person who already knew the outcome be the one filling it in? What goes wrong. The model looks brilliant and the top feature is one nobody questioned because it \"obviously matters\".",
+      "href": "../slides/day3.html#target-leak"
+    },
+    {
+      "deck": "day3",
+      "id": "future-leak",
+      "n": 19,
+      "session": 2,
+      "title": "Future information: right column, wrong date",
+      "text": "Kind 2 Future information: right column, wrong date A history that counts later records: all non-completions of a trainee, whenever they happened A yearly average attached to a row from March A status column overwritten in place: today's value on an old row The question On the day of the prediction, what would the value of this feature have been? Rebuild it with later records hidden and compare.",
+      "href": "../slides/day3.html#future-leak"
+    },
+    {
+      "deck": "day3",
+      "id": "group-leak",
+      "n": 20,
+      "session": 2,
+      "title": "Group or duplicate contamination: the model has met the test rows",
+      "text": "Kind 3 Group or duplicate contamination: the model has met the test rows Many rows of one unit, split at random: hours of one pump, visits of one patient The same record under two keys after two systems were merged Copies made on purpose: classes \"balanced\" by duplicating rows before the split The question What is the unit the model meets in use? Can the same real-world event appear in the table more than once?",
+      "href": "../slides/day3.html#group-leak"
+    },
+    {
+      "deck": "day3",
+      "id": "preparation-leak",
+      "n": 21,
+      "session": 2,
+      "title": "Preparation leakage: something was fitted before the split",
+      "text": "Kind 4 Preparation leakage: something was fitted before the split Scaling or imputing with statistics of all rows Encoding a category by its outcome rate over all rows Selecting the \"best\" features with the outcome of all rows Choosing settings on the rows that report the score The question Was any step fitted or chosen before the split? Everything that learns from data belongs inside the pipeline, fitted on training rows only.",
+      "href": "../slides/day3.html#preparation-leak"
+    },
+    {
+      "deck": "day3",
+      "id": "scheme-from-use",
+      "n": 22,
+      "session": 2,
+      "title": "The validation scheme follows from the use",
+      "text": "The second half of each case The validation scheme follows from the use The model will be used on Scheme More independent rows like these, same period Random Units it has never seen: new pumps, new patients, a new site Grouped by that unit Later records of a population that changes Time-ordered New units, later Grouped and time-ordered In Lab 3.2 the last sentence of each case states the use.",
+      "href": "../slides/day3.html#scheme-from-use"
+    },
+    {
+      "deck": "day3",
+      "id": "check-kind",
+      "n": 23,
+      "session": 2,
+      "title": "Name the leak",
+      "text": "Checkpoint Name the leak A bank predicts which customers will close their account next month. One feature is the number of calls the customer made to the retention desk. Customers are transferred to that desk when they ask to close the account. Which kind of leak is this? Target leakage Preparation leakage Group contamination No leak: call behaviour is a legitimate feature",
+      "href": "../slides/day3.html#check-kind"
+    },
+    {
+      "deck": "day3",
+      "id": "lab-3-2",
+      "n": 24,
+      "session": 2,
+      "title": "Six leaks from other projects",
+      "text": "Lab 3.2 · 25 min Six leaks from other projects Classify six leaks from other projects by type, name the validation scheme each case needs and check the table against the reference. D3_2_six_leaks.ipynb Read the six cases and how their data were collected 5 min Name the kind of leak in each 8 min Name the validation scheme each needs 6 min Check the table; read the explanations 3 min Write the question that would have caught each 3 min ✱ Stretch: Add a seventh case from your own work",
+      "href": "../slides/day3.html#lab-3-2"
+    },
+    {
+      "deck": "day3",
+      "id": "s3",
+      "n": 25,
+      "session": 3,
+      "title": "Hunting planted leaks",
+      "text": "Session 3 Hunting planted leaks Use the time each column is recorded to find features written after the outcome Find duplicated rows that sit on both sides of a split Use importance scores to choose which features to question first 03",
+      "href": "../slides/day3.html#s3"
+    },
+    {
+      "deck": "day3",
+      "id": "too-good",
+      "n": 26,
+      "session": 3,
+      "title": "A score far above your ladder is the start of an audit",
+      "text": "The trigger A score far above your ladder is the start of an audit 1.000 average precision of the table Loay Al-Kadi sent, on his random five-fold split The honest ladder ends at 0.529 The outcome depends on months of a trainee's life after week 2 No table of week-2 columns can know that perfectly So some column is not a week-2 column",
+      "href": "../slides/day3.html#too-good"
+    },
+    {
+      "deck": "day3",
+      "id": "instrument-timestamps",
+      "n": 27,
+      "session": 3,
+      "title": "Timestamps: when is each column written?",
+      "text": "Instrument 1 Timestamps: when is each column written? Column Recorded at aptitude_score Registration absences_w2 End of week 2 weeks_attended Exit provider_rate Not in the dictionary trainee_noncompletions Not in the dictionary The data dictionary answers for recorded columns Removing weeks_attended: 1.000 falls to 0.882 A column missing from the dictionary was computed: ask from which rows",
+      "href": "../slides/day3.html#instrument-timestamps"
+    },
+    {
+      "deck": "day3",
+      "id": "instrument-duplicates",
+      "n": 28,
+      "session": 3,
+      "title": "Duplicates: a new key on an old row",
+      "text": "Instrument 2 Duplicates: a new key on an old row 33,491 rows, 33,491 different enrolment keys 2,104 rows agree with another row on trainee, provider, programme and start date Two provider systems were merged; 1,052 enrolments were entered twice Removing the copies: 0.882 becomes 0.881 How to look Do not test the key. Test the columns that describe the real event. Then ask the owner of the data why they repeat.",
+      "href": "../slides/day3.html#instrument-duplicates"
+    },
+    {
+      "deck": "day3",
+      "id": "instrument-importance",
+      "n": 29,
+      "session": 3,
+      "title": "Importance scores: question the feature that carries the score",
+      "text": "Instrument 3 Importance scores: question the feature that carries the score trainee_noncompletions 80% absences_w2 8% aptitude_score 5% provider_rate 2% Share of gain after the first two removals One computed column carries four fifths of the model Importance does not prove a leak: it says where to look first",
+      "href": "../slides/day3.html#instrument-importance"
+    },
+    {
+      "deck": "day3",
+      "id": "rebuild",
+      "n": 30,
+      "session": 3,
+      "title": "Rebuild the column and see which rows it must have read",
+      "text": "Testing a computed column Rebuild the column and see which rows it must have read Computed column It equals, on every row Verdict trainee_noncompletions All non-completions of the trainee, this enrolment and later ones included. It equals the past-only count on 84% of rows. Leak : future information provider_rate The provider's rate over all rows, 2021 to 2025 Leak : preparation earlier_enrolments The trainee's enrolments that started earlier, without their outcome Keep An audit also clears columns. The third one reads only what the fund knows on the prediction day.",
+      "href": "../slides/day3.html#rebuild"
+    },
+    {
+      "deck": "day3",
+      "id": "one-at-a-time",
+      "n": 31,
+      "session": 3,
+      "title": "One removal at a time, with the score before and after",
+      "text": "The discipline One removal at a time, with the score before and after Removal Before After Kind weeks_attended 1.000 0.882 Target leakage The copied rows 0.882 0.881 Duplicate contamination trainee_noncompletions 0.881 0.503 Future information provider_rate 0.503 0.501 Preparation leakage Each leak hid the ones behind it On the fund's folds the cleaned table scores 0.505; the champion, with a past-only history, 0.529",
+      "href": "../slides/day3.html#one-at-a-time"
+    },
+    {
+      "deck": "day3",
+      "id": "size-and-seriousness",
+      "n": 32,
+      "session": 3,
+      "title": "The size of a leak is measured; whether it is a leak is decided by how the column was made",
+      "text": "A judgment The size of a leak is measured; whether it is a leak is decided by how the column was made provider_rate moved the score by 0.002 Each provider has several hundred rows: one row's own outcome hardly changes the rate With five rows per provider the same column would dominate And it read the 2025 cohort, the holdout Why remove a small leak The measured effect belongs to this table and this model. The fault belongs to the procedure, and the procedure will be reused on the next table.",
+      "href": "../slides/day3.html#size-and-seriousness"
+    },
+    {
+      "deck": "day3",
+      "id": "check-instrument",
+      "n": 33,
+      "session": 3,
+      "title": "Which instrument first?",
+      "text": "Checkpoint Which instrument first? A received table scores far above your ladder. Its data dictionary lists when every recorded column is written. Twelve further columns were computed by a colleague. Where do you start? Tune the model again on the received table Drop all twelve computed columns Switch to a time-ordered split and compare Read the dictionary for columns recorded after the prediction time, then rank the rest by importance",
+      "href": "../slides/day3.html#check-instrument"
+    },
+    {
+      "deck": "day3",
+      "id": "lab-3-3",
+      "n": 34,
+      "session": 3,
+      "title": "Four planted leaks",
+      "text": "Lab 3.3 · 25 min Four planted leaks Find four planted leaks in a received feature table with timestamps, duplicates and importance scores, removing one at a time with the score before and after. D3_3_leak_hunt.ipynb Score the received table as it came 4 min Timestamps: when is each column written? 5 min Duplicates: the same enrolment under two keys 5 min Importance scores: question the top features 7 min Write the audit note: before and after each removal 4 min ✱ Stretch: Rebuild the provider rate from past cohorts only",
+      "href": "../slides/day3.html#lab-3-3"
+    },
+    {
+      "deck": "day3",
+      "id": "s4",
+      "n": 35,
+      "session": 4,
+      "title": "Reading someone else's notebook",
+      "text": "Session 4 Reading someone else's notebook Read a notebook in the order rows, split, preparation, tuning, metric List the faults that make a reported score untrustworthy Measure which fault moves the score most by repairing one at a time 04",
+      "href": "../slides/day3.html#s4"
+    },
+    {
+      "deck": "day3",
+      "id": "first-questions",
+      "n": 36,
+      "session": 4,
+      "title": "Three questions to any reported score",
+      "text": "Before any code Three questions to any reported score On which rows? How many test rows, from which period, with what share of the outcome? Do they look like the population the model will score? Against what? What does a constant answer score on the same rows? What did the previous model score? Chosen how? How many versions were tried, and on which rows was this one chosen? \"95% accuracy\" answers none of them.",
+      "href": "../slides/day3.html#first-questions"
+    },
+    {
+      "deck": "day3",
+      "id": "accuracy-rare",
+      "n": 37,
+      "session": 4,
+      "title": "For a rare outcome, accuracy rewards saying \"nothing happens\"",
+      "text": "The metric For a rare outcome, accuracy rewards saying \"nothing happens\" \"Everyone completes\", all enrolments 0.83 \"Everyone completes\", scorable rows of 2024 H2 0.87 Loay's notebook, all five blocks repaired 0.89 Accuracy counts both classes alike and depends on their share It needs a threshold, and 0.5 is nobody's decision The run log uses average precision and recall at capacity for this reason",
+      "href": "../slides/day3.html#accuracy-rare"
+    },
+    {
+      "deck": "day3",
+      "id": "review-order",
+      "n": 38,
+      "session": 4,
+      "title": "Rows, split, preparation, tuning, metric",
+      "text": "An order to read in Rows, split, preparation, tuning, metric 1 · Rows Who is in the table? Anyone the model never scores? → 2 · Split Does it rehearse the use? → 3 · Preparation What was fitted, copied or encoded before the split? → 4 · Tuning On which rows was the model chosen? → 5 · Metric Does the number mean what the message says? The earlier the fault, the more of what follows it spoils.",
+      "href": "../slides/day3.html#review-order"
+    },
+    {
+      "deck": "day3",
+      "id": "balancing",
+      "n": 39,
+      "session": 4,
+      "title": "\"Balancing the classes\" before the split copies test rows into training",
+      "text": "The fault that did the damage \"Balancing the classes\" before the split copies test rows into training Each non-completer is copied four times, then the table is split at random Most test non-completers have a copy in training A tree with five rows per leaf recognises them The test set is half non-completers: no cohort looks like it If you balance at all Inside the training part only, as a step of the pipeline. The test rows keep the real share. Tomorrow shows that a ranking does not need it.",
+      "href": "../slides/day3.html#balancing"
+    },
+    {
+      "deck": "day3",
+      "id": "repairs",
+      "n": 40,
+      "session": 4,
+      "title": "Repair one fault at a time, then all together",
+      "text": "Lab 3.4, measured Repair one fault at a time, then all together Run Accuracy \"Everyone completes\" Average precision As written 0.948 0.499 0.980 Repair the rows only 0.978 0.490 0.994 Repair the balancing only 0.865 0.835 0.569 Repair the split only 0.743 0.475 0.843 Repair the encoding or the tuning only 0.95 0.499 0.98 All five repaired 0.890 0.874 0.494 One repair makes the number go up. Faults interact.",
+      "href": "../slides/day3.html#repairs"
+    },
+    {
+      "deck": "day3",
+      "id": "review-note",
+      "n": 41,
+      "session": 4,
+      "title": "A review note names numbers, not character",
+      "text": "What you send back A review note names numbers, not character Five lines. The number as reported. The fault that matters most, with its measured effect. The other faults. The honest number. What to do next. \"Your split is wrong\" starts an argument \"With the copies kept out of the test set the accuracy is 0.87, and a constant answer scores 0.84\" ends one Offer the next step: one pipeline, the fund's folds, a line in the run log",
+      "href": "../slides/day3.html#review-note"
+    },
+    {
+      "deck": "day3",
+      "id": "check-review",
+      "n": 42,
+      "session": 4,
+      "title": "What do you ask first?",
+      "text": "Checkpoint What do you ask first? A vendor's slide says: \"Our model predicts non-completion with 91% accuracy.\" Which question tells you most, fastest? Which algorithm does the model use? How many rows was it trained on? What share of the test rows completed, and what does \"everyone completes\" score on them? What is its area under the curve?",
+      "href": "../slides/day3.html#check-review"
+    },
+    {
+      "deck": "day3",
+      "id": "lab-3-4",
+      "n": 43,
+      "session": 4,
+      "title": "A colleague's notebook",
+      "text": "Lab 3.4 · 25 min A colleague's notebook List what makes a colleague's notebook score untrustworthy, check the list, repair the faults one at a time and write the review note. D3_4_colleague_notebook.ipynb Run the notebook as it is; read the reported number 3 min Read the code and mark what you find 9 min Check your list against the reference 3 min Repair one fault at a time and rescore 6 min Write a five-line review note 4 min ✱ Stretch: Rewrite the notebook as one pipeline scored on the fund's folds",
+      "href": "../slides/day3.html#lab-3-4"
+    },
+    {
+      "deck": "day3",
+      "id": "wrap-up",
+      "n": 44,
+      "session": 4,
+      "title": "Three things to keep",
+      "text": "Day 3 Three things to keep The split rehearses the use For the champion: random 0.521, time-ordered 0.525, new trainees 0.500, one year old −0.016. Gaps are measured and written down with their causes. Four kinds, four questions When is it written? What was its value that day? Can the unit be on both sides? Was anything fitted before the split? One removal at a time 1.000, 0.882, 0.881, 0.503, 0.501. And 95% accuracy became 0.89 against a constant 0.87.",
+      "href": "../slides/day3.html#wrap-up"
+    },
+    {
+      "deck": "day3",
+      "id": "next",
+      "n": 45,
+      "session": 4,
+      "title": "Day 4 · Errors, groups and documentation",
+      "text": "Next Day 4 · Errors, groups and documentation The score is trusted. Tomorrow it becomes a decision: where to cut the list for 800 support plans, whether the probabilities hold, for whom the model fails, and what goes into the model card. The 2025 cohort is opened, once The first attempt at the subgroup table is without AI assistance You choose your capstone problem in the last lab",
+      "href": "../slides/day3.html#next"
+    },
+    {
+      "deck": "day4",
+      "id": "title",
+      "n": 1,
+      "session": 0,
+      "title": "Errors, groups and documentation",
+      "text": "SDAIA Academy · Machine Learning for Tabular Data: Baselines and Validation Errors, groups and documentation Day 4: Where to cut the ranking, whether its probabilities hold, for whom it fails, and what to write down Data Science Track4 teaching days + capstone day4 sessions · 4 labsDS-204",
+      "href": "../slides/day4.html#title"
+    },
+    {
+      "deck": "day4",
+      "id": "agenda",
+      "n": 2,
+      "session": 0,
+      "title": "Errors, groups and documentation",
+      "text": "Today Errors, groups and documentation Session 1 · Thresholds for rare outcomes A score becomes a decision at a threshold, and the threshold comes from capacity and costs, never from 0.5. Session 2 · Calibration Calibration: measured by decile, repaired on unseen rows, lost again under drift. Session 3 · Errors by subgroup Errors are harms to people: who is represented, who is missed, and how sure a small slice lets you be. Session 4 · The model card The model card is the hand-over: what the model is for, how it was validated, where it fails and what it must never decide.",
+      "href": "../slides/day4.html#agenda"
+    },
+    {
+      "deck": "day4",
+      "id": "review-day3",
+      "n": 3,
+      "session": 0,
+      "title": "Which kind of leak was it?",
+      "text": "Review of Day 3 Which kind of leak was it? In the received table, trainee_noncompletions equalled the past-only count on 84% of the rows and carried 80% of the model's gain. Which kind of leak is it? Group or duplicate contamination Preparation leakage No leak: a history of non-completion is a fair feature Future information",
+      "href": "../slides/day4.html#review-day3"
+    },
+    {
+      "deck": "day4",
+      "id": "where-we-are",
+      "n": 4,
+      "session": 0,
+      "title": "From a trusted score to a decision and a page that travels with it",
+      "text": "Today From a trusted score to a decision and a page that travels with it Frame and baseline The decision, the rows, three baselines Day 1 Trees and challengers Champion 0.529; challenger not adopted Day 2 Validation and leakage Gaps measured; four leaks removed Day 3 Errors and documentation Threshold, calibration, subgroups, model card Day 4",
+      "href": "../slides/day4.html#where-we-are"
+    },
+    {
+      "deck": "day4",
+      "id": "s1",
+      "n": 5,
+      "session": 1,
+      "title": "Thresholds for rare outcomes",
+      "text": "Session 1 Thresholds for rare outcomes Read precision and recall off a precision-recall curve for a rare outcome Choose a threshold that fits the advisers' capacity and report its precision and recall Explain what happens to a fixed threshold when the next cohort differs 01",
+      "href": "../slides/day4.html#s1"
+    },
+    {
+      "deck": "day4",
+      "id": "score-to-decision",
+      "n": 6,
+      "session": 1,
+      "title": "A model gives a score; a threshold turns it into an action",
+      "text": "The step nobody trains A model gives a score; a threshold turns it into an action Score 0.47 for this trainee, at the end of week 2 → Threshold On the list when the score is at or above the cut → Action An adviser calls in week 3 Average precision judged the ranking over every possible threshold The fund runs one threshold, and lives with its two kinds of error The threshold is a decision of the fund, informed by the model",
+      "href": "../slides/day4.html#score-to-decision"
+    },
+    {
+      "deck": "day4",
+      "id": "precision-recall",
+      "n": 7,
+      "session": 1,
+      "title": "Precision speaks for the advisers, recall for the trainees",
+      "text": "Two sentences for Ghassan Precision speaks for the advisers, recall for the trainees 476 of 800 plans on the 2024 list go to a trainee who then left: precision 0.60 476 of 1,190 trainees who left were on the list: recall 0.40 A random list of 800 would find about 103 Six in ten trainees who left were not on the list Say both sentences; either one alone misleads",
+      "href": "../slides/day4.html#precision-recall"
+    },
+    {
+      "deck": "day4",
+      "id": "three-thresholds",
+      "n": 8,
+      "session": 1,
+      "title": "Three thresholds, three different lists",
+      "text": "Lab 4.1, measured Three thresholds, three different lists Threshold On the list Precision Recall Net value, thousand riyals 0.5, the library default 582 0.65 0.32 589 0.41, fits 800 plans 800 0.60 0.40 711 0.20, break-even 1,679 0.41 0.58 790 0.5 leaves 218 plans unused: nothing in the decision says 0.5 Break-even: a plan costs 450, prevents one loss of 9,000 in four Capacity picks the middle row",
+      "href": "../slides/day4.html#three-thresholds"
+    },
+    {
+      "deck": "day4",
+      "id": "weights",
+      "n": 9,
+      "session": 1,
+      "title": "Class weights move the scores; they do not choose a threshold",
+      "text": "A common remedy Class weights move the scores; they do not choose a threshold Model, cut at 0.5 On the list Average precision Champion 582 0.516 Champion with class weights 2,916 0.520 \"The outcome is rare, so weight it\": the ranking stays as good The scores shift upward, so 0.5 now flags a third of the cohort Rarity is handled by the metric and the threshold, not by changing what the scores mean",
+      "href": "../slides/day4.html#weights"
+    },
+    {
+      "deck": "day4",
+      "id": "holdout",
+      "n": 10,
+      "session": 1,
+      "title": "The same threshold gives a different list on the next cohort",
+      "text": "The 2025 cohort, opened once The same threshold gives a different list on the next cohort Rule On the list Precision Recall 2024, threshold 0.41, where it was chosen 800 0.60 0.40 2025, the same threshold 897 0.61 0.40 2025, the top 800 800 0.65 0.38 The model did not get worse. The cohort is larger and its scores sit a little higher. A threshold on a probability and a capacity in plans are two different things.",
+      "href": "../slides/day4.html#holdout"
+    },
+    {
+      "deck": "day4",
+      "id": "rule",
+      "n": 11,
+      "session": 1,
+      "title": "A fixed threshold or a fixed list length",
+      "text": "The choice to write down A fixed threshold or a fixed list length Fixed list length Always fits the advisers. The weakest name on the list varies: in a hard intake, trainees at higher risk are left out. Fixed threshold Equal risk is treated equally across intakes. The list overruns or underuses capacity, and depends on the probabilities staying calibrated. Either can be defended; the fund chose the list length Write down which rule runs, and who may change it",
+      "href": "../slides/day4.html#rule"
+    },
+    {
+      "deck": "day4",
+      "id": "check-threshold",
+      "n": 12,
+      "session": 1,
+      "title": "What happens to the list next year?",
+      "text": "Checkpoint What happens to the list next year? The fund keeps the threshold of 0.41. Next year a new programme doubles the intake, with trainees much like this year's. What happens? The list roughly doubles to 1,600 names, twice what the advisers can support The list stays at 800, because the threshold was chosen for 800 Precision halves, because there are twice as many trainees The scores fall, so fewer trainees pass the threshold",
+      "href": "../slides/day4.html#check-threshold"
+    },
+    {
+      "deck": "day4",
+      "id": "lab-4-1",
+      "n": 13,
+      "session": 1,
+      "title": "A threshold that fits capacity",
+      "text": "Lab 4.1 · 25 min A threshold that fits capacity Pick a threshold on the precision-recall curve that fits adviser capacity, compare it with 0.5 and with break-even, and test it on the held-out cohort. D4_1_threshold_capacity.ipynb Draw the precision-recall curve of the validation cohort 4 min Find the threshold that fits 800 support plans 6 min Compare with 0.5 and with the break-even probability 5 min Apply the threshold to the held-out cohort 6 min Decide: a fixed threshold or a fixed list length 4 min ✱ Stretch: An interval for the precision at the chosen threshold",
+      "href": "../slides/day4.html#lab-4-1"
+    },
+    {
+      "deck": "day4",
+      "id": "s2",
+      "n": 14,
+      "session": 2,
+      "title": "Calibration",
+      "text": "Session 2 Calibration Compare expected and observed rates by decile and read a reliability plot Calibrate a model on rows it was not trained on, with sigmoid and isotonic methods Explain why a weighted model ranks well and still cannot be read as a probability 02",
+      "href": "../slides/day4.html#s2"
+    },
+    {
+      "deck": "day4",
+      "id": "promise",
+      "n": 15,
+      "session": 2,
+      "title": "A calibrated score keeps a promise: of those given 0.3, three in ten leave",
+      "text": "The idea A calibrated score keeps a promise: of those given 0.3, three in ten leave Calibration is about what the numbers mean Ranking is about their order A model can be good at one and bad at the other It matters when the number is shown to an adviser, compared with a break-even, or multiplied by a cost How to measure it Sort the trainees by score and cut them into ten groups. In each: the mean score (expected) beside the share that left (observed). One summary number: the Brier score, the mean squared gap between score and outcome.",
+      "href": "../slides/day4.html#promise"
+    },
+    {
+      "deck": "day4",
+      "id": "deciles",
+      "n": 16,
+      "session": 2,
+      "title": "Same ranking, very different promises",
+      "text": "Lab 4.2, cohort 2024 Same ranking, very different promises Decile Champion expects Observed Weighted model expects Observed 1, lowest 0.013 0.017 0.071 0.016 5 0.050 0.071 0.297 0.073 8 0.144 0.144 0.573 0.133 9 0.254 0.219 0.723 0.231 10, highest 0.603 0.558 0.902 0.554 What goes wrong. An adviser reads \"0.90\" beside a name. Of the trainees given that number, 55% left.",
+      "href": "../slides/day4.html#deciles"
+    },
+    {
+      "deck": "day4",
+      "id": "calibrators",
+      "n": 17,
+      "session": 2,
+      "title": "A calibrator is a small model from score to probability",
+      "text": "The repair A calibrator is a small model from score to probability Sigmoid A logistic regression on the log-odds of the score: two numbers, a shift and a stretch. Works with few rows; cannot bend. Isotonic A rising step function. Takes any rising shape; needs more rows, and trainees on one step become tied. Fitted on rows the scoring model was not trained on: here the 2024 cohort Tested on rows neither has seen: the 2025 cohort For the weighted model the sigmoid's shift is −2.0; for the champion, −0.2",
+      "href": "../slides/day4.html#calibrators"
+    },
+    {
+      "deck": "day4",
+      "id": "calibration-result",
+      "n": 18,
+      "session": 2,
+      "title": "Calibration repairs what the weights broke, and adds nothing to a calibrated model",
+      "text": "Lab 4.2, on the 2025 cohort Calibration repairs what the weights broke, and adds nothing to a calibrated model Model Calibration Brier Mean expected Average precision Champion as delivered 0.0852 0.137 0.554 Champion sigmoid 0.0853 0.133 0.554 Weighted as delivered 0.1717 0.399 0.553 Weighted sigmoid 0.0854 0.131 0.553 Weighted isotonic 0.0858 0.131 0.526 Observed: 0.135. The sigmoid never changes the order; isotonic ties cost 0.03 here.",
+      "href": "../slides/day4.html#calibration-result"
+    },
+    {
+      "deck": "day4",
+      "id": "drift",
+      "n": 19,
+      "session": 2,
+      "title": "Calibration holds for a population; eight providers are new",
+      "text": "Where the promise breaks Calibration holds for a population; eight providers are new Cohort 2025 Trainees Expected Observed (95% interval) Providers open before 2025 8,214 0.130 0.119 (0.113 to 0.127) Providers that opened in 2025 1,903 0.163 0.204 (0.186 to 0.223) For the new providers the probabilities are four points too low The ranking inside them is as good as elsewhere A provider the model does not know is scored like an average one",
+      "href": "../slides/day4.html#drift"
+    },
+    {
+      "deck": "day4",
+      "id": "check-calibration",
+      "n": 20,
+      "session": 2,
+      "title": "Which score may be read as a probability?",
+      "text": "Checkpoint Which score may be read as a probability? Two models have the same average precision. Model A's scores average 0.14, model B's 0.40; 13.5% of the cohort left. The fund wants to list everyone above the break-even probability, 0.20. Which statement holds? Either model can be used: they rank equally well Only model A's scores can be compared with 0.20, after checking them by decile Model B is better: it is more confident about the trainees at risk Use the mean of the two scores",
+      "href": "../slides/day4.html#check-calibration"
+    },
+    {
+      "deck": "day4",
+      "id": "lab-4-2",
+      "n": 21,
+      "session": 2,
+      "title": "Calibrate and compare by decile",
+      "text": "Lab 4.2 · 25 min Calibrate and compare by decile Calibrate the boosted model, compare expected and observed rates by decile before and after, and see where the 2025 cohort moves the calibration. D4_2_calibration.ipynb Expected against observed by decile, as delivered 5 min Fit sigmoid and isotonic calibrators on the validation cohort 6 min Compare by decile on the held-out cohort 6 min Look at the providers that opened in 2025 4 min Write the calibration line of the model card 4 min ✱ Stretch: Calibrate inside the time-ordered folds",
+      "href": "../slides/day4.html#lab-4-2"
+    },
+    {
+      "deck": "day4",
+      "id": "s3",
+      "n": 22,
+      "session": 3,
+      "title": "Errors by subgroup",
+      "text": "Session 3 Errors by subgroup Compare the training data with the eligible population by region, age band and gender Report held-out error rates by subgroup with intervals that reflect slice size Relate each finding to a bias type of the SDAIA AI Bias Reference Guide and to one action 03",
+      "href": "../slides/day4.html#s3"
+    },
+    {
+      "deck": "day4",
+      "id": "two-harms",
+      "n": 23,
+      "session": 3,
+      "title": "Two errors, two different harms",
+      "text": "Errors are not symmetric Two errors, two different harms Missed A trainee leaves and was not on the list. Nobody called. The harm falls on the trainee. Measured among those who left: the miss rate, 0.62 for the 2025 list. Listed without need A trainee on the list would have completed anyway. An adviser's hour is spent; the trainee gets a friendly call. Measured on the list: one minus precision. The first harm leads the audit The question: is the miss rate the same for everyone?",
+      "href": "../slides/day4.html#two-harms"
+    },
+    {
+      "deck": "day4",
+      "id": "represented",
+      "n": 24,
+      "session": 3,
+      "title": "Who is in the data the model learnt from?",
+      "text": "Before any error Who is in the data the model learnt from? Group In training data In eligible population Ratio Age 35 and over 4.7% 20% 0.24 Age 17 to 19 6.8% 16% 0.42 Najran 2.2% 3.6% 0.61 Jazan 4.2% 6.8% 0.62 Women 43% 52% 0.82 Age 20 to 24 45% 31% 1.44 Every validation score of this week describes the people who enrolled, not the people the fund serves.",
+      "href": "../slides/day4.html#represented"
+    },
+    {
+      "deck": "day4",
+      "id": "intervals",
+      "n": 25,
+      "session": 3,
+      "title": "A rate from a small slice needs an interval that knows its size",
+      "text": "The tool A rate from a small slice needs an interval that knows its size Slice Left Missed 95% interval Riyadh 444 0.58 0.53 to 0.62 Jazan 86 0.73 0.63 to 0.82 Qassim 21 0.81 0.60 to 0.92 Al-Baha 12 0.75 0.47 to 0.91 The miss rate is a share of those who left: that count sets the width The Wilson interval stays inside 0 and 1 and behaves for small counts Read the width before the position",
+      "href": "../slides/day4.html#intervals"
+    },
+    {
+      "deck": "day4",
+      "id": "by-region",
+      "n": 26,
+      "session": 3,
+      "title": "By the rule stated in advance, two regional gaps are supported",
+      "text": "Lab 4.3, measured By the rule stated in advance, two regional gaps are supported The rule: a gap is supported when the whole interval lies above or below the cohort's miss rate, 0.62 Jazan: 0.73, interval 0.63 to 0.82: above Riyadh: 0.58, interval 0.530 to 0.622: below 0.623, by a hair Najran, 0.75: its interval starts at 0.61 Qassim, 0.81: too few cases to tell Nineteen slices Thirteen regions, two genders, four age bands. With that many, one can cross the line by chance. A rule fixed in advance limits the damage; a cause you can check does more.",
+      "href": "../slides/day4.html#by-region"
+    },
+    {
+      "deck": "day4",
+      "id": "gender-age",
+      "n": 27,
+      "session": 3,
+      "title": "A five-point gap between women and men is not supported, and not dismissed",
+      "text": "The other two attributes A five-point gap between women and men is not supported, and not dismissed Slice Left Missed 95% interval Women 625 0.65 0.61 to 0.69 Men 744 0.60 0.57 to 0.64 Age 17 to 19 91 0.55 0.45 to 0.65 Age 35 and over 123 0.57 0.48 to 0.65 Both gender intervals contain 0.62 Women are also under-represented in the training data So this row is read first on the next cohort's table",
+      "href": "../slides/day4.html#gender-age"
+    },
+    {
+      "deck": "day4",
+      "id": "cause",
+      "n": 28,
+      "session": 3,
+      "title": "Where attendance is kept on paper, the model's best signal is weakest",
+      "text": "A gap with a cause Where attendance is kept on paper, the model's best signal is weakest Registers Left Missed (95% interval) Recorded absences, mean Non-completion Electronic, eleven regions 1,232 0.61 (0.58 to 0.64) 0.54 13% Paper, Jazan and Najran 137 0.74 (0.66 to 0.80) 0.27 23% More trainees leave there, and fewer early absences are recorded The model is right about what the registers say Retraining changes nothing: the fault is in the measurement",
+      "href": "../slides/day4.html#cause"
+    },
+    {
+      "deck": "day4",
+      "id": "bias-types",
+      "n": 29,
+      "session": 3,
+      "title": "Four findings, four bias types of the SDAIA guide, one action each",
+      "text": "Naming what was found Four findings, four bias types of the SDAIA guide, one action each Finding Bias type One action Trainees who leave in Jazan and Najran are missed more Measurement Electronic registers; advisers there do not rely on the list alone Trainees of 35 and over are a quarter as present as in the population Coverage State it in the card; validate again before use on programmes for this group The highest miss rate rests on 21 cases Sample size Report intervals; pool small regions or cohorts One miss rate, 0.62, was all that had been reported Aggregation Report by region, gender and age band with every cohort",
+      "href": "../slides/day4.html#bias-types"
+    },
+    {
+      "deck": "day4",
+      "id": "not-blind",
+      "n": 30,
+      "session": 3,
+      "title": "Leaving a column out does not make a model blind to it",
+      "text": "A common belief Leaving a column out does not make a model blind to it Gender is not a feature of Mubakkir Other features differ between women and men: programme, employment, distance And who is in the data differs: 43% against 52% So errors can still differ by gender What follows The attribute stays in the table, outside the model, so that errors can be audited. Under the Personal Data Protection Law personal data serve a stated purpose: here the audit of errors, agreed with the fund's data protection officer.",
+      "href": "../slides/day4.html#not-blind"
+    },
+    {
+      "deck": "day4",
+      "id": "check-slice",
+      "n": 31,
+      "session": 3,
+      "title": "Reading a small slice",
+      "text": "Checkpoint Reading a small slice In one region 12 trainees left and 9 of them were not on the list: a miss rate of 0.75, interval 0.47 to 0.91. The cohort's rate is 0.62. What do you report? The model fails this region: 0.75 is far above 0.62 The region is fine: its interval contains 0.62 Leave the region out of the table: the slice is too small The rate with its interval, and that 12 cases cannot tell; pool with later cohorts",
+      "href": "../slides/day4.html#check-slice"
+    },
+    {
+      "deck": "day4",
+      "id": "lab-4-3",
+      "n": 32,
+      "session": 3,
+      "title": "Errors by region, gender and age band",
+      "text": "Lab 4.3 · 25 min Errors by region, gender and age band Break held-out errors down by region, gender and age band with intervals, check who is represented and name the bias type behind each finding. D4_3_subgroup_errors.ipynb Compare the training data with the eligible population 5 min Miss rate and precision by region, with intervals 7 min The same by gender and by age band 5 min Decide which gaps the intervals support 4 min Name the bias type and one action per finding 4 min ✱ Stretch: The same table by provider: how many slices can carry an interval?",
+      "href": "../slides/day4.html#lab-4-3"
+    },
+    {
+      "deck": "day4",
+      "id": "s4",
+      "n": 33,
+      "session": 4,
+      "title": "The model card",
+      "text": "Session 4 The model card Assemble a model card from measured results State the limits of the validation and the uses the model is not for Prepare the hand-over a deployment team needs and frame the capstone problem 04",
+      "href": "../slides/day4.html#s4"
+    },
+    {
+      "deck": "day4",
+      "id": "card-holds",
+      "n": 34,
+      "session": 4,
+      "title": "A model card is the one page that travels with the model",
+      "text": "The hand-over A model card is the one page that travels with the model Measured: filled from results Intended use · data · validation scheme · results on held-out rows · calibration · errors by subgroup. Written: no number writes them What the model is not for · where the scores do not hold · who decides · what the next team needs. Its readers were not in the room: an adviser, an auditor, the deployment team Every number in it can be traced to a run",
+      "href": "../slides/day4.html#card-holds"
+    },
+    {
+      "deck": "day4",
+      "id": "honest-results",
+      "n": 35,
+      "session": 4,
+      "title": "The results section says what was not shown",
+      "text": "What the card admits The results section says what was not shown Champion 0.529 on the folds; against the logistic rung +0.005, interval −0.010 to +0.019: an advantage is not shown New trainees 0.491, returning trainees 0.578: the headline is an average Expected 13.7%, observed 13.5% overall; four points too low at new providers Why write it down. The next team may need a model an adviser can read, or one that is cheaper to run. The card tells them a simpler one does as well within the uncertainty.",
+      "href": "../slides/day4.html#honest-results"
+    },
+    {
+      "deck": "day4",
+      "id": "limits",
+      "n": 36,
+      "session": 4,
+      "title": "A useful limit names a situation and what to do in it",
+      "text": "The written half A useful limit names a situation and what to do in it Weak Useful \"May not generalise to new data.\" \"At a provider that opened after training the probabilities are about four points too low: use the rank, not the number.\" \"Performance may degrade over time.\" \"A model one year old scored 0.016 lower: retrain every half-year, on programmes due to end.\" \"Use with care in some regions.\" \"Where attendance is kept on paper, a trainee who is not on the list is not thereby low-risk.\" A reader should recognise the situation when they are in it.",
+      "href": "../slides/day4.html#limits"
+    },
+    {
+      "deck": "day4",
+      "id": "human",
+      "n": 37,
+      "session": 4,
+      "title": "The score puts a name on a list; a person decides",
+      "text": "The sentence to keep The score puts a name on a list; a person decides An adviser decides whether and how to contact a trainee An adviser may add any trainee who is not on the list No trainee is refused, ranked for funding or told a score Providers are not ranked by it What the score does not answer It says who is likely to leave. It does not say whether a support plan helps, or whom it helps most. That needs a comparison of supported and unsupported trainees, which the fund has not run.",
+      "href": "../slides/day4.html#human"
+    },
+    {
+      "deck": "day4",
+      "id": "handover",
+      "n": 38,
+      "session": 4,
+      "title": "What a deployment team cannot guess",
+      "text": "After this course What a deployment team cannot guess The code version, the seed and the lock file The date of training and the rule for training rows Each feature, when it is recorded, and how history is built The list rule, and who may change it What to monitor each intake, and when to retrain Where it continues Serving, monitoring and retraining are not in this course. AE-205 deploys a model as a service; AE-305 operates it. Both start from a card like this one.",
+      "href": "../slides/day4.html#handover"
+    },
+    {
+      "deck": "day4",
+      "id": "capstone-brief",
+      "n": 39,
+      "session": 4,
+      "title": "The capstone: one problem, the whole path, eight minutes",
+      "text": "Day 5 The capstone: one problem, the whole path, eight minutes Six problems on the shortlist: three synthetic cases, three public tables A public repository of your own, AI-full, with prompts and transcripts committed A README that reports ladder, validation, leakage audit, threshold, subgroup errors and one paired comparison The defence Four minutes are yours. Then the assessor swaps the split or removes a feature, and you say what will happen to the score, and why, before it is run.",
+      "href": "../slides/day4.html#capstone-brief"
+    },
+    {
+      "deck": "day4",
+      "id": "check-card",
+      "n": 40,
+      "session": 4,
+      "title": "Which sentence belongs in the card?",
+      "text": "Checkpoint Which sentence belongs in the card? You may add one sentence to the limits of Mubakkir's card. Which one helps its readers most? \"The model uses gradient-boosted trees with 400 trees of 8 leaves.\" \"Results may vary on new data.\" \"Not validated for trainees in their first two weeks: they have no early-absence record.\" \"The model achieves an average precision of 0.55 on held-out data.\"",
+      "href": "../slides/day4.html#check-card"
+    },
+    {
+      "deck": "day4",
+      "id": "lab-4-4",
+      "n": 41,
+      "session": 4,
+      "title": "The model card and the capstone problem",
+      "text": "Lab 4.4 · 25 min The model card and the capstone problem Draft the model card of Mubakkir from the measured results, write its limits and hand-over list, and choose and frame the capstone problem. D4_4_model_card.ipynb Collect the measured numbers 4 min Fill the card: use, data, validation, results, subgroups 8 min Write the limits and the human-decision statement 5 min List what the deployment team needs 3 min Choose the capstone problem and write its framing 5 min ✱ Stretch: Exchange cards with a neighbour: one question each",
+      "href": "../slides/day4.html#lab-4-4"
+    },
+    {
+      "deck": "day4",
+      "id": "wrap-up",
+      "n": 42,
+      "session": 4,
+      "title": "Three things to keep",
+      "text": "Day 4 Three things to keep The decision sets the threshold 800 plans: precision 0.65, recall 0.38 on the 2025 cohort. The same threshold listed 897. Write down the rule. Check what the numbers mean The champion's probabilities hold by decile; the weighted model's do not; at new providers they run four points low. An average hides people Miss rate 0.62 overall, 0.74 where registers are on paper. Intervals for every slice, a bias type and an action for every finding.",
+      "href": "../slides/day4.html#wrap-up"
+    },
+    {
+      "deck": "day4",
+      "id": "next",
+      "n": 43,
+      "session": 4,
+      "title": "Day 5 · Capstone",
+      "text": "Next Day 5 · Capstone Your problem, your repository, the same path: frame, ladder, validation, audit, threshold, subgroups, card. Then eight minutes in which a change is named and you predict its effect. Start from your framing of Lab 4.4 and the README template Hold some rows back now; score them once",
+      "href": "../slides/day4.html#next"
+    },
+    {
+      "deck": "capstone",
+      "id": "title",
+      "n": 1,
+      "session": 0,
+      "title": "Capstone: a validated tabular model and its defence",
+      "text": "SDAIA Academy · Machine Learning for Tabular Data: Baselines and Validation Capstone: a validated tabular model and its defence Capstone: Each participant defends a tabular model from framing to model card in eight minutes, including one change the assessor asks for Data Science Track4 teaching days + capstone day8 min talk and demoDS-204",
+      "href": "../slides/capstone.html#title"
+    },
+    {
+      "deck": "capstone",
+      "id": "agenda",
+      "n": 2,
+      "session": 0,
+      "title": "How the day runs",
+      "text": "Capstone How the day runs Build and finish your problem from framing to model card; the README is the deliverable Supervised exit check without AI assistance, items in the style of the badge exam Defences eight minutes each, one timer, one change named by the assessor Review and closing what the repositories showed, the follow-up task, what comes next",
+      "href": "../slides/capstone.html#agenda"
+    },
+    {
+      "deck": "capstone",
+      "id": "deliverable",
+      "n": 3,
+      "session": 0,
+      "title": "A public repository whose README reports six things",
+      "text": "What you hand in A public repository whose README reports six things Ladder and validation Baselines and models on identical folds; the split and the use it rehearses. Audit and comparison Leaks removed one at a time; one paired difference with an interval and a decision. Threshold and subgroups The rule for the list on rows held out to the end; errors by subgroup with intervals. A fixed seed and a lock file: a fresh clone reproduces every number The model card, and the prompts and agent transcripts you used, in ai/",
+      "href": "../slides/capstone.html#deliverable"
+    },
+    {
+      "deck": "capstone",
+      "id": "rubric",
+      "n": 4,
+      "session": 0,
+      "title": "The rubric",
+      "text": "How the repository is scored The rubric Framing and baseline 15% Validation and leakage 25% Models and comparison 20% Threshold, calibration and subgroup errors 25% Model card and reproducibility 15% A modest score that is validated beats a high one that is not. No criterion rewards the size of the number.",
+      "href": "../slides/capstone.html#rubric"
+    },
+    {
+      "deck": "capstone",
+      "id": "format",
+      "n": 5,
+      "session": 0,
+      "title": "Eight minutes: four are yours, four belong to one change",
+      "text": "The defence Eight minutes: four are yours, four belong to one change Minutes 0 to 4 · You present The decision. The validation scheme and why. The ladder in one table. The finding you are least comfortable with. Minutes 4 to 8 · One change The assessor swaps the split or removes a feature. You say what will happen to the score, and why, before it is run. Then it is run, or the result is shown. One timer, no separate question time. The change and your prediction are the questions.",
+      "href": "../slides/capstone.html#format"
+    },
+    {
+      "deck": "capstone",
+      "id": "the-change",
+      "n": 6,
+      "session": 0,
+      "title": "Predict the effect before it is run",
+      "text": "What the assessor may ask Predict the effect before it is run The change What a good answer contains \"Score it under a random split.\" The direction, a rough size, and which rows the training part would then know \"Keep each unit on one side.\" Whether the model can recognise a unit, and what history is worth \"Remove your strongest feature.\" What the feature carries, and which others can stand in for it \"Put back the column you removed.\" The kind of leak, and why the higher score cannot be repeated in use",
+      "href": "../slides/capstone.html#the-change"
+    },
+    {
+      "deck": "capstone",
+      "id": "running-order",
+      "n": 7,
+      "session": 0,
+      "title": "Who defends when",
+      "text": "Running order Who defends when # Presenter Problem 1 2 3 4 5 6 7 8",
+      "href": "../slides/capstone.html#running-order"
+    },
+    {
+      "deck": "capstone",
+      "id": "final-prep",
+      "n": 8,
+      "session": 0,
+      "title": "Final prep · 20 minutes",
+      "text": "Before the first defence Final prep · 20 minutes Clone your repository into a new folder and run it once. Have a second split ready as a switch.",
+      "href": "../slides/capstone.html#final-prep"
+    },
+    {
+      "deck": "capstone",
+      "id": "now-presenting",
+      "n": 9,
+      "session": 0,
+      "title": "Defence, with the change at minute 4",
+      "text": "Now presenting Defence, with the change at minute 4",
+      "href": "../slides/capstone.html#now-presenting"
+    },
+    {
+      "deck": "capstone",
+      "id": "review",
+      "n": 10,
+      "session": 0,
+      "title": "What the repositories showed",
+      "text": "Trainer review What the repositories showed Strongest patterns What several repositories got right. Common gaps What most would repair next. One surprise A prediction that failed, and what it taught.",
+      "href": "../slides/capstone.html#review"
+    },
+    {
+      "deck": "capstone",
+      "id": "follow-up",
+      "n": 11,
+      "session": 0,
+      "title": "The follow-up: the leakage checklist on a model that is not yours",
+      "text": "In the next four weeks The follow-up: the leakage checklist on a model that is not yours Choose one model from your own work, or a public notebook Work through labs/followup/leakage_checklist.md Send the one-page note of note_template.md to your trainer What the note holds The reported score, the split and the use, each checklist question with its answer, what you would remove or measure next. Numbers, not opinions.",
+      "href": "../slides/capstone.html#follow-up"
+    },
+    {
+      "deck": "capstone",
+      "id": "what-next",
+      "n": 12,
+      "session": 0,
+      "title": "Keep going",
+      "text": "After the course Keep going Your repository stays yours: keep it reproducible, and add the one measurement you named today AE-205 Deploying AI Services: a model like yours as a service, with containers, serving and monitoring AE-305 Operating Machine Learning and Language Model Systems: retraining, drift and operations, starting from a model card",
+      "href": "../slides/capstone.html#what-next"
+    },
+    {
+      "deck": "capstone",
+      "id": "thanks",
+      "n": 13,
+      "session": 0,
+      "title": "Thank you",
+      "text": "SDAIA Academy Thank you Machine Learning for Tabular Data: Baselines and Validation",
+      "href": "../slides/capstone.html#thanks"
+    }
+  ]
+}

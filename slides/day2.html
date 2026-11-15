@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-ax="deck" data-track="data-science">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 2 · Trees and challengers · Machine Learning for Tabular Data: Baselines and Validation</title>
+<meta name="generator" content="SDAIA Academy engine 1.0.0">
+<link rel="icon" href="../_engine/icon.svg">
+<link rel="alternate" type="text/markdown" href="day2.md">
+<link rel="describedby" href="../llms.txt">
+<link rel="stylesheet" href="../_engine/academy.css">
+</head>
+<body>
+<div class="deck" data-course="Machine Learning for Tabular Data: Baselines and Validation" data-track="data-science" data-day="Day 2">
+<section class="slide title" id="title" data-auto="title" data-label="Welcome" data-n="1">
+  <div class="kicker">SDAIA Academy · Machine Learning for Tabular Data: Baselines and Validation</div>
+  <h1>Trees and challengers</h1>
+  <p class="lead mt">Day 2: Boosted trees, a fixed tuning budget, an automated challenger and a paired decision</p>
+  <div class="meta"><span class="track">Data Science Track</span><span>4 teaching days + capstone day</span><span>4 sessions · 4 labs</span><span>DS-204</span></div>
+  <aside class="notes"><p>Open with yesterday's bar: the logistic model with history scores 0.524 on the fund's five folds. Read out the guesses the room wrote down for tuned boosted trees and keep them visible until Lab 2.2. Same rhythm: concepts, one checkpoint, a 25-minute lab. Breaks are yours: press B.</p></aside>
+</section>
+
+<section class="slide" id="agenda" data-auto="agenda" data-label="Agenda" data-n="2">
+  <div class="kicker">Today</div>
+  <h2>Trees and challengers</h2>
+  <div class="agenda"><div class="item"><div><b>Session 1 · Gradient-boosted trees</b><small>Boosted trees with the library's defaults: what they fit, what they memorise, and what importance scores can and cannot say.</small></div></div><div class="item"><div><b>Session 2 · Tuning under a budget</b><small>A budget of 20 trials, spent inside each training part so that the reported score is not the one that chose the settings.</small></div></div><div class="item"><div><b>Session 3 · Automated and pretrained challengers</b><small>An automated challenger, and what to check before a pretrained one: its licence, where the data goes, and a contest on equal terms.</small></div></div><div class="item"><div><b>Session 4 · Is the challenger better</b><small>Two models scored on the same folds give paired differences: an interval on their mean, and a decision stated before looking.</small></div></div></div>
+  <aside class="notes"><p>Three more rungs today, then the question that decides between rungs. Every lab starts from the reference run log, so nobody needs yesterday's files.</p></aside>
+</section>
+
+<section class="slide" id="review-day1" data-lo="LO2" data-n="3">
+  <div class="kicker">Review of Day 1</div>
+  <h2>What did history add, and how do you know?</h2>
+  <div class="quiz" data-type="single" data-lo="LO2" data-id="review-day1-q1">
+    <p class="lead">Two history features lifted the logistic rung from 0.501 to 0.524. The fold spread of that rung is 0.028. Why is the gain still believable?</p>
+    <div class="opts">
+      <div class="opt" data-why="Compares the gain with the base rate, which says nothing about whether the gain is noise" data-k="A">Because 0.023 is large compared with the base rate of 0.12</div>
+      <div class="opt" data-why="Trusts the size of the table: many rows shrink noise but do not show that this difference is outside it" data-k="B">Because the table has 32,000 development rows</div>
+      <div class="opt" data-ok data-k="C">Because the gain has the same sign on all five folds, where both models met the same rows</div>
+      <div class="opt" data-why="Takes passing the time-travel test as proof of usefulness: the test shows the features read the past only" data-k="D">Because the features passed the time-travel test</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A difference is judged fold by fold. Five gains of +0.012 to +0.031 on the same rows say more than two means and a spread.</div>
+  </div>
+  <aside class="notes"><p>Answer: the third option. Two minutes at most. This is the idea of session 4 in one question: the folds pair the two models, and the pairing removes most of the spread.</p></aside>
+</section>
+
+<section class="slide" id="where-we-are" data-n="4">
+  <div class="kicker">Today</div>
+  <h2>The features are fixed; today the model changes</h2>
+  <div class="ladder" style="--n:4">
+    <div class="rung c-teal off"><b>Frame and baseline</b>Constant 0.118, rules 0.310, logistic 0.524<small>Day 1</small></div>
+    <div class="rung c-cyan on"><b>Trees and challengers</b>Boosted trees, a tuning budget, a paired decision<small>Day 2</small></div>
+    <div class="rung c-coral off"><b>Validation and leakage</b>Three splits, four kinds of leak, an audit<small>Day 3</small></div>
+    <div class="rung c-purple off"><b>Errors and documentation</b>Threshold, calibration, subgroups, model card<small>Day 4</small></div>
+  </div>
+  <aside class="notes"><p>The same 17 features, the same five folds, the same log. Anything that changes a score today is the model or its settings, which is what makes the comparisons clean.</p></aside>
+</section>
+
+<!-- Session 1 -->
+
+<section class="slide section" id="s1" data-auto="section" data-session="1" data-n="5">
+  <div class="kicker">Session 1</div>
+  <h1>Gradient-boosted trees</h1>
+  <ul class="bullets outcomes"><li>Describe how boosting adds small trees to correct the errors so far</li><li>Compare training and validation scores and read the gap</li><li>Read importance scores and name two of their limits</li></ul>
+  <div class="sess-no">01</div>
+  <aside class="notes"><p>Participants met trees in FN-105. This session gives boosting in one picture and spends its time on what the defaults do to this table.</p></aside>
+</section>
+
+<section class="slide" id="one-tree" data-lo="LO2" data-n="6" data-session="1">
+  <div class="kicker">The building block</div>
+  <h2>A tree splits the trainees into groups and predicts each group's rate</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>Absent 2 days or more?</b>The first question splits all trainees</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>Sponsored by an employer?</b>Asked only inside the "absent" group</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>A leaf</b>The share that did not complete among the trainees who land here</div>
+  </div>
+  <ul class="bullets mt">
+    <li>Every question is "is this column above or below a value?"</li>
+    <li>A second question inside one branch is an <b>interaction</b>, found without anyone writing it</li>
+    <li>Scaling changes nothing: trees only compare</li>
+  </ul>
+  <aside class="notes"><p>The example is not arbitrary. In this table early absence is a strong sign for most trainees and means much less for those sponsored by an employer, who miss days for work and finish anyway. A linear model adds one weight for absence; a tree can ask the second question. That is the stretch of Lab 1.3 answered.</p></aside>
+</section>
+
+<section class="slide" id="boosting" data-lo="LO2" data-n="7" data-session="1">
+  <div class="kicker">Many small trees</div>
+  <h2>Boosting adds one small tree at a time, each correcting the sum so far</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Start from the base rate</li>
+      <li>Fit a small tree to what the current model still gets wrong</li>
+      <li>Add a fraction of it: the <b>learning rate</b></li>
+      <li>Repeat a few hundred times</li>
+      <li>The prediction is the sum of all the trees</li>
+    </ul>
+    <div class="card c-teal"><h4>Why it leads on tables</h4><p class="small mb0">It handles mixed columns, missing values and interactions with little preparation, and it runs on a laptop processor. On medium-sized tables, tuned tree ensembles have matched or beaten deep networks in published comparisons.</p></div>
+  </div>
+  <aside class="notes"><p>LightGBM, XGBoost and CatBoost are three implementations of the same idea; the labs use LightGBM because it is fast on a processor. Sources: Grinsztajn, Oyallon and Varoquaux (2022), a benchmark on 45 tabular datasets of medium size.</p></aside>
+</section>
+
+<section class="slide" id="defaults" data-lo="LO2" data-n="8" data-session="1">
+  <div class="kicker">What ships in the box</div>
+  <h2>Defaults are one setting among thousands, chosen for nobody's table</h2>
+  <table class="t">
+    <tr><th>Setting</th><th>LightGBM default</th><th>What it controls</th></tr>
+    <tr><td>Trees</td><td class="num">100</td><td>How long the sum grows</td></tr>
+    <tr><td>Leaves per tree</td><td class="num">31</td><td>How many interactions one tree can hold</td></tr>
+    <tr><td>Learning rate</td><td class="num">0.1</td><td>How much each tree may correct</td></tr>
+    <tr><td>Rows per leaf, at least</td><td class="num">20</td><td>How small a group may be</td></tr>
+  </table>
+  <div class="callout note mt"><b>31 leaves with 20 rows each.</b> A tree may isolate a group of 20 trainees. With 9,000 training rows and a 12% outcome, that is two or three non-completers per leaf.</div>
+  <aside class="notes"><p>The defaults are sensible starting points for large tables. The point for the lab: a default is a decision somebody else made without seeing your data, so it belongs in the log as its own rung, not as "the boosted model".</p></aside>
+</section>
+
+<section class="slide" id="train-vs-valid" data-lo="LO2" data-n="9" data-session="1">
+  <div class="kicker">Lab 2.1, fold by fold</div>
+  <h2>The training score measures memory; the gap shrinks as the rows grow</h2>
+  <table class="t small">
+    <tr><th>Fold</th><th class="num">Training rows</th><th class="num">Score on training rows</th><th class="num">Score on validation rows</th></tr>
+    <tr><td>1</td><td class="num">9,068</td><td class="num">0.849</td><td class="num">0.501</td></tr>
+    <tr><td>2</td><td class="num">12,960</td><td class="num">0.786</td><td class="num">0.473</td></tr>
+    <tr><td>3</td><td class="num">17,028</td><td class="num">0.739</td><td class="num">0.521</td></tr>
+    <tr><td>4</td><td class="num">21,382</td><td class="num">0.707</td><td class="num">0.507</td></tr>
+    <tr><td>5</td><td class="num">25,836</td><td class="num">0.685</td><td class="num">0.515</td></tr>
+  </table>
+  <div class="callout warn mt"><b>What goes wrong.</b> A report quotes 0.85. It is the model's score on rows it has already seen. Only the validation column goes into the log.</div>
+  <aside class="notes"><p>From Lab 2.1, boosted trees with defaults, average precision. Ask the room what the gap would be with 100,000 training rows: smaller still. Overfitting is not a property of the model alone but of the model and the amount of data together.</p></aside>
+</section>
+
+<section class="slide" id="more-trees" data-lo="LO2" data-n="10" data-session="1">
+  <div class="kicker">Follow the trees</div>
+  <h2>Past 50 trees, each new tree helps the training rows and hurts the others</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th class="num">Trees</th><th class="num">Training</th><th class="num">Validation</th></tr>
+      <tr><td class="num">10</td><td class="num">0.519</td><td class="num">0.492</td></tr>
+      <tr><td class="num">25</td><td class="num">0.559</td><td class="num">0.507</td></tr>
+      <tr class="hl"><td class="num">50</td><td class="num">0.615</td><td class="num">0.517</td></tr>
+      <tr><td class="num">100</td><td class="num">0.685</td><td class="num">0.515</td></tr>
+      <tr><td class="num">200</td><td class="num">0.775</td><td class="num">0.508</td></tr>
+      <tr><td class="num">400</td><td class="num">0.897</td><td class="num">0.500</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>Fold 5, default trees of 31 leaves</li>
+      <li>The training score never stops rising</li>
+      <li>The validation score peaks early and declines</li>
+      <li>The peak depends on the other settings: smaller trees peak later</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 2.1, step 3. The tempting move is to pick 50 trees because the validation score is best there. That is tuning on the validation fold, and it is the subject of the next session. The stretch of the lab does it properly, on a part of the training rows.</p></aside>
+</section>
+
+<section class="slide" id="defaults-vs-logistic" data-lo="LO2" data-n="11" data-session="1">
+  <div class="kicker">The rung, measured</div>
+  <h2>With defaults, boosted trees score below the logistic model</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Fold</th><th class="num">Logistic + history</th><th class="num">Boosted, defaults</th><th class="num">Difference</th></tr>
+      <tr><td>1</td><td class="num">0.557</td><td class="num">0.501</td><td class="num">−0.056</td></tr>
+      <tr><td>2</td><td class="num">0.514</td><td class="num">0.473</td><td class="num">−0.041</td></tr>
+      <tr><td>3</td><td class="num">0.530</td><td class="num">0.521</td><td class="num">−0.009</td></tr>
+      <tr><td>4</td><td class="num">0.509</td><td class="num">0.507</td><td class="num">−0.002</td></tr>
+      <tr><td>5</td><td class="num">0.512</td><td class="num">0.515</td><td class="num">+0.004</td></tr>
+      <tr class="hl"><td>Mean</td><td class="num">0.524</td><td class="num">0.503</td><td class="num">−0.021</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>A more flexible model is not automatically a rung up</li>
+      <li>The loss is largest where training rows are fewest</li>
+      <li>It goes into the log as it is</li>
+      <li>The honest next step: tune, under a budget</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 2.1. This is the slide to dwell on: most participants expect the trees to win. The pattern down the folds, from −0.056 to +0.004, says the defaults are too flexible for 9,000 rows and about right for 26,000.</p></aside>
+</section>
+
+<section class="slide" id="importance" data-lo="LO2 LO1" data-n="12" data-session="1">
+  <div class="kicker">What does the model use?</div>
+  <h2>Two importance scores, two different answers for the same column</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Column</th><th class="num">Share of gain</th><th class="num">Score lost when shuffled</th></tr>
+      <tr><td><code>absences_w2</code></td><td class="num">39%</td><td class="num">0.251</td></tr>
+      <tr><td><code>aptitude_score</code></td><td class="num">16%</td><td class="num">0.076</td></tr>
+      <tr><td><code>prior_noncompletions</code></td><td class="num">5%</td><td class="num">0.041</td></tr>
+      <tr class="hl"><td><code>provider_id</code></td><td class="num">11%</td><td class="num">0.029</td></tr>
+      <tr class="hl"><td><code>distance_km</code></td><td class="num">8%</td><td class="num">0.007</td></tr>
+    </table>
+    <ul class="bullets">
+      <li><b>Gain</b> is counted on training rows: it rewards columns with many values</li>
+      <li><b>Permutation</b> is measured on validation rows, one column at a time</li>
+      <li>Columns that carry the same information share the credit</li>
+      <li>Neither gives a direction or a cause</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 2.1, fold 5. Distance takes 8% of the gain and costs 0.007 when shuffled: many splits on a continuous column, little that generalises. Importance has one more use, tomorrow: a column that carries far more of the score than it should is the first suspect in a leakage audit. Sources: scikit-learn user guide, Permutation feature importance.</p></aside>
+</section>
+
+<section class="slide" id="check-training-score" data-lo="LO2" data-n="13" data-session="1">
+  <div class="kicker">Checkpoint</div>
+  <h2>What does a high training score tell you?</h2>
+  <div class="quiz" data-type="single" data-lo="LO2" data-id="check-training-score-q1">
+    <p class="lead">A boosted model scores 0.85 on its 9,068 training rows and 0.50 on the validation rows of the same fold. What do you conclude?</p>
+    <div class="opts">
+      <div class="opt" data-ok data-k="A">The model has memorised part of the training rows; 0.50 is the number to log</div>
+      <div class="opt" data-why="Averages memory and generalisation: the training score is not an estimate of anything the advisers will see" data-k="B">The true score is about halfway, near 0.67</div>
+      <div class="opt" data-why="Reads a large gap as a leak: leakage inflates the validation score, and here it is the training score that is high" data-k="C">The validation rows must contain a leak</div>
+      <div class="opt" data-why="Blames the validation fold: its rows are simply the ones the model has not seen, which is their purpose" data-k="D">The validation fold is unusually hard and should be replaced</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A training score measures how flexible the model is. Only rows the model has not seen estimate how it will do.</div>
+  </div>
+  <aside class="notes"><p>Answer: the first option. If the room picks the leak: good instinct, wrong direction. A leak makes a validation score too good. A high training score with an ordinary validation score is plain overfitting.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-2-1" data-auto="lab" data-lab="2.1" data-label="Lab 2.1" data-n="14" data-session="1">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 2.1 · 25 min</div><h2>Boosted trees with defaults</h2><p class="lead small">Train boosted trees with defaults, compare training and validation scores on the fund's folds and log the rung.</p><a class="nb" href="../labs/D2_1_boosted_defaults.ipynb">D2_1_boosted_defaults.ipynb</a></div><ul class="checklist"><li>Fit with defaults on one fold: training against validation <span class="min">5 min</span></li><li>Score the five folds and log the run <span class="min">5 min</span></li><li>Follow both scores as trees are added <span class="min">7 min</span></li><li>Set the rung beside the logistic model <span class="min">4 min</span></li><li>Read two kinds of importance <span class="min">4 min</span></li><li class="stretch">✱ Stretch: Stop adding trees early, without touching the validation fold</li></ul></div>
+  <aside class="notes"><p>AI-tutor. Two short exercises. Typical problems: scoring the pipeline on prepared arrays in task 1 (pass the raw rows to U.predict), and forgetting num_iteration in task 3. The permutation step takes about half a minute. The lab reads the logistic fold scores from the reference log; no earlier lab is needed.</p></aside>
+</section>
+
+<!-- Session 2 -->
+
+<section class="slide section" id="s2" data-auto="section" data-session="2" data-n="15">
+  <div class="kicker">Session 2</div>
+  <h1>Tuning under a budget</h1>
+  <ul class="bullets outcomes"><li>Name the settings of boosted trees that are worth a budget</li><li>Run a random search whose choices are made on inner folds</li><li>Report the gain over defaults with its fold spread and its cost in time</li></ul>
+  <div class="sess-no">02</div>
+  <aside class="notes"><p>The idea that carries the session: a score that was used to choose something is no longer a clean estimate. Nested folds are the answer, and a stated budget is its companion.</p></aside>
+</section>
+
+<section class="slide" id="settings-that-matter" data-lo="LO2" data-n="16" data-session="2">
+  <div class="kicker">What to tune</div>
+  <h2>A few settings trade flexibility against stability</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>How much is learnt</h4><p class="small mb0">The number of trees and the learning rate. They work as a pair: a smaller rate needs more trees.</p></div>
+    <div class="card c-cyan"><h4>How complex each tree is</h4><p class="small mb0">Leaves per tree, and the fewest rows a leaf may hold. Fewer leaves and larger leaves: less to memorise.</p></div>
+    <div class="card c-coral"><h4>How much is held back</h4><p class="small mb0">Each tree sees a share of the rows and of the inputs; a penalty shrinks the leaf values.</p></div>
+  </div>
+  <p class="lead mt">Lab 2.2 searches seven settings with 2,592 combinations. The budget is 20 of them.</p>
+  <aside class="notes"><p>The search space is in the notebook: 100 to 400 trees, a rate of 0.02 to 0.1, 4 to 31 leaves, 20 to 200 rows per leaf, two sampling shares and a penalty. Sources: LightGBM documentation, Parameters tuning.</p></aside>
+</section>
+
+<section class="slide" id="budget" data-lo="LO2" data-n="17" data-session="2">
+  <div class="kicker">The rule</div>
+  <h2>State the budget before the search, and draw the trials at random</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>A <b>budget</b>: 20 trials, fixed in advance, with a seed</li>
+      <li><b>Random search</b>: each trial draws every setting independently</li>
+      <li>With a few settings that matter and several that hardly do, random draws cover the important ones better than a grid</li>
+      <li>Every trial is kept, the poor ones too</li>
+    </ul>
+    <div class="card c-purple"><h4>Why a budget is about honesty</h4><p class="small mb0">Each trial is another look at the validation rows. A search that stops "when the score looks good" has no defined number of looks, and its best score cannot be interpreted.</p></div>
+  </div>
+  <aside class="notes"><p>Smarter searches exist (Bayesian optimisation, successive halving) and automated tools use them. They change how the budget is spent, not the need for one. Sources: Bergstra and Bengio (2012).</p></aside>
+</section>
+
+<section class="slide" id="choosing-flatters" data-lo="LO2 LO1" data-n="18" data-session="2">
+  <div class="kicker">Why tuning needs its own rows</div>
+  <h2>A score that chose the winner flatters the winner</h2>
+  <table class="t">
+    <tr><th>Rows used to choose among 20 trials</th><th class="num">Winner's score there</th><th class="num">Same model, fresh rows</th><th class="num">Flattery</th></tr>
+    <tr><td>10,885</td><td class="num">0.521</td><td class="num">0.522</td><td class="num">−0.001</td></tr>
+    <tr><td>2,000</td><td class="num">0.529</td><td class="num">0.519</td><td class="num">+0.010</td></tr>
+    <tr class="hl"><td>500</td><td class="num">0.540</td><td class="num">0.515</td><td class="num">+0.025</td></tr>
+  </table>
+  <div class="callout warn mt"><b>What goes wrong.</b> The best of 20 is partly the best and partly the luckiest. The fewer rows choose, and the more trials compete, the larger the lucky part.</div>
+  <aside class="notes"><p>From Lab 2.2, step 5: the 20 trials of the final search, the winner picked on a random part of the validation rows, averaged over 40 repeats. With ten thousand rows the effect vanishes; with 500 it is twice the fold spread of the champion. You cannot know in advance which case you are in, which is why the choice and the report use different rows.</p></aside>
+</section>
+
+<section class="slide" id="nested" data-lo="LO2 LO3" data-n="19" data-session="2">
+  <div class="kicker">Nested validation</div>
+  <h2>Inner folds choose, the outer fold reports</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · Outer fold</b>Set its validation half-year aside</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>2 · Inner folds</b>Inside the training part, score 20 trials on two later half-years</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>3 · Refit</b>The best settings, on the whole training part</div>
+    <div class="arrow">→</div>
+    <div class="step c-purple"><b>4 · Report</b>One score on the half-year no trial has seen</div>
+  </div>
+  <ul class="bullets mt">
+    <li>Repeated for each of the five outer folds: five searches, five scores</li>
+    <li>What is validated is the <b>procedure</b> "search 20 trials, then fit"</li>
+    <li>The inner folds are built like the outer ones: later half-years</li>
+  </ul>
+  <aside class="notes"><p>This costs five searches in place of one: 140 seconds on a laptop for this table. The inner score and the outer score sit on different rows, so they are not compared as numbers: one chooses, the other reports. Sources: scikit-learn example, Nested versus non-nested cross-validation.</p></aside>
+</section>
+
+<section class="slide" id="nested-result" data-lo="LO2" data-n="20" data-session="2">
+  <div class="kicker">Lab 2.2, measured</div>
+  <h2>Twenty trials gain 0.026 over defaults, on every fold</h2>
+  <table class="t small">
+    <tr><th>Fold</th><th class="num">Defaults</th><th class="num">Tuned (nested)</th><th class="num">Gain</th><th>Settings chosen: trees · leaves · rate</th></tr>
+    <tr><td>1</td><td class="num">0.501</td><td class="num">0.542</td><td class="num">+0.041</td><td>200 · 8 · 0.05</td></tr>
+    <tr><td>2</td><td class="num">0.473</td><td class="num">0.517</td><td class="num">+0.044</td><td>400 · 4 · 0.05</td></tr>
+    <tr><td>3</td><td class="num">0.521</td><td class="num">0.540</td><td class="num">+0.019</td><td>400 · 4 · 0.05</td></tr>
+    <tr><td>4</td><td class="num">0.507</td><td class="num">0.519</td><td class="num">+0.013</td><td>400 · 8 · 0.05</td></tr>
+    <tr><td>5</td><td class="num">0.515</td><td class="num">0.526</td><td class="num">+0.011</td><td>400 · 4 · 0.10</td></tr>
+    <tr class="hl"><td>Mean · spread</td><td class="num">0.503 · 0.019</td><td class="num">0.529 · 0.012</td><td class="num">+0.026</td><td>small trees, every time</td></tr>
+  </table>
+  <p class="lead mt">Every fold chose trees of 4 or 8 leaves. The default is 31.</p>
+  <aside class="notes"><p>From Lab 2.2. The folds chose different settings and the same kind: small trees, more of them. Nobody should ask "which of the five is the model": the nested score describes the procedure. The fund's settings come from one more search on all development rows: 400 trees, 8 leaves, rate 0.05, at least 50 rows per leaf. That model is the champion from here on.</p></aside>
+</section>
+
+<section class="slide" id="tuned-vs-logistic" data-lo="LO2 LO4" data-n="21" data-session="2">
+  <div class="kicker">The ladder so far</div>
+  <h2>The tuned trees are 0.005 above the logistic model</h2>
+  <div class="bars">
+    <div class="row"><span>Three rules</span><div class="bar c-navy" style="--w:59%"></div><span class="val">0.310</span></div>
+    <div class="row"><span>Logistic + history</span><div class="bar c-teal" style="--w:99%"></div><span class="val">0.524</span></div>
+    <div class="row"><span>Boosted, defaults</span><div class="bar c-coral" style="--w:95%"></div><span class="val">0.503</span></div>
+    <div class="row"><span>Boosted, 20 trials</span><div class="bar c-purple" style="--w:100%"></div><span class="val">0.529</span></div>
+  </div>
+  <ul class="bullets mt">
+    <li>Against the logistic rung: ahead on four folds, behind by 0.015 on fold 1</li>
+    <li>A mean gain of 0.005 with fold spreads of 0.012 and 0.020</li>
+    <li>Is that a gain? Session 4 gives the tool to answer</li>
+  </ul>
+  <aside class="notes"><p>From Lab 2.2. Return to the guesses of yesterday evening: most rooms guess a gain of 0.05 or more. This table is mostly additive, with a handful of interactions, and the logistic model with history captures most of what there is. Do not resolve the question here; let it stand until the paired comparison.</p></aside>
+</section>
+
+<section class="slide" id="check-nested" data-lo="LO1" data-n="22" data-session="2">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which score may be reported?</h2>
+  <div class="quiz" data-type="single" data-lo="LO1" data-id="check-nested-q1">
+    <p class="lead">An analyst tries 200 settings, scores each on the same five folds and reports the highest mean, 0.547. What is wrong with the number?</p>
+    <div class="opts">
+      <div class="opt" data-why="Blames the amount of search: more trials are fine when the choice and the report use different rows" data-k="A">200 trials are too many for a table of this size</div>
+      <div class="opt" data-why="Blames the method of search: a grid would have the same fault, because the fault is where the winner is scored" data-k="B">Random search is unreliable; a grid would give the true score</div>
+      <div class="opt" data-why="Expects the folds themselves to be at fault: they are fine for scoring one model fixed in advance" data-k="C">Five folds are too few to score any model</div>
+      <div class="opt" data-ok data-k="D">The folds that chose the winner also score it, so part of 0.547 is luck</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The best of 200 on a set of rows is biased upward on those rows. Choose on inner folds; report on rows no trial has seen.</div>
+  </div>
+  <aside class="notes"><p>Answer: the fourth option. Name the kind of fault: it is preparation leakage in the wide sense, a choice fitted on the rows later used to score. Tomorrow's taxonomy has a box for it.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-2-2" data-auto="lab" data-lab="2.2" data-label="Lab 2.2" data-n="23" data-session="2">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 2.2 · 25 min</div><h2>Twenty trials in nested folds</h2><p class="lead small">Run a 20-trial search in nested folds, record the gain over defaults and see how far the inner score flatters the choice.</p><a class="nb" href="../labs/D2_2_nested_search.ipynb">D2_2_nested_search.ipynb</a></div><ul class="checklist"><li>Read the search space and the budget <span class="min">3 min</span></li><li>Write the search over inner folds <span class="min">8 min</span></li><li>Run it inside each outer fold <span class="min">6 min</span></li><li>Log the tuned rung; record the gain <span class="min">4 min</span></li><li>Compare inner and outer scores <span class="min">4 min</span></li><li class="stretch">✱ Stretch: Spend 40 trials: what does the second half of the budget buy?</li></ul></div>
+  <aside class="notes"><p>AI-tutor. One exercise: the body of the trial loop. The nested run takes two to three minutes on a laptop and longer on a small hosted runtime: start it, then discuss the trial table of task 2 while it runs. Quick mode (DS204_QUICK=1) uses 4 trials. The lab reads the defaults and the logistic fold scores from the reference log.</p></aside>
+</section>
+
+<!-- Session 3 -->
+
+<section class="slide section" id="s3" data-auto="section" data-session="3" data-n="24">
+  <div class="kicker">Session 3</div>
+  <h1>Automated and pretrained challengers</h1>
+  <ul class="bullets outcomes"><li>Describe what an automated tabular tool and a tabular foundation model each do</li><li>Check a challenger's licence and where the data would be sent before using it</li><li>Run a challenger on the same folds and the same time budget as the champion</li></ul>
+  <div class="sess-no">03</div>
+  <aside class="notes"><p>The champion needs an opponent it did not choose itself. Two kinds exist today: tools that automate what you did in Lab 2.2, and models pretrained on other tables.</p></aside>
+</section>
+
+<section class="slide" id="two-challengers" data-lo="LO4" data-n="25" data-session="3">
+  <div class="kicker">Two kinds of challenger</div>
+  <h2>One automates the search; the other arrives already trained</h2>
+  <div class="cols cols-2">
+    <div class="card c-teal"><h4>Automated machine learning</h4><p class="small mb0">You give the training rows, a metric and a time limit. The tool prepares the columns, trains several model families, tunes them and blends the best. Example: AutoGluon Tabular. It trains on your machine, on your rows only.</p></div>
+    <div class="card c-purple"><h4>A tabular foundation model</h4><p class="small mb0">A network pretrained on millions of synthetic tables. It reads your training rows as context and predicts the new rows in one pass, with no tuning. Example: TabPFN. Published results are strongest on small tables.</p></div>
+  </div>
+  <div class="callout note mt"><b>Both are challengers, not shortcuts.</b> Each has to stand on the same folds as the champion, in the same log.</div>
+  <aside class="notes"><p>The lab runs the first kind. The second kind is discussed and not run: its weights are a download of a pretrained model, which the labs of this course avoid, and its licence needs the reading of the next slide. Sources: AutoGluon documentation, Tabular essentials; Hollmann and others (2025).</p></aside>
+</section>
+
+<section class="slide" id="licence-check" data-lo="LO4" data-n="26" data-session="3">
+  <div class="kicker">Before any score</div>
+  <h2>Three questions decide whether a challenger may be used at all</h2>
+  <table class="t small">
+    <tr><th>Question</th><th>AutoGluon Tabular</th><th>TabPFN (checked November 2026)</th></tr>
+    <tr><td><b>Licence of the code</b></td><td>Apache 2.0</td><td>Apache 2.0</td></tr>
+    <tr><td><b>Licence of the weights</b></td><td>None: it trains from your rows</td><td>Separate from the code; recent versions are released for non-commercial use</td></tr>
+    <tr><td><b>Where do the rows go?</b></td><td>Nowhere</td><td>Nowhere when run locally; to the provider when its hosted service is used</td></tr>
+  </table>
+  <div class="callout warn mt"><b>What goes wrong.</b> A pretrained model wins the contest, and three weeks later someone reads the licence of its weights. Read it first, on the official page, on the day you use it.</div>
+  <aside class="notes"><p>The facts in the third column come from the project's own repository and change with every release: this is the kind of slide to re-verify each time the course runs. For the fund, the second question is also a data protection question: trainee records may not leave the fund's machines without Maram Al-Rasheed's agreement, whatever the score. Sources: TabPFN repository, licence section; AutoGluon package metadata.</p></aside>
+</section>
+
+<section class="slide" id="fair-contest" data-lo="LO4" data-n="27" data-session="3">
+  <div class="kicker">A fair contest</div>
+  <h2>Same folds, same features, same time, written down first</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li><b>Folds:</b> the fund's five, forward in time</li>
+      <li><b>Features:</b> the champion's 17, no others</li>
+      <li><b>Time:</b> what the champion's search used, 140 seconds for five folds, so 28 seconds a fold</li>
+      <li><b>Metric:</b> average precision, told to the tool</li>
+      <li><b>Configuration:</b> one preset, fixed before the run</li>
+    </ul>
+    <div class="card c-coral"><h4>What a contest without rules measures</h4><p class="small mb0">Give one side an hour and the other a minute, or let one side see a column the other did not, and the result says who was favoured, not which approach is better.</p></div>
+  </div>
+  <aside class="notes"><p>The configuration is the first cell of Lab 2.3 and it is saved with the result. In the capstone, the rubric line "models and comparison" asks for exactly this: identical folds and a stated budget.</p></aside>
+</section>
+
+<section class="slide" id="tool-own-score" data-lo="LO4 LO3" data-n="28" data-session="3">
+  <div class="kicker">Read what it built</div>
+  <h2>The tool's own score comes from a split it chose by itself</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Built on fold 5</th><th class="num">Its own validation score</th></tr>
+      <tr class="hl"><td>Weighted blend</td><td class="num">0.491</td></tr>
+      <tr><td>LightGBM, three variants</td><td class="num">0.483 to 0.484</td></tr>
+      <tr><td>Random forests, two</td><td class="num">0.447 to 0.455</td></tr>
+      <tr><td>Extra trees, two</td><td class="num">0.443 to 0.445</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>It set aside a <b>random</b> part of the training rows to choose and weight its models</li>
+      <li>The fund validates forward in time</li>
+      <li>On the fund's fold 5 the same blend scores 0.518</li>
+      <li>Log your score, never the tool's</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 2.3. The two numbers differ because they sit on different rows, not because one is wrong. The stretch hands the tool the fund's inner split in place of its own. Tomorrow's first session is about exactly this: a tool cannot know that your rows have an order and that trainees repeat unless you tell it.</p></aside>
+</section>
+
+<section class="slide" id="challenger-result" data-lo="LO4" data-n="29" data-session="3">
+  <div class="kicker">Lab 2.3, measured</div>
+  <h2>On equal terms the challenger lands close to the champion</h2>
+  <table class="t small">
+    <tr><th>Fold</th><th class="num">Champion</th><th class="num">Challenger</th><th class="num">Challenger − champion</th></tr>
+    <tr><td>1</td><td class="num">0.542</td><td class="num">0.534</td><td class="num">−0.009</td></tr>
+    <tr><td>2</td><td class="num">0.517</td><td class="num">0.497</td><td class="num">−0.021</td></tr>
+    <tr><td>3</td><td class="num">0.540</td><td class="num">0.541</td><td class="num">+0.001</td></tr>
+    <tr><td>4</td><td class="num">0.519</td><td class="num">0.521</td><td class="num">+0.001</td></tr>
+    <tr><td>5</td><td class="num">0.526</td><td class="num">0.518</td><td class="num">−0.008</td></tr>
+    <tr class="hl"><td>Mean</td><td class="num">0.529</td><td class="num">0.522</td><td class="num">−0.007</td></tr>
+  </table>
+  <p class="lead mt">Ahead on two folds, behind on three. Not yet a decision.</p>
+  <aside class="notes"><p>From Lab 2.3: AutoGluon Tabular, preset medium_quality, 28 seconds a fold, tree models only because no neural network library is installed in the lab environment. With a longer limit or a larger preset the result may differ, and that would be a different contest with a different budget for the champion too.</p></aside>
+</section>
+
+<section class="slide" id="check-contest" data-lo="LO4" data-n="30" data-session="3">
+  <div class="kicker">Checkpoint</div>
+  <h2>What makes this contest unfair?</h2>
+  <div class="quiz" data-type="single" data-lo="LO4" data-id="check-contest-q1">
+    <p class="lead">A team reports that an automated tool beats their tuned model, 0.561 to 0.529. Which detail makes the comparison worthless?</p>
+    <div class="opts">
+      <div class="opt" data-why="Objects to a difference in kind: a challenger is allowed to be a blend, that is the point of testing it" data-k="A">The tool blends several models and the champion is one model</div>
+      <div class="opt" data-ok data-k="B">The tool's 0.561 is its own internal validation score; the champion's 0.529 is on the fund's folds</div>
+      <div class="opt" data-why="Objects to the metric being shared: both sides should be optimised for the metric that is reported" data-k="C">The tool was told to optimise average precision</div>
+      <div class="opt" data-why="Objects to equal budgets: the same time limit is what makes the contest fair" data-k="D">Both ran with a limit of 28 seconds a fold</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Two scores compare only on the same rows. The tool's own number sits on a random split it made inside the training rows.</div>
+  </div>
+  <aside class="notes"><p>Answer: the second option. The three wrong options are all things that are fine, which is the point: the only thing that is not negotiable is that both sides are scored on the same rows.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-2-3" data-auto="lab" data-lab="2.3" data-label="Lab 2.3" data-n="31" data-session="3">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 2.3 · 25 min</div><h2>A challenger on equal terms</h2><p class="lead small">Run an automated challenger on the same five folds with the time budget the tuned search used, and log it beside the champion.</p><a class="nb" href="../labs/D2_3_challenger.ipynb">D2_3_challenger.ipynb</a></div><ul class="checklist"><li>Read the challenger configuration and its licence <span class="min">3 min</span></li><li>Write the function that runs it on one fold <span class="min">8 min</span></li><li>Run the five folds on the same time budget <span class="min">7 min</span></li><li>Log the run; read what it built <span class="min">4 min</span></li><li>Set the two rows of the log side by side <span class="min">3 min</span></li><li class="stretch">✱ Stretch: Give the challenger the fund's inner split in place of its own</li></ul></div>
+  <aside class="notes"><p>AI-tutor. The five folds take about two and a half minutes at 28 seconds each. If the tool is not installed, or on a runtime where it does not import, the notebook continues on the trainer's reference run and says so. The tool reports model families that are not installed; the notebook silences those lines. Quick mode uses 12 seconds a fold.</p></aside>
+</section>
+
+<!-- Session 4 -->
+
+<section class="slide section" id="s4" data-auto="section" data-session="4" data-n="32">
+  <div class="kicker">Session 4</div>
+  <h1>Is the challenger better</h1>
+  <ul class="bullets outcomes"><li>Explain why fold scores of two models are compared as pairs</li><li>Compute the mean paired difference with an interval</li><li>Decide against a minimum effect stated in advance, in one line</li></ul>
+  <div class="sess-no">04</div>
+  <aside class="notes"><p>DS-201 taught intervals and the bootstrap on survey and repair data. This session uses both for one purpose: deciding between two models.</p></aside>
+</section>
+
+<section class="slide" id="pairs" data-lo="LO4" data-n="33" data-session="4">
+  <div class="kicker">The key idea</div>
+  <h2>Two models on the same folds give pairs, and pairs are compared by their differences</h2>
+  <div class="cols cols-2 mid">
+    <div class="bars">
+      <div class="row"><span>Spread of the champion's folds</span><div class="bar c-teal" style="--w:69%"></div><span class="val">0.012</span></div>
+      <div class="row"><span>Spread of the challenger's folds</span><div class="bar c-coral" style="--w:100%"></div><span class="val">0.017</span></div>
+      <div class="row"><span>Spread of the five differences</span><div class="bar c-purple" style="--w:52%"></div><span class="val">0.009</span></div>
+    </div>
+    <ul class="bullets">
+      <li>A hard half-year lowers both models</li>
+      <li>The difference within a fold removes that shared part</li>
+      <li>So the differences vary less than either score</li>
+      <li>Compare two means with their spreads and you throw the pairing away</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 2.4. Yesterday's history features were the cleaner example: a gain of 0.023 inside a spread of 0.028, and positive on every fold. The pairing only exists because both models were scored on identical folds, which is why the ladder insisted on them from the first rung.</p></aside>
+</section>
+
+<section class="slide" id="t-interval" data-lo="LO4" data-n="34" data-session="4">
+  <div class="kicker">An interval on the mean difference</div>
+  <h2>Five differences give an honest, wide interval</h2>
+  <div class="cols cols-2 mid">
+    <div class="stat center"><div class="big">−0.007</div><div class="lbl">mean difference, challenger minus champion; 95% interval −0.018 to +0.004</div></div>
+    <ul class="bullets">
+      <li>Mean ± <i>t</i> × (spread of the differences ÷ √5)</li>
+      <li>With 5 folds the multiplier is 2.78, not 1.96</li>
+      <li>The interval contains zero: no difference is shown</li>
+      <li>The folds share training rows, so the true uncertainty is, if anything, larger</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 2.4: differences −0.009, −0.021, +0.001, +0.001, −0.008. The t interval treats the five folds as a sample of the half-years the model might meet. It is the simplest defensible interval and the one the course outcome asks for.</p></aside>
+</section>
+
+<section class="slide" id="paired-bootstrap" data-lo="LO4" data-n="35" data-session="4">
+  <div class="kicker">A second opinion</div>
+  <h2>The paired bootstrap resamples validation rows, not folds</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Both models scored the same 21,770 validation rows</li>
+      <li>Draw rows again with replacement, inside each fold</li>
+      <li>Score <b>both</b> models on the same draw</li>
+      <li>Keep the difference; repeat 1,000 times</li>
+    </ul>
+    <table class="t small">
+      <tr><th>Method</th><th>95% interval of the difference</th></tr>
+      <tr><td><i>t</i> over five folds</td><td>−0.018 to +0.004</td></tr>
+      <tr><td>Paired bootstrap over rows</td><td>−0.013 to −0.002</td></tr>
+    </table>
+  </div>
+  <div class="callout note mt"><b>Two questions.</b> The first asks what other half-years would show, the second what other trainees in these half-years would show. Report both when they differ.</div>
+  <aside class="notes"><p>From Lab 2.4. Here they differ, mildly: the bootstrap is narrower and excludes zero, the t interval does not. Within these five half-years the champion is slightly ahead; whether that holds for another half-year, five folds cannot say. Neither interval comes near the minimum effect, so the decision is the same. This is the bootstrap of DS-201, with the one new idea that both models are scored on the same draw.</p></aside>
+</section>
+
+<section class="slide" id="minimum-effect" data-lo="LO4" data-n="36" data-session="4">
+  <div class="kicker">The decision rule</div>
+  <h2>State the smallest gain worth having before you look</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>Adopt the challenger</h4><p class="small mb0">The whole interval lies above the minimum effect.</p></div>
+    <div class="card c-coral"><h4>Keep the champion</h4><p class="small mb0">The whole interval lies below the minimum effect.</p></div>
+    <div class="card c-purple"><h4>Not shown</h4><p class="small mb0">The interval straddles it. The rule says what happens then: the simpler model stays.</p></div>
+  </div>
+  <p class="lead mt">For the fund: +0.01 average precision, agreed with Dr. Haya Al-Mogren before the contest.</p>
+  <aside class="notes"><p>The minimum effect is a business judgment, not a statistical one: a blend of seven models costs more to explain, to serve and to maintain than one model, and a gain below 0.01 changes almost nobody's place on a list of 800. Stated after the result, a minimum effect tends to land just below whatever was measured.</p></aside>
+</section>
+
+<section class="slide" id="decision-line" data-lo="LO4" data-n="37" data-session="4">
+  <div class="kicker">The one-line decision</div>
+  <h2>Difference, interval, minimum effect, decision</h2>
+  <div class="callout tip"><b>The line of Lab 2.4.</b> On the same five folds the challenger differs from the champion by −0.007 average precision (95% interval −0.018 to +0.004; paired bootstrap −0.013 to −0.002). Minimum effect stated in advance: +0.01. Decision: keep the champion.</div>
+  <ul class="bullets mt">
+    <li>Four parts, in this order, in the capstone README</li>
+    <li>"Keep the champion" is shown here: the whole interval is below +0.01</li>
+    <li>It is a statement about this contest: 28 seconds a fold, one preset</li>
+  </ul>
+  <aside class="notes"><p>From Lab 2.4. A reviewer can check each part: the difference from the log, the interval from five numbers, the minimum effect from the note written before the run.</p></aside>
+</section>
+
+<section class="slide" id="champion-vs-logistic" data-lo="LO2 LO4" data-n="38" data-session="4">
+  <div class="kicker">The same tool, pointed at our own ladder</div>
+  <h2>The tuned trees are not shown to beat the logistic model</h2>
+  <div class="cols cols-2 mid">
+    <div class="stat center"><div class="big">+0.005</div><div class="lbl">champion minus logistic with history; 95% interval −0.010 to +0.019</div></div>
+    <ul class="bullets">
+      <li>The interval contains zero and the minimum effect</li>
+      <li>Verdict by the rule: <b>not shown</b></li>
+      <li>The course carries the trees forward; the model card says a linear model does as well</li>
+      <li>A result worth reporting, not hiding</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From the stretch of Lab 2.4. Ask the room what they would tell the director. A fair answer: the boosted model is the champion of the ladder by 0.005, which five folds cannot distinguish from nothing; the logistic model is simpler to read and to explain to an adviser; the course continues with the boosted model because the entry's remaining labs are about it, and the model card says plainly that a linear model does as well within the uncertainty.</p></aside>
+</section>
+
+<section class="slide" id="check-interval" data-lo="LO4" data-n="39" data-session="4">
+  <div class="kicker">Checkpoint</div>
+  <h2>What does this interval decide?</h2>
+  <div class="quiz" data-type="single" data-lo="LO4" data-id="check-interval-q1">
+    <p class="lead">A challenger's mean paired difference is +0.006, with a 95% interval from −0.004 to +0.016. The minimum effect stated in advance is +0.01. What is the decision?</p>
+    <div class="opts">
+      <div class="opt" data-why="Reads the mean alone: +0.006 is positive, but the interval reaches below zero and below the minimum effect" data-k="A">Adopt the challenger: its mean difference is positive</div>
+      <div class="opt" data-why="Reads an interval containing zero as proof of equality: the data are also compatible with a gain of +0.016" data-k="B">The two models are shown to be equal</div>
+      <div class="opt" data-ok data-k="C">Not shown: the interval straddles the minimum effect, so the champion stays</div>
+      <div class="opt" data-why="Lowers the bar after seeing the result: a minimum effect moved to fit the data is no longer a rule" data-k="D">Adopt it, with the minimum effect lowered to +0.005</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The interval holds values on both sides of +0.01. The rule fixed in advance says the simpler model stays until more folds or more rows settle it.</div>
+  </div>
+  <aside class="notes"><p>Answer: the third option. Spend a moment on the second option: "not shown to differ" and "shown to be equal" are different statements, and only a narrow interval around zero supports the second.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-2-4" data-auto="lab" data-lab="2.4" data-label="Lab 2.4" data-n="40" data-session="4">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 2.4 · 25 min</div><h2>The paired difference and the decision</h2><p class="lead small">Compute the paired fold difference between champion and challenger with an interval, check it with a paired bootstrap and write the one-line decision.</p><a class="nb" href="../labs/D2_4_paired_difference.ipynb">D2_4_paired_difference.ipynb</a></div><ul class="checklist"><li>Line up the fold scores of the two models <span class="min">3 min</span></li><li>Compute the paired differences and their mean <span class="min">4 min</span></li><li>Put a t interval on the mean difference <span class="min">6 min</span></li><li>Check it with a paired bootstrap over rows <span class="min">7 min</span></li><li>Write the decision in one line <span class="min">5 min</span></li><li class="stretch">✱ Stretch: The same comparison between the champion and the logistic rung</li></ul></div>
+  <aside class="notes"><p>AI-tutor. Three short exercises: the differences, the t interval, the decision rule. The bootstrap runs 1,000 draws in under a minute. The lab is the evidence for the fourth course outcome: a paired comparison with an interval and a one-line decision. It starts from the reference log and reference probabilities, so nobody needs Labs 2.2 or 2.3.</p></aside>
+</section>
+
+<!-- Close -->
+
+<section class="slide" id="wrap-up" data-n="41" data-session="4">
+  <div class="kicker">Day 2</div>
+  <h2>Three things to keep</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>Defaults are a rung, not the model</h4><p class="small mb0">Boosted trees with defaults scored 0.503, below the logistic rung at 0.524. Twenty trials in nested folds reached 0.529.</p></div>
+    <div class="card c-cyan"><h4>Choose and report on different rows</h4><p class="small mb0">A winner picked on 500 rows was flattered by 0.025. Inner folds choose; the outer fold reports.</p></div>
+    <div class="card c-coral"><h4>A difference needs an interval</h4><p class="small mb0">Challenger −0.007 (−0.018 to +0.004): keep the champion. Champion over logistic +0.005 (−0.010 to +0.019): not shown.</p></div>
+  </div>
+  <aside class="notes"><p>Ask: which line of today's log surprised you most? Usually the defaults. Then: which sentence would you be least comfortable saying to the director? Usually the last one, and it is the most useful.</p></aside>
+</section>
+
+<section class="slide dark" id="next" data-n="42" data-session="4">
+  <div class="kicker">Next</div>
+  <h1>Day 3 · Validation and leakage</h1>
+  <p class="lead">Every score so far used the fund's folds. Tomorrow you find out why they are built that way, what a random split would have told you, and how to audit a score that is too good.</p>
+  <ul class="bullets">
+    <li>Loay Al-Kadi's notebook reports a score above 0.9 on this table</li>
+    <li>Tomorrow's first attempts at the split and the leak hunt are without AI assistance</li>
+  </ul>
+  <aside class="notes"><p>Day 3 runs on supplied tables and the champion's saved settings, so nobody who struggled today starts behind.</p></aside>
+</section>
+</div>
+<script type="application/json" id="academy-data">{"v":1,"engine":"1.0.0","build":{"at":"2026-11-15T16:02:38Z","version":"2027.1.0","commit":"6acdecd"},"course":{"id":"ds-204","code":"DS-204","title":"Machine Learning for Tabular Data: Baselines and Validation","track":"data-science","lang":"en","dir":"ltr","url":"https://sdaiaacademy.github.io/ds-204/","repo":"SDAIAAcademy/ds-204","home":"../index.html"},"deck":{"id":"day2","kind":"day","day":2,"label":"Day 2","title":"Trees and challengers","prev":"day1.html","next":"day3.html","md":"day2.md","alt":{}},"sessions":[{"n":1,"label":"Session 1","title":"Gradient-boosted trees","slide":"s1","outcomes":["Describe how boosting adds small trees to correct the errors so far","Compare training and validation scores and read the gap","Read importance scores and name two of their limits"],"minutes":50,"lab":{"id":"2.1","title":"Boosted trees with defaults","minutes":25,"href":"../labs/D2_1_boosted_defaults.ipynb"}},{"n":2,"label":"Session 2","title":"Tuning under a budget","slide":"s2","outcomes":["Name the settings of boosted trees that are worth a budget","Run a random search whose choices are made on inner folds","Report the gain over defaults with its fold spread and its cost in time"],"minutes":50,"lab":{"id":"2.2","title":"Twenty trials in nested folds","minutes":25,"href":"../labs/D2_2_nested_search.ipynb"}},{"n":3,"label":"Session 3","title":"Automated and pretrained challengers","slide":"s3","outcomes":["Describe what an automated tabular tool and a tabular foundation model each do","Check a challenger's licence and where the data would be sent before using it","Run a challenger on the same folds and the same time budget as the champion"],"minutes":50,"lab":{"id":"2.3","title":"A challenger on equal terms","minutes":25,"href":"../labs/D2_3_challenger.ipynb"}},{"n":4,"label":"Session 4","title":"Is the challenger better","slide":"s4","outcomes":["Explain why fold scores of two models are compared as pairs","Compute the mean paired difference with an interval","Decide against a minimum effect stated in advance, in one line"],"minutes":50,"lab":{"id":"2.4","title":"The paired difference and the decision","minutes":25,"href":"../labs/D2_4_paired_difference.ipynb"}}],"slides":[{"id":"title","n":1,"title":"Trees and challengers","kind":"title","session":0,"hash":"8922bd9d","md":"#### [day2#title] Trees and challengers\n\n*SDAIA Academy · Machine Learning for Tabular Data: Baselines and Validation*\n\nDay 2: Boosted trees, a fixed tuning budget, an automated challenger and a paired decision\n\nData Science Track · 4 teaching days + capstone day · 4 sessions · 4 labs · DS-204","notes":"Open with yesterday's bar: the logistic model with history scores 0.524 on the fund's five folds. Read out the guesses the room wrote down for tuned boosted trees and keep them visible until Lab 2.2. Same rhythm: concepts, one checkpoint, a 25-minute lab. Breaks are yours: press B.","minutes":null,"lo":[]},{"id":"agenda","n":2,"title":"Trees and challengers","kind":"content","session":0,"hash":"d7b3c036","md":"#### [day2#agenda] Trees and challengers\n\n*Today*\n\n- **Session 1 · Gradient-boosted trees**: Boosted trees with the library's defaults: what they fit, what they memorise, and what importance scores can and cannot say.\n- **Session 2 · Tuning under a budget**: A budget of 20 trials, spent inside each training part so that the reported score is not the one that chose the settings.\n- **Session 3 · Automated and pretrained challengers**: An automated challenger, and what to check before a pretrained one: its licence, where the data goes, and a contest on equal terms.\n- **Session 4 · Is the challenger better**: Two models scored on the same folds give paired differences: an interval on their mean, and a decision stated before looking.","notes":"Three more rungs today, then the question that decides between rungs. Every lab starts from the reference run log, so nobody needs yesterday's files.","minutes":null,"lo":[]},{"id":"review-day1","n":3,"title":"What did history add, and how do you know?","kind":"quiz","session":0,"hash":"7fd3d771","md":"#### [day2#review-day1] What did history add, and how do you know?\n\n*Review of Day 1*\n\n**Question:** Two history features lifted the logistic rung from 0.501 to 0.524. The fold spread of that rung is 0.028. Why is the gain still believable?\n\n- A. Because 0.023 is large compared with the base rate of 0.12\n- B. Because the table has 32,000 development rows\n- C. Because the gain has the same sign on all five folds, where both models met the same rows\n- D. Because the features passed the time-travel test","notes":"Answer: the third option. Two minutes at most. This is the idea of session 4 in one question: the folds pair the two models, and the pairing removes most of the spread.","minutes":null,"lo":["LO2"]},{"id":"where-we-are","n":4,"title":"The features are fixed; today the model changes","kind":"content","session":0,"hash":"8791b2e0","md":"#### [day2#where-we-are] The features are fixed; today the model changes\n\n*Today*\n\n1. **Frame and baseline**: Constant 0.118, rules 0.310, logistic 0.524 (Day 1)\n2. **Trees and challengers**: Boosted trees, a tuning budget, a paired decision (Day 2)\n3. **Validation and leakage**: Three splits, four kinds of leak, an audit (Day 3)\n4. **Errors and documentation**: Threshold, calibration, subgroups, model card (Day 4)","notes":"The same 17 features, the same five folds, the same log. Anything that changes a score today is the model or its settings, which is what makes the comparisons clean.","minutes":null,"lo":[]},{"id":"s1","n":5,"title":"Gradient-boosted trees","kind":"section","session":1,"hash":"95c8944b","md":"#### [day2#s1] Gradient-boosted trees\n\n*Session 1*\n\n- Describe how boosting adds small trees to correct the errors so far\n- Compare training and validation scores and read the gap\n- Read importance scores and name two of their limits","notes":"Participants met trees in FN-105. This session gives boosting in one picture and spends its time on what the defaults do to this table.","minutes":null,"lo":["LO2"]},{"id":"one-tree","n":6,"title":"A tree splits the trainees into groups and predicts each group's rate","kind":"content","session":1,"hash":"c19f4014","md":"#### [day2#one-tree] A tree splits the trainees into groups and predicts each group's rate\n\n*The building block*\n\n1. **Absent 2 days or more?** The first question splits all trainees\n2. **Sponsored by an employer?** Asked only inside the \"absent\" group\n3. **A leaf** The share that did not complete among the trainees who land here\n\n- Every question is \"is this column above or below a value?\"\n- A second question inside one branch is an **interaction**, found without anyone writing it\n- Scaling changes nothing: trees only compare","notes":"The example is not arbitrary. In this table early absence is a strong sign for most trainees and means much less for those sponsored by an employer, who miss days for work and finish anyway. A linear model adds one weight for absence; a tree can ask the second question. That is the stretch of Lab 1.3 answered.","minutes":null,"lo":["LO2"]},{"id":"boosting","n":7,"title":"Boosting adds one small tree at a time, each correcting the sum so far","kind":"content","session":1,"hash":"c2782be5","md":"#### [day2#boosting] Boosting adds one small tree at a time, each correcting the sum so far\n\n*Many small trees*\n\n- Start from the base rate\n- Fit a small tree to what the current model still gets wrong\n- Add a fraction of it: the **learning rate**\n- Repeat a few hundred times\n- The prediction is the sum of all the trees\n\n- **Why it leads on tables.** It handles mixed columns, missing values and interactions with little preparation, and it runs on a laptop processor. On medium-sized tables, tuned tree ensembles have matched or beaten deep networks in published comparisons.","notes":"LightGBM, XGBoost and CatBoost are three implementations of the same idea; the labs use LightGBM because it is fast on a processor. Sources: Grinsztajn, Oyallon and Varoquaux (2022), a benchmark on 45 tabular datasets of medium size.","minutes":null,"lo":["LO2"]},{"id":"defaults","n":8,"title":"Defaults are one setting among thousands, chosen for nobody's table","kind":"content","session":1,"hash":"79f11ce5","md":"#### [day2#defaults] Defaults are one setting among thousands, chosen for nobody's table\n\n*What ships in the box*\n\n| Setting | LightGBM default | What it controls |\n| --- | --- | --- |\n| Trees | 100 | How long the sum grows |\n| Leaves per tree | 31 | How many interactions one tree can hold |\n| Learning rate | 0.1 | How much each tree may correct |\n| Rows per leaf, at least | 20 | How small a group may be |\n\n> **31 leaves with 20 rows each.** A tree may isolate a group of 20 trainees. With 9,000 training rows and a 12% outcome, that is two or three non-completers per leaf.","notes":"The defaults are sensible starting points for large tables. The point for the lab: a default is a decision somebody else made without seeing your data, so it belongs in the log as its own rung, not as \"the boosted model\".","minutes":null,"lo":["LO2"]},{"id":"train-vs-valid","n":9,"title":"The training score measures memory; the gap shrinks as the rows grow","kind":"content","session":1,"hash":"fa0a36c0","md":"#### [day2#train-vs-valid] The training score measures memory; the gap shrinks as the rows grow\n\n*Lab 2.1, fold by fold*\n\n| Fold | Training rows | Score on training rows | Score on validation rows |\n| --- | --- | --- | --- |\n| 1 | 9,068 | 0.849 | 0.501 |\n| 2 | 12,960 | 0.786 | 0.473 |\n| 3 | 17,028 | 0.739 | 0.521 |\n| 4 | 21,382 | 0.707 | 0.507 |\n| 5 | 25,836 | 0.685 | 0.515 |\n\n> **What goes wrong.** A report quotes 0.85. It is the model's score on rows it has already seen. Only the validation column goes into the log.","notes":"From Lab 2.1, boosted trees with defaults, average precision. Ask the room what the gap would be with 100,000 training rows: smaller still. Overfitting is not a property of the model alone but of the model and the amount of data together.","minutes":null,"lo":["LO2"]},{"id":"more-trees","n":10,"title":"Past 50 trees, each new tree helps the training rows and hurts the others","kind":"content","session":1,"hash":"ec7ab069","md":"#### [day2#more-trees] Past 50 trees, each new tree helps the training rows and hurts the others\n\n*Follow the trees*\n\n| Trees | Training | Validation |\n| --- | --- | --- |\n| 10 | 0.519 | 0.492 |\n| 25 | 0.559 | 0.507 |\n| 50 | 0.615 | 0.517 |\n| 100 | 0.685 | 0.515 |\n| 200 | 0.775 | 0.508 |\n| 400 | 0.897 | 0.500 |\n\n- Fold 5, default trees of 31 leaves\n- The training score never stops rising\n- The validation score peaks early and declines\n- The peak depends on the other settings: smaller trees peak later","notes":"From Lab 2.1, step 3. The tempting move is to pick 50 trees because the validation score is best there. That is tuning on the validation fold, and it is the subject of the next session. The stretch of the lab does it properly, on a part of the training rows.","minutes":null,"lo":["LO2"]},{"id":"defaults-vs-logistic","n":11,"title":"With defaults, boosted trees score below the logistic model","kind":"content","session":1,"hash":"f69ce101","md":"#### [day2#defaults-vs-logistic] With defaults, boosted trees score below the logistic model\n\n*The rung, measured*\n\n| Fold | Logistic + history | Boosted, defaults | Difference |\n| --- | --- | --- | --- |\n| 1 | 0.557 | 0.501 | −0.056 |\n| 2 | 0.514 | 0.473 | −0.041 |\n| 3 | 0.530 | 0.521 | −0.009 |\n| 4 | 0.509 | 0.507 | −0.002 |\n| 5 | 0.512 | 0.515 | +0.004 |\n| Mean | 0.524 | 0.503 | −0.021 |\n\n- A more flexible model is not automatically a rung up\n- The loss is largest where training rows are fewest\n- It goes into the log as it is\n- The honest next step: tune, under a budget","notes":"From Lab 2.1. This is the slide to dwell on: most participants expect the trees to win. The pattern down the folds, from −0.056 to +0.004, says the defaults are too flexible for 9,000 rows and about right for 26,000.","minutes":null,"lo":["LO2"]},{"id":"importance","n":12,"title":"Two importance scores, two different answers for the same column","kind":"content","session":1,"hash":"6a295d3e","md":"#### [day2#importance] Two importance scores, two different answers for the same column\n\n*What does the model use?*\n\n| Column | Share of gain | Score lost when shuffled |\n| --- | --- | --- |\n| `absences_w2` | 39% | 0.251 |\n| `aptitude_score` | 16% | 0.076 |\n| `prior_noncompletions` | 5% | 0.041 |\n| `provider_id` | 11% | 0.029 |\n| `distance_km` | 8% | 0.007 |\n\n- **Gain** is counted on training rows: it rewards columns with many values\n- **Permutation** is measured on validation rows, one column at a time\n- Columns that carry the same information share the credit\n- Neither gives a direction or a cause","notes":"From Lab 2.1, fold 5. Distance takes 8% of the gain and costs 0.007 when shuffled: many splits on a continuous column, little that generalises. Importance has one more use, tomorrow: a column that carries far more of the score than it should is the first suspect in a leakage audit. Sources: scikit-learn user guide, Permutation feature importance.","minutes":null,"lo":["LO2","LO1"]},{"id":"check-training-score","n":13,"title":"What does a high training score tell you?","kind":"quiz","session":1,"hash":"554fde38","md":"#### [day2#check-training-score] What does a high training score tell you?\n\n*Checkpoint*\n\n**Question:** A boosted model scores 0.85 on its 9,068 training rows and 0.50 on the validation rows of the same fold. What do you conclude?\n\n- A. The model has memorised part of the training rows; 0.50 is the number to log\n- B. The true score is about halfway, near 0.67\n- C. The validation rows must contain a leak\n- D. The validation fold is unusually hard and should be replaced","notes":"Answer: the first option. If the room picks the leak: good instinct, wrong direction. A leak makes a validation score too good. A high training score with an ordinary validation score is plain overfitting.","minutes":null,"lo":["LO2"]},{"id":"lab-2-1","n":14,"title":"Boosted trees with defaults","kind":"lab","session":1,"hash":"cd9394fc","md":"#### [day2#lab-2-1] Boosted trees with defaults\n\nLab 2.1 · 25 min\n\nTrain boosted trees with defaults, compare training and validation scores on the fund's folds and log the rung.\n\n[D2_1_boosted_defaults.ipynb](https://sdaiaacademy.github.io/ds-204/labs/D2_1_boosted_defaults.ipynb)\n\n- [ ] Fit with defaults on one fold: training against validation (5 min)\n- [ ] Score the five folds and log the run (5 min)\n- [ ] Follow both scores as trees are added (7 min)\n- [ ] Set the rung beside the logistic model (4 min)\n- [ ] Read two kinds of importance (4 min)\n- [ ] ✱ Stretch: Stop adding trees early, without touching the validation fold","notes":"AI-tutor. Two short exercises. Typical problems: scoring the pipeline on prepared arrays in task 1 (pass the raw rows to U.predict), and forgetting num_iteration in task 3. The permutation step takes about half a minute. The lab reads the logistic fold scores from the reference log; no earlier lab is needed.","minutes":null,"lo":[]},{"id":"s2","n":15,"title":"Tuning under a budget","kind":"section","session":2,"hash":"20ba9457","md":"#### [day2#s2] Tuning under a budget\n\n*Session 2*\n\n- Name the settings of boosted trees that are worth a budget\n- Run a random search whose choices are made on inner folds\n- Report the gain over defaults with its fold spread and its cost in time","notes":"The idea that carries the session: a score that was used to choose something is no longer a clean estimate. Nested folds are the answer, and a stated budget is its companion.","minutes":null,"lo":["LO2"]},{"id":"settings-that-matter","n":16,"title":"A few settings trade flexibility against stability","kind":"content","session":2,"hash":"8d81957f","md":"#### [day2#settings-that-matter] A few settings trade flexibility against stability\n\n*What to tune*\n\n- **How much is learnt.** The number of trees and the learning rate. They work as a pair: a smaller rate needs more trees.\n- **How complex each tree is.** Leaves per tree, and the fewest rows a leaf may hold. Fewer leaves and larger leaves: less to memorise.\n- **How much is held back.** Each tree sees a share of the rows and of the inputs; a penalty shrinks the leaf values.\n\nLab 2.2 searches seven settings with 2,592 combinations. The budget is 20 of them.","notes":"The search space is in the notebook: 100 to 400 trees, a rate of 0.02 to 0.1, 4 to 31 leaves, 20 to 200 rows per leaf, two sampling shares and a penalty. Sources: LightGBM documentation, Parameters tuning.","minutes":null,"lo":["LO2"]},{"id":"budget","n":17,"title":"State the budget before the search, and draw the trials at random","kind":"content","session":2,"hash":"b5fd0354","md":"#### [day2#budget] State the budget before the search, and draw the trials at random\n\n*The rule*\n\n- A **budget**: 20 trials, fixed in advance, with a seed\n- **Random search**: each trial draws every setting independently\n- With a few settings that matter and several that hardly do, random draws cover the important ones better than a grid\n- Every trial is kept, the poor ones too\n\n- **Why a budget is about honesty.** Each trial is another look at the validation rows. A search that stops \"when the score looks good\" has no defined number of looks, and its best score cannot be interpreted.","notes":"Smarter searches exist (Bayesian optimisation, successive halving) and automated tools use them. They change how the budget is spent, not the need for one. Sources: Bergstra and Bengio (2012).","minutes":null,"lo":["LO2"]},{"id":"choosing-flatters","n":18,"title":"A score that chose the winner flatters the winner","kind":"content","session":2,"hash":"6bd99d17","md":"#### [day2#choosing-flatters] A score that chose the winner flatters the winner\n\n*Why tuning needs its own rows*\n\n| Rows used to choose among 20 trials | Winner's score there | Same model, fresh rows | Flattery |\n| --- | --- | --- | --- |\n| 10,885 | 0.521 | 0.522 | −0.001 |\n| 2,000 | 0.529 | 0.519 | +0.010 |\n| 500 | 0.540 | 0.515 | +0.025 |\n\n> **What goes wrong.** The best of 20 is partly the best and partly the luckiest. The fewer rows choose, and the more trials compete, the larger the lucky part.","notes":"From Lab 2.2, step 5: the 20 trials of the final search, the winner picked on a random part of the validation rows, averaged over 40 repeats. With ten thousand rows the effect vanishes; with 500 it is twice the fold spread of the champion. You cannot know in advance which case you are in, which is why the choice and the report use different rows.","minutes":null,"lo":["LO2","LO1"]},{"id":"nested","n":19,"title":"Inner folds choose, the outer fold reports","kind":"content","session":2,"hash":"0e58ffdf","md":"#### [day2#nested] Inner folds choose, the outer fold reports\n\n*Nested validation*\n\n1. **1 · Outer fold** Set its validation half-year aside\n2. **2 · Inner folds** Inside the training part, score 20 trials on two later half-years\n3. **3 · Refit** The best settings, on the whole training part\n4. **4 · Report** One score on the half-year no trial has seen\n\n- Repeated for each of the five outer folds: five searches, five scores\n- What is validated is the **procedure** \"search 20 trials, then fit\"\n- The inner folds are built like the outer ones: later half-years","notes":"This costs five searches in place of one: 140 seconds on a laptop for this table. The inner score and the outer score sit on different rows, so they are not compared as numbers: one chooses, the other reports. Sources: scikit-learn example, Nested versus non-nested cross-validation.","minutes":null,"lo":["LO2","LO3"]},{"id":"nested-result","n":20,"title":"Twenty trials gain 0.026 over defaults, on every fold","kind":"content","session":2,"hash":"35b30062","md":"#### [day2#nested-result] Twenty trials gain 0.026 over defaults, on every fold\n\n*Lab 2.2, measured*\n\n| Fold | Defaults | Tuned (nested) | Gain | Settings chosen: trees · leaves · rate |\n| --- | --- | --- | --- | --- |\n| 1 | 0.501 | 0.542 | +0.041 | 200 · 8 · 0.05 |\n| 2 | 0.473 | 0.517 | +0.044 | 400 · 4 · 0.05 |\n| 3 | 0.521 | 0.540 | +0.019 | 400 · 4 · 0.05 |\n| 4 | 0.507 | 0.519 | +0.013 | 400 · 8 · 0.05 |\n| 5 | 0.515 | 0.526 | +0.011 | 400 · 4 · 0.10 |\n| Mean · spread | 0.503 · 0.019 | 0.529 · 0.012 | +0.026 | small trees, every time |\n\nEvery fold chose trees of 4 or 8 leaves. The default is 31.","notes":"From Lab 2.2. The folds chose different settings and the same kind: small trees, more of them. Nobody should ask \"which of the five is the model\": the nested score describes the procedure. The fund's settings come from one more search on all development rows: 400 trees, 8 leaves, rate 0.05, at least 50 rows per leaf. That model is the champion from here on.","minutes":null,"lo":["LO2"]},{"id":"tuned-vs-logistic","n":21,"title":"The tuned trees are 0.005 above the logistic model","kind":"content","session":2,"hash":"ac7a08aa","md":"#### [day2#tuned-vs-logistic] The tuned trees are 0.005 above the logistic model\n\n*The ladder so far*\n\n| Item | Value |\n| --- | --- |\n| Three rules | 0.310 |\n| Logistic + history | 0.524 |\n| Boosted, defaults | 0.503 |\n| Boosted, 20 trials | 0.529 |\n\n- Against the logistic rung: ahead on four folds, behind by 0.015 on fold 1\n- A mean gain of 0.005 with fold spreads of 0.012 and 0.020\n- Is that a gain? Session 4 gives the tool to answer","notes":"From Lab 2.2. Return to the guesses of yesterday evening: most rooms guess a gain of 0.05 or more. This table is mostly additive, with a handful of interactions, and the logistic model with history captures most of what there is. Do not resolve the question here; let it stand until the paired comparison.","minutes":null,"lo":["LO2","LO4"]},{"id":"check-nested","n":22,"title":"Which score may be reported?","kind":"quiz","session":2,"hash":"c46ee676","md":"#### [day2#check-nested] Which score may be reported?\n\n*Checkpoint*\n\n**Question:** An analyst tries 200 settings, scores each on the same five folds and reports the highest mean, 0.547. What is wrong with the number?\n\n- A. 200 trials are too many for a table of this size\n- B. Random search is unreliable; a grid would give the true score\n- C. Five folds are too few to score any model\n- D. The folds that chose the winner also score it, so part of 0.547 is luck","notes":"Answer: the fourth option. Name the kind of fault: it is preparation leakage in the wide sense, a choice fitted on the rows later used to score. Tomorrow's taxonomy has a box for it.","minutes":null,"lo":["LO1"]},{"id":"lab-2-2","n":23,"title":"Twenty trials in nested folds","kind":"lab","session":2,"hash":"265deafe","md":"#### [day2#lab-2-2] Twenty trials in nested folds\n\nLab 2.2 · 25 min\n\nRun a 20-trial search in nested folds, record the gain over defaults and see how far the inner score flatters the choice.\n\n[D2_2_nested_search.ipynb](https://sdaiaacademy.github.io/ds-204/labs/D2_2_nested_search.ipynb)\n\n- [ ] Read the search space and the budget (3 min)\n- [ ] Write the search over inner folds (8 min)\n- [ ] Run it inside each outer fold (6 min)\n- [ ] Log the tuned rung; record the gain (4 min)\n- [ ] Compare inner and outer scores (4 min)\n- [ ] ✱ Stretch: Spend 40 trials: what does the second half of the budget buy?","notes":"AI-tutor. One exercise: the body of the trial loop. The nested run takes two to three minutes on a laptop and longer on a small hosted runtime: start it, then discuss the trial table of task 2 while it runs. Quick mode (DS204_QUICK=1) uses 4 trials. The lab reads the defaults and the logistic fold scores from the reference log.","minutes":null,"lo":[]},{"id":"s3","n":24,"title":"Automated and pretrained challengers","kind":"section","session":3,"hash":"f229fa39","md":"#### [day2#s3] Automated and pretrained challengers\n\n*Session 3*\n\n- Describe what an automated tabular tool and a tabular foundation model each do\n- Check a challenger's licence and where the data would be sent before using it\n- Run a challenger on the same folds and the same time budget as the champion","notes":"The champion needs an opponent it did not choose itself. Two kinds exist today: tools that automate what you did in Lab 2.2, and models pretrained on other tables.","minutes":null,"lo":["LO4"]},{"id":"two-challengers","n":25,"title":"One automates the search; the other arrives already trained","kind":"content","session":3,"hash":"1024f720","md":"#### [day2#two-challengers] One automates the search; the other arrives already trained\n\n*Two kinds of challenger*\n\n- **Automated machine learning.** You give the training rows, a metric and a time limit. The tool prepares the columns, trains several model families, tunes them and blends the best. Example: AutoGluon Tabular. It trains on your machine, on your rows only.\n- **A tabular foundation model.** A network pretrained on millions of synthetic tables. It reads your training rows as context and predicts the new rows in one pass, with no tuning. Example: TabPFN. Published results are strongest on small tables.\n\n> **Both are challengers, not shortcuts.** Each has to stand on the same folds as the champion, in the same log.","notes":"The lab runs the first kind. The second kind is discussed and not run: its weights are a download of a pretrained model, which the labs of this course avoid, and its licence needs the reading of the next slide. Sources: AutoGluon documentation, Tabular essentials; Hollmann and others (2025).","minutes":null,"lo":["LO4"]},{"id":"licence-check","n":26,"title":"Three questions decide whether a challenger may be used at all","kind":"content","session":3,"hash":"3f035827","md":"#### [day2#licence-check] Three questions decide whether a challenger may be used at all\n\n*Before any score*\n\n| Question | AutoGluon Tabular | TabPFN (checked November 2026) |\n| --- | --- | --- |\n| **Licence of the code** | Apache 2.0 | Apache 2.0 |\n| **Licence of the weights** | None: it trains from your rows | Separate from the code; recent versions are released for non-commercial use |\n| **Where do the rows go?** | Nowhere | Nowhere when run locally; to the provider when its hosted service is used |\n\n> **What goes wrong.** A pretrained model wins the contest, and three weeks later someone reads the licence of its weights. Read it first, on the official page, on the day you use it.","notes":"The facts in the third column come from the project's own repository and change with every release: this is the kind of slide to re-verify each time the course runs. For the fund, the second question is also a data protection question: trainee records may not leave the fund's machines without Maram Al-Rasheed's agreement, whatever the score. Sources: TabPFN repository, licence section; AutoGluon package metadata.","minutes":null,"lo":["LO4"]},{"id":"fair-contest","n":27,"title":"Same folds, same features, same time, written down first","kind":"content","session":3,"hash":"f5e108f2","md":"#### [day2#fair-contest] Same folds, same features, same time, written down first\n\n*A fair contest*\n\n- **Folds:** the fund's five, forward in time\n- **Features:** the champion's 17, no others\n- **Time:** what the champion's search used, 140 seconds for five folds, so 28 seconds a fold\n- **Metric:** average precision, told to the tool\n- **Configuration:** one preset, fixed before the run\n\n- **What a contest without rules measures.** Give one side an hour and the other a minute, or let one side see a column the other did not, and the result says who was favoured, not which approach is better.","notes":"The configuration is the first cell of Lab 2.3 and it is saved with the result. In the capstone, the rubric line \"models and comparison\" asks for exactly this: identical folds and a stated budget.","minutes":null,"lo":["LO4"]},{"id":"tool-own-score","n":28,"title":"The tool's own score comes from a split it chose by itself","kind":"content","session":3,"hash":"8bd03d07","md":"#### [day2#tool-own-score] The tool's own score comes from a split it chose by itself\n\n*Read what it built*\n\n| Built on fold 5 | Its own validation score |\n| --- | --- |\n| Weighted blend | 0.491 |\n| LightGBM, three variants | 0.483 to 0.484 |\n| Random forests, two | 0.447 to 0.455 |\n| Extra trees, two | 0.443 to 0.445 |\n\n- It set aside a **random** part of the training rows to choose and weight its models\n- The fund validates forward in time\n- On the fund's fold 5 the same blend scores 0.518\n- Log your score, never the tool's","notes":"From Lab 2.3. The two numbers differ because they sit on different rows, not because one is wrong. The stretch hands the tool the fund's inner split in place of its own. Tomorrow's first session is about exactly this: a tool cannot know that your rows have an order and that trainees repeat unless you tell it.","minutes":null,"lo":["LO4","LO3"]},{"id":"challenger-result","n":29,"title":"On equal terms the challenger lands close to the champion","kind":"content","session":3,"hash":"08a0894b","md":"#### [day2#challenger-result] On equal terms the challenger lands close to the champion\n\n*Lab 2.3, measured*\n\n| Fold | Champion | Challenger | Challenger − champion |\n| --- | --- | --- | --- |\n| 1 | 0.542 | 0.534 | −0.009 |\n| 2 | 0.517 | 0.497 | −0.021 |\n| 3 | 0.540 | 0.541 | +0.001 |\n| 4 | 0.519 | 0.521 | +0.001 |\n| 5 | 0.526 | 0.518 | −0.008 |\n| Mean | 0.529 | 0.522 | −0.007 |\n\nAhead on two folds, behind on three. Not yet a decision.","notes":"From Lab 2.3: AutoGluon Tabular, preset medium_quality, 28 seconds a fold, tree models only because no neural network library is installed in the lab environment. With a longer limit or a larger preset the result may differ, and that would be a different contest with a different budget for the champion too.","minutes":null,"lo":["LO4"]},{"id":"check-contest","n":30,"title":"What makes this contest unfair?","kind":"quiz","session":3,"hash":"3a3845b7","md":"#### [day2#check-contest] What makes this contest unfair?\n\n*Checkpoint*\n\n**Question:** A team reports that an automated tool beats their tuned model, 0.561 to 0.529. Which detail makes the comparison worthless?\n\n- A. The tool blends several models and the champion is one model\n- B. The tool's 0.561 is its own internal validation score; the champion's 0.529 is on the fund's folds\n- C. The tool was told to optimise average precision\n- D. Both ran with a limit of 28 seconds a fold","notes":"Answer: the second option. The three wrong options are all things that are fine, which is the point: the only thing that is not negotiable is that both sides are scored on the same rows.","minutes":null,"lo":["LO4"]},{"id":"lab-2-3","n":31,"title":"A challenger on equal terms","kind":"lab","session":3,"hash":"6214da27","md":"#### [day2#lab-2-3] A challenger on equal terms\n\nLab 2.3 · 25 min\n\nRun an automated challenger on the same five folds with the time budget the tuned search used, and log it beside the champion.\n\n[D2_3_challenger.ipynb](https://sdaiaacademy.github.io/ds-204/labs/D2_3_challenger.ipynb)\n\n- [ ] Read the challenger configuration and its licence (3 min)\n- [ ] Write the function that runs it on one fold (8 min)\n- [ ] Run the five folds on the same time budget (7 min)\n- [ ] Log the run; read what it built (4 min)\n- [ ] Set the two rows of the log side by side (3 min)\n- [ ] ✱ Stretch: Give the challenger the fund's inner split in place of its own","notes":"AI-tutor. The five folds take about two and a half minutes at 28 seconds each. If the tool is not installed, or on a runtime where it does not import, the notebook continues on the trainer's reference run and says so. The tool reports model families that are not installed; the notebook silences those lines. Quick mode uses 12 seconds a fold.","minutes":null,"lo":[]},{"id":"s4","n":32,"title":"Is the challenger better","kind":"section","session":4,"hash":"f81a5c42","md":"#### [day2#s4] Is the challenger better\n\n*Session 4*\n\n- Explain why fold scores of two models are compared as pairs\n- Compute the mean paired difference with an interval\n- Decide against a minimum effect stated in advance, in one line","notes":"DS-201 taught intervals and the bootstrap on survey and repair data. This session uses both for one purpose: deciding between two models.","minutes":null,"lo":["LO4"]},{"id":"pairs","n":33,"title":"Two models on the same folds give pairs, and pairs are compared by their differences","kind":"content","session":4,"hash":"1ba1469e","md":"#### [day2#pairs] Two models on the same folds give pairs, and pairs are compared by their differences\n\n*The key idea*\n\n| Item | Value |\n| --- | --- |\n| Spread of the champion's folds | 0.012 |\n| Spread of the challenger's folds | 0.017 |\n| Spread of the five differences | 0.009 |\n\n- A hard half-year lowers both models\n- The difference within a fold removes that shared part\n- So the differences vary less than either score\n- Compare two means with their spreads and you throw the pairing away","notes":"From Lab 2.4. Yesterday's history features were the cleaner example: a gain of 0.023 inside a spread of 0.028, and positive on every fold. The pairing only exists because both models were scored on identical folds, which is why the ladder insisted on them from the first rung.","minutes":null,"lo":["LO4"]},{"id":"t-interval","n":34,"title":"Five differences give an honest, wide interval","kind":"content","session":4,"hash":"834436a3","md":"#### [day2#t-interval] Five differences give an honest, wide interval\n\n*An interval on the mean difference*\n\n**−0.007** mean difference, challenger minus champion; 95% interval −0.018 to +0.004\n\n- Mean ± *t* × (spread of the differences ÷ √5)\n- With 5 folds the multiplier is 2.78, not 1.96\n- The interval contains zero: no difference is shown\n- The folds share training rows, so the true uncertainty is, if anything, larger","notes":"From Lab 2.4: differences −0.009, −0.021, +0.001, +0.001, −0.008. The t interval treats the five folds as a sample of the half-years the model might meet. It is the simplest defensible interval and the one the course outcome asks for.","minutes":null,"lo":["LO4"]},{"id":"paired-bootstrap","n":35,"title":"The paired bootstrap resamples validation rows, not folds","kind":"content","session":4,"hash":"a47ad9f7","md":"#### [day2#paired-bootstrap] The paired bootstrap resamples validation rows, not folds\n\n*A second opinion*\n\n- Both models scored the same 21,770 validation rows\n- Draw rows again with replacement, inside each fold\n- Score **both** models on the same draw\n- Keep the difference; repeat 1,000 times\n\n| Method | 95% interval of the difference |\n| --- | --- |\n| *t* over five folds | −0.018 to +0.004 |\n| Paired bootstrap over rows | −0.013 to −0.002 |\n\n> **Two questions.** The first asks what other half-years would show, the second what other trainees in these half-years would show. Report both when they differ.","notes":"From Lab 2.4. Here they differ, mildly: the bootstrap is narrower and excludes zero, the t interval does not. Within these five half-years the champion is slightly ahead; whether that holds for another half-year, five folds cannot say. Neither interval comes near the minimum effect, so the decision is the same. This is the bootstrap of DS-201, with the one new idea that both models are scored on the same draw.","minutes":null,"lo":["LO4"]},{"id":"minimum-effect","n":36,"title":"State the smallest gain worth having before you look","kind":"content","session":4,"hash":"b5027c4c","md":"#### [day2#minimum-effect] State the smallest gain worth having before you look\n\n*The decision rule*\n\n- **Adopt the challenger.** The whole interval lies above the minimum effect.\n- **Keep the champion.** The whole interval lies below the minimum effect.\n- **Not shown.** The interval straddles it. The rule says what happens then: the simpler model stays.\n\nFor the fund: +0.01 average precision, agreed with Dr. Haya Al-Mogren before the contest.","notes":"The minimum effect is a business judgment, not a statistical one: a blend of seven models costs more to explain, to serve and to maintain than one model, and a gain below 0.01 changes almost nobody's place on a list of 800. Stated after the result, a minimum effect tends to land just below whatever was measured.","minutes":null,"lo":["LO4"]},{"id":"decision-line","n":37,"title":"Difference, interval, minimum effect, decision","kind":"content","session":4,"hash":"5b325c6e","md":"#### [day2#decision-line] Difference, interval, minimum effect, decision\n\n*The one-line decision*\n\n> **The line of Lab 2.4.** On the same five folds the challenger differs from the champion by −0.007 average precision (95% interval −0.018 to +0.004; paired bootstrap −0.013 to −0.002). Minimum effect stated in advance: +0.01. Decision: keep the champion.\n\n- Four parts, in this order, in the capstone README\n- \"Keep the champion\" is shown here: the whole interval is below +0.01\n- It is a statement about this contest: 28 seconds a fold, one preset","notes":"From Lab 2.4. A reviewer can check each part: the difference from the log, the interval from five numbers, the minimum effect from the note written before the run.","minutes":null,"lo":["LO4"]},{"id":"champion-vs-logistic","n":38,"title":"The tuned trees are not shown to beat the logistic model","kind":"content","session":4,"hash":"a4e240fe","md":"#### [day2#champion-vs-logistic] The tuned trees are not shown to beat the logistic model\n\n*The same tool, pointed at our own ladder*\n\n**+0.005** champion minus logistic with history; 95% interval −0.010 to +0.019\n\n- The interval contains zero and the minimum effect\n- Verdict by the rule: **not shown**\n- The course carries the trees forward; the model card says a linear model does as well\n- A result worth reporting, not hiding","notes":"From the stretch of Lab 2.4. Ask the room what they would tell the director. A fair answer: the boosted model is the champion of the ladder by 0.005, which five folds cannot distinguish from nothing; the logistic model is simpler to read and to explain to an adviser; the course continues with the boosted model because the entry's remaining labs are about it, and the model card says plainly that a linear model does as well within the uncertainty.","minutes":null,"lo":["LO2","LO4"]},{"id":"check-interval","n":39,"title":"What does this interval decide?","kind":"quiz","session":4,"hash":"6976851a","md":"#### [day2#check-interval] What does this interval decide?\n\n*Checkpoint*\n\n**Question:** A challenger's mean paired difference is +0.006, with a 95% interval from −0.004 to +0.016. The minimum effect stated in advance is +0.01. What is the decision?\n\n- A. Adopt the challenger: its mean difference is positive\n- B. The two models are shown to be equal\n- C. Not shown: the interval straddles the minimum effect, so the champion stays\n- D. Adopt it, with the minimum effect lowered to +0.005","notes":"Answer: the third option. Spend a moment on the second option: \"not shown to differ\" and \"shown to be equal\" are different statements, and only a narrow interval around zero supports the second.","minutes":null,"lo":["LO4"]},{"id":"lab-2-4","n":40,"title":"The paired difference and the decision","kind":"lab","session":4,"hash":"0c5b33ff","md":"#### [day2#lab-2-4] The paired difference and the decision\n\nLab 2.4 · 25 min\n\nCompute the paired fold difference between champion and challenger with an interval, check it with a paired bootstrap and write the one-line decision.\n\n[D2_4_paired_difference.ipynb](https://sdaiaacademy.github.io/ds-204/labs/D2_4_paired_difference.ipynb)\n\n- [ ] Line up the fold scores of the two models (3 min)\n- [ ] Compute the paired differences and their mean (4 min)\n- [ ] Put a t interval on the mean difference (6 min)\n- [ ] Check it with a paired bootstrap over rows (7 min)\n- [ ] Write the decision in one line (5 min)\n- [ ] ✱ Stretch: The same comparison between the champion and the logistic rung","notes":"AI-tutor. Three short exercises: the differences, the t interval, the decision rule. The bootstrap runs 1,000 draws in under a minute. The lab is the evidence for the fourth course outcome: a paired comparison with an interval and a one-line decision. It starts from the reference log and reference probabilities, so nobody needs Labs 2.2 or 2.3.","minutes":null,"lo":[]},{"id":"wrap-up","n":41,"title":"Three things to keep","kind":"content","session":4,"hash":"89270c4a","md":"#### [day2#wrap-up] Three things to keep\n\n*Day 2*\n\n- **Defaults are a rung, not the model.** Boosted trees with defaults scored 0.503, below the logistic rung at 0.524. Twenty trials in nested folds reached 0.529.\n- **Choose and report on different rows.** A winner picked on 500 rows was flattered by 0.025. Inner folds choose; the outer fold reports.\n- **A difference needs an interval.** Challenger −0.007 (−0.018 to +0.004): keep the champion. Champion over logistic +0.005 (−0.010 to +0.019): not shown.","notes":"Ask: which line of today's log surprised you most? Usually the defaults. Then: which sentence would you be least comfortable saying to the director? Usually the last one, and it is the most useful.","minutes":null,"lo":[]},{"id":"next","n":42,"title":"Day 3 · Validation and leakage","kind":"content","session":4,"hash":"0038530c","md":"#### [day2#next] Day 3 · Validation and leakage\n\n*Next*\n\nEvery score so far used the fund's folds. Tomorrow you find out why they are built that way, what a random split would have told you, and how to audit a score that is too good.\n\n- Loay Al-Kadi's notebook reports a score above 0.9 on this table\n- Tomorrow's first attempts at the split and the leak hunt are without AI assistance","notes":"Day 3 runs on supplied tables and the champion's saved settings, so nobody who struggled today starts behind.","minutes":null,"lo":[]}],"activities":[{"id":"review-day1-q1","slide":"review-day1","type":"single","prompt":"Two history features lifted the logistic rung from 0.501 to 0.524. The fold spread of that rung is 0.028. Why is the gain still believable?","options":[{"key":"A","text":"Because 0.023 is large compared with the base rate of 0.12"},{"key":"B","text":"Because the table has 32,000 development rows"},{"key":"C","text":"Because the gain has the same sign on all five folds, where both models met the same rows"},{"key":"D","text":"Because the features passed the time-travel test"}],"correct":[2],"explanation":"A difference is judged fold by fold. Five gains of +0.012 to +0.031 on the same rows say more than two means and a spread.","misconceptions":["Compares the gain with the base rate, which says nothing about whether the gain is noise","Trusts the size of the table: many rows shrink noise but do not show that this difference is outside it","","Takes passing the time-travel test as proof of usefulness: the test shows the features read the past only"],"lo":["LO2"]},{"id":"check-training-score-q1","slide":"check-training-score","type":"single","prompt":"A boosted model scores 0.85 on its 9,068 training rows and 0.50 on the validation rows of the same fold. What do you conclude?","options":[{"key":"A","text":"The model has memorised part of the training rows; 0.50 is the number to log"},{"key":"B","text":"The true score is about halfway, near 0.67"},{"key":"C","text":"The validation rows must contain a leak"},{"key":"D","text":"The validation fold is unusually hard and should be replaced"}],"correct":[0],"explanation":"A training score measures how flexible the model is. Only rows the model has not seen estimate how it will do.","misconceptions":["","Averages memory and generalisation: the training score is not an estimate of anything the advisers will see","Reads a large gap as a leak: leakage inflates the validation score, and here it is the training score that is high","Blames the validation fold: its rows are simply the ones the model has not seen, which is their purpose"],"lo":["LO2"]},{"id":"check-nested-q1","slide":"check-nested","type":"single","prompt":"An analyst tries 200 settings, scores each on the same five folds and reports the highest mean, 0.547. What is wrong with the number?","options":[{"key":"A","text":"200 trials are too many for a table of this size"},{"key":"B","text":"Random search is unreliable; a grid would give the true score"},{"key":"C","text":"Five folds are too few to score any model"},{"key":"D","text":"The folds that chose the winner also score it, so part of 0.547 is luck"}],"correct":[3],"explanation":"The best of 200 on a set of rows is biased upward on those rows. Choose on inner folds; report on rows no trial has seen.","misconceptions":["Blames the amount of search: more trials are fine when the choice and the report use different rows","Blames the method of search: a grid would have the same fault, because the fault is where the winner is scored","Expects the folds themselves to be at fault: they are fine for scoring one model fixed in advance",""],"lo":["LO1"]},{"id":"check-contest-q1","slide":"check-contest","type":"single","prompt":"A team reports that an automated tool beats their tuned model, 0.561 to 0.529. Which detail makes the comparison worthless?","options":[{"key":"A","text":"The tool blends several models and the champion is one model"},{"key":"B","text":"The tool's 0.561 is its own internal validation score; the champion's 0.529 is on the fund's folds"},{"key":"C","text":"The tool was told to optimise average precision"},{"key":"D","text":"Both ran with a limit of 28 seconds a fold"}],"correct":[1],"explanation":"Two scores compare only on the same rows. The tool's own number sits on a random split it made inside the training rows.","misconceptions":["Objects to a difference in kind: a challenger is allowed to be a blend, that is the point of testing it","","Objects to the metric being shared: both sides should be optimised for the metric that is reported","Objects to equal budgets: the same time limit is what makes the contest fair"],"lo":["LO4"]},{"id":"check-interval-q1","slide":"check-interval","type":"single","prompt":"A challenger's mean paired difference is +0.006, with a 95% interval from −0.004 to +0.016. The minimum effect stated in advance is +0.01. What is the decision?","options":[{"key":"A","text":"Adopt the challenger: its mean difference is positive"},{"key":"B","text":"The two models are shown to be equal"},{"key":"C","text":"Not shown: the interval straddles the minimum effect, so the champion stays"},{"key":"D","text":"Adopt it, with the minimum effect lowered to +0.005"}],"correct":[2],"explanation":"The interval holds values on both sides of +0.01. The rule fixed in advance says the simpler model stays until more folds or more rows settle it.","misconceptions":["Reads the mean alone: +0.006 is positive, but the interval reaches below zero and below the minimum effect","Reads an interval containing zero as proof of equality: the data are also compatible with a gain of +0.016","","Lowers the bar after seeing the result: a minimum effect moved to fit the data is no longer a rule"],"lo":["LO4"]}],"ai":{"context":{"course":"../context/course.md","courseJs":"../context/course.js","day":"day2.md","llms":"../llms.txt"},"tasks":[],"tools":[]},"bridge":{"allowedOrigins":[]},"features":{},"strings":{}}</script>
+<script src="../_engine/academy.js"></script>
+</body>
+</html>

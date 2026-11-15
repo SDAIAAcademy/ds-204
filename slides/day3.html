@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-ax="deck" data-track="data-science">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 3 · Validation and leakage · Machine Learning for Tabular Data: Baselines and Validation</title>
+<meta name="generator" content="SDAIA Academy engine 1.0.0">
+<link rel="icon" href="../_engine/icon.svg">
+<link rel="alternate" type="text/markdown" href="day3.md">
+<link rel="describedby" href="../llms.txt">
+<link rel="stylesheet" href="../_engine/academy.css">
+</head>
+<body>
+<div class="deck" data-course="Machine Learning for Tabular Data: Baselines and Validation" data-track="data-science" data-day="Day 3">
+<section class="slide title" id="title" data-auto="title" data-label="Welcome" data-n="1">
+  <div class="kicker">SDAIA Academy · Machine Learning for Tabular Data: Baselines and Validation</div>
+  <h1>Validation and leakage</h1>
+  <p class="lead mt">Day 3: The split that mirrors use, the four kinds of leakage and how to audit a score</p>
+  <div class="meta"><span class="track">Data Science Track</span><span>4 teaching days + capstone day</span><span>4 sessions · 4 labs</span><span>DS-204</span></div>
+  <aside class="notes"><p>Today is about trust in a number. Two days produced an honest ladder that ends at 0.529. Today the room meets a table that scores 1.000 and a notebook that reports 95%, and learns to take both apart. The first attempts at Labs 3.1 and 3.3 are without AI assistance: say so now. Breaks are yours: press B.</p></aside>
+</section>
+
+<section class="slide" id="agenda" data-auto="agenda" data-label="Agenda" data-n="2">
+  <div class="kicker">Today</div>
+  <h2>Validation and leakage</h2>
+  <div class="agenda"><div class="item"><div><b>Session 1 · The split decides the score</b><small>The same model scores differently under random, grouped and time-ordered splits, and each gap has a cause you can name.</small></div></div><div class="item"><div><b>Session 2 · Kinds of leakage</b><small>Four kinds of leakage, each with the question that catches it, practised on cases from other sectors.</small></div></div><div class="item"><div><b>Session 3 · Hunting planted leaks</b><small>Three instruments for an audit: when each column is written, whether rows repeat, and which features carry the score.</small></div></div><div class="item"><div><b>Session 4 · Reading someone else's notebook</b><small>Reviewing a notebook you did not write: an order to read it in, and the things that make its headline number untrustworthy.</small></div></div></div>
+  <aside class="notes"><p>Session 1 is about the split, sessions 2 to 4 about leakage: its kinds, how to hunt it, and how to review a score someone else produced. Every lab starts from supplied tables and the champion's saved settings.</p></aside>
+</section>
+
+<section class="slide" id="review-day2" data-lo="LO4" data-n="3">
+  <div class="kicker">Review of Day 2</div>
+  <h2>What did the challenger's interval decide?</h2>
+  <div class="quiz" data-type="single" data-lo="LO4" data-id="review-day2-q1">
+    <p class="lead">The challenger differed from the champion by −0.007 (95% interval −0.018 to +0.004). The minimum effect was +0.01. Why was the decision "keep the champion" and not "not shown"?</p>
+    <div class="opts">
+      <div class="opt" data-why="Reads the sign of the mean alone: a negative mean with an interval reaching above the minimum effect would be 'not shown'" data-k="A">Because the mean difference is negative</div>
+      <div class="opt" data-ok data-k="B">Because the whole interval lies below the minimum effect</div>
+      <div class="opt" data-why="Requires the interval to exclude zero: the rule compares the interval with the minimum effect, not with zero" data-k="C">Because the interval excludes zero</div>
+      <div class="opt" data-why="Counts folds: three of five is not a rule that was stated, and it ignores the size of the differences" data-k="D">Because the champion won on three of the five folds</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The upper end, +0.004, is below +0.01: even the most favourable value the data allow is not worth a blend of seven models.</div>
+  </div>
+  <aside class="notes"><p>Answer: the second option. Two minutes. The contrast to recall: champion against logistic was +0.005 with an interval from −0.010 to +0.019, which straddles the minimum effect, so that one was "not shown".</p></aside>
+</section>
+
+<section class="slide" id="where-we-are" data-n="4">
+  <div class="kicker">Today</div>
+  <h2>The model is fixed; today the score itself is questioned</h2>
+  <div class="ladder" style="--n:4">
+    <div class="rung c-teal off"><b>Frame and baseline</b>The decision, the rows, three baselines<small>Day 1</small></div>
+    <div class="rung c-cyan off"><b>Trees and challengers</b>Champion 0.529; challenger not adopted<small>Day 2</small></div>
+    <div class="rung c-coral on"><b>Validation and leakage</b>Three splits, four kinds of leak, an audit<small>Day 3</small></div>
+    <div class="rung c-purple off"><b>Errors and documentation</b>Threshold, calibration, subgroups, model card<small>Day 4</small></div>
+  </div>
+  <aside class="notes"><p>The champion keeps the settings of Lab 2.2 all day. What changes is how its rows are cut, and then which columns it is given.</p></aside>
+</section>
+
+<!-- Session 1 -->
+
+<section class="slide section" id="s1" data-auto="section" data-session="1" data-n="5">
+  <div class="kicker">Session 1</div>
+  <h1>The split decides the score</h1>
+  <ul class="bullets outcomes"><li>Choose the split that mirrors how a model will be used</li><li>Implement random, grouped and time-ordered splits on the same rows</li><li>Explain each gap between the three scores from the structure of the data</li></ul>
+  <div class="sess-no">01</div>
+  <aside class="notes"><p>FN-105 introduced the three-way split and DS-201 the idea of an interval. This session adds the question FN-105 left open: which rows go on which side, and why.</p></aside>
+</section>
+
+<section class="slide" id="rehearsal" data-lo="LO3" data-n="6" data-session="1">
+  <div class="kicker">The principle</div>
+  <h2>A validation split is a rehearsal of how the model will be used</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>Who is new in use?</h4><p class="small mb0">New rows of known people, or people the model has never seen? If people are new, they must be new in validation.</p></div>
+    <div class="card c-cyan"><h4>What is later in use?</h4><p class="small mb0">The model is trained once and scores what comes afterwards. Then validation rows come after training rows.</p></div>
+    <div class="card c-coral"><h4>What is known on that day?</h4><p class="small mb0">An outcome that does not exist yet cannot train a model. Training rows are those whose outcome was known.</p></div>
+  </div>
+  <p class="lead mt">The split is chosen from the use, before any score is seen.</p>
+  <aside class="notes"><p>For Mubakkir: each January and July a model is trained on what the fund knows and scores the intake of the next half-year. Most trainees are new; some return. The fund's folds rehearse exactly that. Sources: scikit-learn user guide, Cross-validation.</p></aside>
+</section>
+
+<section class="slide" id="three-splits" data-lo="LO3" data-n="7" data-session="1">
+  <div class="kicker">Three ways to cut the same rows</div>
+  <h2>Random, grouped and time-ordered splits answer different questions</h2>
+  <table class="t">
+    <tr><th>Split</th><th>How it cuts</th><th>The question it answers</th></tr>
+    <tr><td><b>Random</b></td><td>Each row lands in a fold by chance</td><td>How well does the model do on more rows like these, from the same period?</td></tr>
+    <tr><td><b>Grouped</b></td><td>All rows of one trainee stay on one side</td><td>How well does it do on a trainee it has never seen?</td></tr>
+    <tr><td><b>Time-ordered</b></td><td>Train on the past, validate on a later half-year</td><td>How well does it do on the next intake?</td></tr>
+  </table>
+  <div class="callout note mt"><b>None is wrong in itself.</b> A split is wrong for a use. A random split is right when rows are independent and the model is used on rows like them.</div>
+  <aside class="notes"><p>In scikit-learn: StratifiedKFold, GroupKFold and TimeSeriesSplit, or folds you build yourself as the fund does. Participants write the first two in Lab 3.1.</p></aside>
+</section>
+
+<section class="slide" id="what-training-knows" data-lo="LO3" data-n="8" data-session="1">
+  <div class="kicker">Lab 3.1, before any score</div>
+  <h2>A random split trains on the future and on outcomes nobody knew yet</h2>
+  <table class="t small">
+    <tr><th>For the day a validation row is scored</th><th class="num">Random</th><th class="num">Grouped</th><th class="num">Time-ordered</th></tr>
+    <tr><td>Validation trainees who also have a training row</td><td class="num">40%</td><td class="num">0%</td><td class="num">30%</td></tr>
+    <tr><td>Training rows that start later than that day</td><td class="num">47%</td><td class="num">47%</td><td class="num">0%</td></tr>
+    <tr><td>Training rows whose programme was not yet due to end</td><td class="num">58%</td><td class="num">58%</td><td class="num">0%</td></tr>
+    <tr><td>Training rows per fold</td><td class="num">25,951</td><td class="num">25,951</td><td class="num">17,254</td></tr>
+  </table>
+  <div class="callout warn mt"><b>What goes wrong.</b> A split is judged by its score only. Describe first what the training part knows; the table costs ten lines and no model.</div>
+  <aside class="notes"><p>From Lab 3.1, task 1. The grouped split solves the first row and none of the others. The time-ordered folds keep 30% shared trainees on purpose: returning trainees are part of the fund's real intake, and their history is built from the past only.</p></aside>
+</section>
+
+<section class="slide" id="due-to-end" data-lo="LO3" data-n="9" data-session="1">
+  <div class="kicker">A detail that decides the folds</div>
+  <h2>Train on programmes that were due to end, not on those that had ended</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>On 1 July 2024 a 36-week programme that began in March is still running</li>
+      <li>Its early leavers already have an outcome; its other trainees have none</li>
+      <li>"Every row with a known outcome" keeps the leavers and drops their classmates</li>
+      <li>The model then learns that recent long programmes always fail</li>
+    </ul>
+    <div class="card c-coral"><h4>The fund's rule</h4><p class="small mb0">A row trains a fold only when its programme's <b>planned end</b> lies before the validation half-year begins. The whole class enters together, or not at all.</p></div>
+  </div>
+  <aside class="notes"><p>This is label maturity: a label needs time to exist, and it arrives at different speeds for the two classes. The trainer's first version of these folds used the exit date and produced a model that was far worse on recent cohorts for no visible reason. It is the most common fault in time-ordered validation of outcomes that take months to settle: churn, default, readmission.</p></aside>
+</section>
+
+<section class="slide" id="three-scores" data-lo="LO3" data-n="10" data-session="1">
+  <div class="kicker">Lab 3.1, measured</div>
+  <h2>For the champion, the random split does not overstate; hiding the history does</h2>
+  <div class="bars">
+    <div class="row"><span>Random</span><div class="bar c-coral" style="--w:99%"></div><span class="val">0.521</span></div>
+    <div class="row"><span>Grouped</span><div class="bar c-cyan" style="--w:99%"></div><span class="val">0.520</span></div>
+    <div class="row"><span>Grouped, history hidden</span><div class="bar c-purple" style="--w:95%"></div><span class="val">0.500</span></div>
+    <div class="row"><span>Time-ordered</span><div class="bar c-teal" style="--w:100%"></div><span class="val">0.525</span></div>
+  </div>
+  <ul class="bullets mt">
+    <li>Random against time-ordered: −0.004, inside the fold spreads of 0.021 and 0.012</li>
+    <li>Grouping alone changes nothing: the champion does not recognise a trainee</li>
+    <li>A trainee the fund has never seen has no history: −0.020</li>
+  </ul>
+  <aside class="notes"><p>From Lab 3.1: the champion with the fund's settings, average precision. Most rooms expect the random split to score far higher. Here it does not, and that is the lesson: the gap is a measurement, and it depends on the table and the model. Seven trainees in ten have a single row, so there is little to memorise. The next slides show where the split does matter for this model.</p></aside>
+</section>
+
+<section class="slide" id="new-and-returning" data-lo="LO3" data-n="11" data-session="1">
+  <div class="kicker">The grouped gap, explained</div>
+  <h2>One score averages two kinds of trainees</h2>
+  <div class="cols cols-2 mid">
+    <table class="t">
+      <tr><th>In the fund's validation folds</th><th class="num">Share of rows</th><th class="num">Average precision</th></tr>
+      <tr><td>New to the fund</td><td class="num">66%</td><td class="num">0.491</td></tr>
+      <tr><td>Returning</td><td class="num">34%</td><td class="num">0.578</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>The 0.529 of the ladder is partly earned on returning trainees</li>
+      <li>For a programme where nobody has a history, quote the grouped score with history hidden: 0.500</li>
+      <li>Both numbers go into the model card</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 3.1, task 3, on the reference validation-fold probabilities of the champion. The base rates differ slightly, 11% and 13%, so the two average precisions are not a pure comparison; the direction is clear. Lab 1.4 found the same split with the logistic model.</p></aside>
+</section>
+
+<section class="slide" id="ageing" data-lo="LO3" data-n="12" data-session="1">
+  <div class="kicker">What only time order can show</div>
+  <h2>A model one year old scores 0.016 below a fresh one</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Age of the model</th><th class="num">Against a fresh model</th><th class="num">Pairs</th></tr>
+      <tr><td>Fresh</td><td class="num">0.000</td><td class="num">5</td></tr>
+      <tr><td>Half a year</td><td class="num">−0.006</td><td class="num">4</td></tr>
+      <tr class="hl"><td>One year</td><td class="num">−0.016</td><td class="num">3</td></tr>
+      <tr><td>One and a half years</td><td class="num">−0.020</td><td class="num">2</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>Each fold's model, scored on the later half-years too</li>
+      <li>A random split trains and validates on one period: its model never ages</li>
+      <li>The older model also had fewer rows: both are what "not retraining" means</li>
+      <li>The number sets the retraining interval</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 3.1, task 4. This is where a random split overstates for the fund: it reports the score of a model that is always as fresh as its data, and a model in use is not. The fund changed during these years: an employer mandate, a stipend rule, blended delivery. With few pairs these are indications, not intervals; the direction is the same in every column of the grid.</p></aside>
+</section>
+
+<section class="slide" id="when-random-overstates" data-lo="LO3 LO1" data-n="13" data-session="1">
+  <div class="kicker">Beyond this table</div>
+  <h2>When does a random split overstate badly?</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>Many rows per unit</h4><p class="small mb0">Thousands of readings per machine, dozens of visits per patient. The model recognises the unit. Here: at most four rows per trainee.</p></div>
+    <div class="card c-cyan"><h4>Features built from other rows</h4><p class="small mb0">A rate or a count that read the validation rows or the future. The next three sessions.</p></div>
+    <div class="card c-coral"><h4>A world that moves fast</h4><p class="small mb0">Prices, fraud patterns, policies. The faster the change, the more a model's age costs.</p></div>
+  </div>
+  <div class="callout tip mt"><b>The habit.</b> Choose the split from the use. Then measure the other splits once, and write the gaps down with their causes.</div>
+  <aside class="notes"><p>The stretch of Lab 3.1 tries a model that can memorise, with leaves of one row: even then no gap opens between random and grouped, because 72% of the trainees have one row. In the pump case of the next lab, the same experiment gives a recall of 0.94 that collapses on new pumps.</p></aside>
+</section>
+
+<section class="slide" id="check-split" data-lo="LO3" data-n="14" data-session="1">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which split for which use?</h2>
+  <div class="quiz" data-type="single" data-lo="LO3" data-id="check-split-q1">
+    <p class="lead">The fund wants to offer Mubakkir to a partner fund in another country. None of its trainees has ever enrolled with Sullam. Which score from Lab 3.1 comes closest to what the partner should expect?</p>
+    <div class="opts">
+      <div class="opt" data-why="Picks the highest honest score: it includes returning trainees with a history, which the partner does not have" data-k="A">The time-ordered score, 0.525</div>
+      <div class="opt" data-why="Assumes rows like these from the same period: the partner's trainees are all new, with no history" data-k="B">The random score, 0.521</div>
+      <div class="opt" data-ok data-k="C">The grouped score with history hidden, 0.500, and even that with caution</div>
+      <div class="opt" data-why="Takes the score of returning trainees for everyone: it is the best case, earned with history columns" data-k="D">The score of returning trainees, 0.578</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> In that use every trainee is new. The grouped split with hidden history rehearses it; other providers and another country are further differences no split of this table can rehearse.</div>
+  </div>
+  <aside class="notes"><p>Answer: the third option. The caution matters: a split can only rehearse differences that exist inside the table. A new country is outside it, and the model card says so under limits.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-3-1" data-auto="lab" data-lab="3.1" data-label="Lab 3.1" data-n="15" data-session="1">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 3.1 · 25 min</div><h2>One model, three splits</h2><p class="lead small">Score one model under random, grouped and time-ordered splits, measure how far the random split overstates and explain each gap.</p><a class="nb" href="../labs/D3_1_three_splits.ipynb">D3_1_three_splits.ipynb</a></div><ul class="checklist"><li>Build the three splits on the same rows <span class="min">5 min</span></li><li>Score the same model under each <span class="min">7 min</span></li><li>Explain the gap: new and returning trainees <span class="min">4 min</span></li><li>What only time order shows: let the model age <span class="min">5 min</span></li><li>Write the gap table with one sentence per gap <span class="min">4 min</span></li><li class="stretch">✱ Stretch: A model that memorises: does the grouped gap grow?</li></ul></div>
+  <aside class="notes"><p>AI-off for the first attempt at tasks 1 and 2: two short functions and the reading of the first table. Typical problems: forgetting groups= in GroupKFold; grouping by the enrolment key in place of the trainee. Task 2 fits twenty models and takes about a minute. Ask each pair to write what they expect before running task 2. The lab is the evidence for the third course outcome: the gap table with one sentence per gap.</p></aside>
+</section>
+
+<!-- Session 2 -->
+
+<section class="slide section" id="s2" data-auto="section" data-session="2" data-n="16">
+  <div class="kicker">Session 2</div>
+  <h1>Kinds of leakage</h1>
+  <ul class="bullets outcomes"><li>Distinguish target leakage, future information, group or duplicate contamination and preparation leakage</li><li>Identify the kind of leak from a description of how the data were collected</li><li>Match each case to the validation scheme its use requires</li></ul>
+  <div class="sess-no">02</div>
+  <aside class="notes"><p>Leakage is information in training that will not be there in use. This session names four kinds and gives each a question; the lab applies them to six cases from other sectors.</p></aside>
+</section>
+
+<section class="slide" id="four-kinds" data-lo="LO1" data-n="17" data-session="2">
+  <div class="kicker">A taxonomy</div>
+  <h2>Leakage comes in four kinds</h2>
+  <div class="cols cols-2">
+    <div class="card c-coral"><h4>Target leakage</h4><p class="small mb0">A column written because of the outcome, or together with it.</p></div>
+    <div class="card c-purple"><h4>Future information</h4><p class="small mb0">A value computed from records later than the prediction time.</p></div>
+    <div class="card c-cyan"><h4>Group or duplicate contamination</h4><p class="small mb0">The same person, machine or row on both sides of the split.</p></div>
+    <div class="card c-teal"><h4>Preparation leakage</h4><p class="small mb0">A step fitted or chosen on rows that later score the model.</p></div>
+  </div>
+  <p class="lead mt">All four give a score in validation that the model cannot repeat in use.</p>
+  <aside class="notes"><p>The first two are faults of a column, the third of the split, the fourth of the procedure. Real cases often show two at once; the taxonomy tells you where to look. Sources: Kapoor and Narayanan (2023), who found leakage in published work across 17 fields.</p></aside>
+</section>
+
+<section class="slide" id="target-leak" data-lo="LO1" data-n="18" data-session="2">
+  <div class="kicker">Kind 1</div>
+  <h2>Target leakage: the column knows the answer</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Recorded when the outcome happens: <code>exit_reason</code>, <code>weeks_attended</code></li>
+      <li>A consequence of the outcome: calls from the collections team after a missed payment</li>
+      <li>Someone's answer to the same question: an antibiotic ordered because the doctor suspects the infection</li>
+    </ul>
+    <div class="card c-coral"><h4>The question</h4><p class="small mb0">When is this column written, and by whom? Would a person who already knew the outcome be the one filling it in?</p></div>
+  </div>
+  <div class="callout warn mt"><b>What goes wrong.</b> The model looks brilliant and the top feature is one nobody questioned because it "obviously matters".</div>
+  <aside class="notes"><p>Day 1 already removed three such columns with the data dictionary. The hard cases are the indirect ones, like the antibiotic: the column is recorded before the outcome is confirmed, yet it exists only because a human has half-made the prediction.</p></aside>
+</section>
+
+<section class="slide" id="future-leak" data-lo="LO1" data-n="19" data-session="2">
+  <div class="kicker">Kind 2</div>
+  <h2>Future information: right column, wrong date</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>A history that counts later records: all non-completions of a trainee, whenever they happened</li>
+      <li>A yearly average attached to a row from March</li>
+      <li>A status column overwritten in place: today's value on an old row</li>
+    </ul>
+    <div class="card c-purple"><h4>The question</h4><p class="small mb0">On the day of the prediction, what would the value of this feature have been? Rebuild it with later records hidden and compare.</p></div>
+  </div>
+  <aside class="notes"><p>The time-travel test of Lab 1.4 is the instrument for this kind. The feature is legitimate in idea, a history, and wrong in construction. Overwritten columns are the quiet version: a database that keeps only the current employment status puts today's status on a row from 2022.</p></aside>
+</section>
+
+<section class="slide" id="group-leak" data-lo="LO1" data-n="20" data-session="2">
+  <div class="kicker">Kind 3</div>
+  <h2>Group or duplicate contamination: the model has met the test rows</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Many rows of one unit, split at random: hours of one pump, visits of one patient</li>
+      <li>The same record under two keys after two systems were merged</li>
+      <li>Copies made on purpose: classes "balanced" by duplicating rows before the split</li>
+    </ul>
+    <div class="card c-cyan"><h4>The question</h4><p class="small mb0">What is the unit the model meets in use? Can the same real-world event appear in the table more than once?</p></div>
+  </div>
+  <aside class="notes"><p>A unique key proves nothing about unique rows. Look for rows that agree on everything that describes the event. The third bullet comes back this afternoon in Loay's notebook.</p></aside>
+</section>
+
+<section class="slide" id="preparation-leak" data-lo="LO1" data-n="21" data-session="2">
+  <div class="kicker">Kind 4</div>
+  <h2>Preparation leakage: something was fitted before the split</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Scaling or imputing with statistics of all rows</li>
+      <li>Encoding a category by its outcome rate over all rows</li>
+      <li>Selecting the "best" features with the outcome of all rows</li>
+      <li>Choosing settings on the rows that report the score</li>
+    </ul>
+    <div class="card c-teal"><h4>The question</h4><p class="small mb0">Was any step fitted or chosen before the split? Everything that learns from data belongs inside the pipeline, fitted on training rows only.</p></div>
+  </div>
+  <aside class="notes"><p>The first bullet usually costs little, as Lab 1.3 measured; the third can turn noise into an accuracy of 0.9 when there are hundreds of candidate columns. Tuning on the test rows is the same fault, which is why Day 2 nested its search. Sources: scikit-learn user guide, Common pitfalls and recommended practices.</p></aside>
+</section>
+
+<section class="slide" id="scheme-from-use" data-lo="LO1 LO3" data-n="22" data-session="2">
+  <div class="kicker">The second half of each case</div>
+  <h2>The validation scheme follows from the use</h2>
+  <table class="t">
+    <tr><th>The model will be used on</th><th>Scheme</th></tr>
+    <tr><td>More independent rows like these, same period</td><td>Random</td></tr>
+    <tr><td>Units it has never seen: new pumps, new patients, a new site</td><td>Grouped by that unit</td></tr>
+    <tr><td>Later records of a population that changes</td><td>Time-ordered</td></tr>
+    <tr><td>New units, later</td><td>Grouped and time-ordered</td></tr>
+  </table>
+  <p class="lead mt">In Lab 3.2 the last sentence of each case states the use.</p>
+  <aside class="notes"><p>The same table can need two schemes for two uses: appointments of known patients next month are time-ordered; the same model offered to a new clinic needs a grouped split. This is why the scheme cannot be read off the data alone.</p></aside>
+</section>
+
+<section class="slide" id="check-kind" data-lo="LO1" data-n="23" data-session="2">
+  <div class="kicker">Checkpoint</div>
+  <h2>Name the leak</h2>
+  <div class="quiz" data-type="single" data-lo="LO1" data-id="check-kind-q1">
+    <p class="lead">A bank predicts which customers will close their account next month. One feature is the number of calls the customer made to the retention desk. Customers are transferred to that desk when they ask to close the account. Which kind of leak is this?</p>
+    <div class="opts">
+      <div class="opt" data-ok data-k="A">Target leakage</div>
+      <div class="opt" data-why="Looks for a step fitted before the split: nothing was fitted here, the column itself carries the outcome" data-k="B">Preparation leakage</div>
+      <div class="opt" data-why="Looks for repeated customers across the split: the fault would remain with every customer on one side" data-k="C">Group contamination</div>
+      <div class="opt" data-why="Treats call counts as ordinary behaviour: these calls exist only because the customer has asked to leave" data-k="D">No leak: call behaviour is a legitimate feature</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The column is a consequence of the outcome: a call to that desk is made after the customer has decided. Calls to the general helpline would be a fair feature.</div>
+  </div>
+  <aside class="notes"><p>Answer: the first option. The fourth option is the instructive one: the same kind of column, calls, can be honest or a leak depending on who writes it and when. That is why the question is about the process and not about the name of the column.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-3-2" data-auto="lab" data-lab="3.2" data-label="Lab 3.2" data-n="24" data-session="2">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 3.2 · 25 min</div><h2>Six leaks from other projects</h2><p class="lead small">Classify six leaks from other projects by type, name the validation scheme each case needs and check the table against the reference.</p><a class="nb" href="../labs/D3_2_six_leaks.ipynb">D3_2_six_leaks.ipynb</a></div><ul class="checklist"><li>Read the six cases and how their data were collected <span class="min">5 min</span></li><li>Name the kind of leak in each <span class="min">8 min</span></li><li>Name the validation scheme each needs <span class="min">6 min</span></li><li>Check the table; read the explanations <span class="min">3 min</span></li><li>Write the question that would have caught each <span class="min">3 min</span></li><li class="stretch">✱ Stretch: Add a seventh case from your own work</li></ul></div>
+  <aside class="notes"><p>AI-tutor, with the request that each pair decides before asking an assistant. No model is trained. Cases that divide rooms: case 3, where the split is right and the fault is the selection before it; case 6, which is also future information. Accept a reasoned second kind. The checked table is the evidence for the first course outcome.</p></aside>
+</section>
+
+<!-- Session 3 -->
+
+<section class="slide section" id="s3" data-auto="section" data-session="3" data-n="25">
+  <div class="kicker">Session 3</div>
+  <h1>Hunting planted leaks</h1>
+  <ul class="bullets outcomes"><li>Use the time each column is recorded to find features written after the outcome</li><li>Find duplicated rows that sit on both sides of a split</li><li>Use importance scores to choose which features to question first</li></ul>
+  <div class="sess-no">03</div>
+  <aside class="notes"><p>From classifying described leaks to finding real ones. The session gives three instruments and one discipline: one removal at a time, with the score before and after.</p></aside>
+</section>
+
+<section class="slide" id="too-good" data-lo="LO1" data-n="26" data-session="3">
+  <div class="kicker">The trigger</div>
+  <h2>A score far above your ladder is the start of an audit</h2>
+  <div class="cols cols-2 mid">
+    <div class="stat center"><div class="big">1.000</div><div class="lbl">average precision of the table Loay Al-Kadi sent, on his random five-fold split</div></div>
+    <ul class="bullets">
+      <li>The honest ladder ends at 0.529</li>
+      <li>The outcome depends on months of a trainee's life after week 2</li>
+      <li>No table of week-2 columns can know that perfectly</li>
+      <li>So some column is not a week-2 column</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 3.3. The ladder is what makes the alarm possible: without honest rungs, 1.000 is just a good day. In practice the suspicious score is rarely 1.000; a jump of 0.2 over the previous best with no new idea behind it deserves the same treatment.</p></aside>
+</section>
+
+<section class="slide" id="instrument-timestamps" data-lo="LO1" data-n="27" data-session="3">
+  <div class="kicker">Instrument 1</div>
+  <h2>Timestamps: when is each column written?</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Column</th><th>Recorded at</th></tr>
+      <tr><td><code>aptitude_score</code></td><td>Registration</td></tr>
+      <tr><td><code>absences_w2</code></td><td>End of week 2</td></tr>
+      <tr class="hl"><td><code>weeks_attended</code></td><td>Exit</td></tr>
+      <tr><td><code>provider_rate</code></td><td>Not in the dictionary</td></tr>
+      <tr><td><code>trainee_noncompletions</code></td><td>Not in the dictionary</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>The data dictionary answers for recorded columns</li>
+      <li>Removing <code>weeks_attended</code>: 1.000 falls to 0.882</li>
+      <li>A column missing from the dictionary was <b>computed</b>: ask from which rows</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 3.3, task 2. When no dictionary exists, the instrument is a conversation with whoever owns the system: Hamza Al-Babtain for the providers' registers. A column's missingness can also carry a timestamp: a field that is blank until exit.</p></aside>
+</section>
+
+<section class="slide" id="instrument-duplicates" data-lo="LO1" data-n="28" data-session="3">
+  <div class="kicker">Instrument 2</div>
+  <h2>Duplicates: a new key on an old row</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>33,491 rows, 33,491 different enrolment keys</li>
+      <li>2,104 rows agree with another row on trainee, provider, programme and start date</li>
+      <li>Two provider systems were merged; 1,052 enrolments were entered twice</li>
+      <li>Removing the copies: 0.882 becomes 0.881</li>
+    </ul>
+    <div class="card c-cyan"><h4>How to look</h4><p class="small mb0">Do not test the key. Test the columns that describe the real event. Then ask the owner of the data why they repeat.</p></div>
+  </div>
+  <aside class="notes"><p>From Lab 3.3, task 3. The effect on the score is small here: three rows in a hundred, and a larger leak still in the table. The copies also count twice in every rate and interval, which is reason enough. In the insurer's case of Lab 3.2 the share was double and the model was scored on rows it had seen.</p></aside>
+</section>
+
+<section class="slide" id="instrument-importance" data-lo="LO1" data-n="29" data-session="3">
+  <div class="kicker">Instrument 3</div>
+  <h2>Importance scores: question the feature that carries the score</h2>
+  <div class="bars">
+    <div class="row"><span>trainee_noncompletions</span><div class="bar c-coral" style="--w:100%"></div><span class="val">80%</span></div>
+    <div class="row"><span>absences_w2</span><div class="bar c-teal" style="--w:9%"></div><span class="val">8%</span></div>
+    <div class="row"><span>aptitude_score</span><div class="bar c-teal" style="--w:6%"></div><span class="val">5%</span></div>
+    <div class="row"><span>provider_rate</span><div class="bar c-teal" style="--w:3%"></div><span class="val">2%</span></div>
+  </div>
+  <ul class="bullets mt">
+    <li>Share of gain after the first two removals</li>
+    <li>One computed column carries four fifths of the model</li>
+    <li>Importance does not prove a leak: it says where to look first</li>
+  </ul>
+  <aside class="notes"><p>From Lab 3.3, task 4. Compare with Lab 2.1, where the strongest honest feature, early absences, held 39% of the gain. A history of non-completion is a plausible strong feature, which is exactly why it has to be tested and not just believed or thrown out.</p></aside>
+</section>
+
+<section class="slide" id="rebuild" data-lo="LO1" data-n="30" data-session="3">
+  <div class="kicker">Testing a computed column</div>
+  <h2>Rebuild the column and see which rows it must have read</h2>
+  <table class="t small">
+    <tr><th>Computed column</th><th>It equals, on every row</th><th>Verdict</th></tr>
+    <tr><td><code>trainee_noncompletions</code></td><td>All non-completions of the trainee, this enrolment and later ones included. It equals the past-only count on 84% of rows.</td><td><b>Leak</b>: future information</td></tr>
+    <tr><td><code>provider_rate</code></td><td>The provider's rate over all rows, 2021 to 2025</td><td><b>Leak</b>: preparation</td></tr>
+    <tr><td><code>earlier_enrolments</code></td><td>The trainee's enrolments that started earlier, without their outcome</td><td><b>Keep</b></td></tr>
+  </table>
+  <div class="callout note mt"><b>An audit also clears columns.</b> The third one reads only what the fund knows on the prediction day.</div>
+  <aside class="notes"><p>From Lab 3.3. The 84% is the dangerous part: on most rows the leaking column and the honest one agree, so a glance at a sample shows nothing. The other 16% are the rows where the count includes the outcome being predicted, or a later one.</p></aside>
+</section>
+
+<section class="slide" id="one-at-a-time" data-lo="LO1" data-n="31" data-session="3">
+  <div class="kicker">The discipline</div>
+  <h2>One removal at a time, with the score before and after</h2>
+  <table class="t small">
+    <tr><th>Removal</th><th class="num">Before</th><th class="num">After</th><th>Kind</th></tr>
+    <tr><td><code>weeks_attended</code></td><td class="num">1.000</td><td class="num">0.882</td><td>Target leakage</td></tr>
+    <tr><td>The copied rows</td><td class="num">0.882</td><td class="num">0.881</td><td>Duplicate contamination</td></tr>
+    <tr><td><code>trainee_noncompletions</code></td><td class="num">0.881</td><td class="num">0.503</td><td>Future information</td></tr>
+    <tr><td><code>provider_rate</code></td><td class="num">0.503</td><td class="num">0.501</td><td>Preparation leakage</td></tr>
+  </table>
+  <ul class="bullets mt">
+    <li>Each leak hid the ones behind it</li>
+    <li>On the fund's folds the cleaned table scores 0.505; the champion, with a past-only history, 0.529</li>
+  </ul>
+  <aside class="notes"><p>From Lab 3.3: the audit note. While weeks_attended was in the table, nothing else seemed to matter; an analyst who removes it and sees 0.88 may well stop there, pleased. The audit ends when the score is back in the range the ladder explains, and every remaining feature has an answer to "when is it written".</p></aside>
+</section>
+
+<section class="slide" id="size-and-seriousness" data-lo="LO1" data-n="32" data-session="3">
+  <div class="kicker">A judgment</div>
+  <h2>The size of a leak is measured; whether it is a leak is decided by how the column was made</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li><code>provider_rate</code> moved the score by 0.002</li>
+      <li>Each provider has several hundred rows: one row's own outcome hardly changes the rate</li>
+      <li>With five rows per provider the same column would dominate</li>
+      <li>And it read the 2025 cohort, the holdout</li>
+    </ul>
+    <div class="card c-coral"><h4>Why remove a small leak</h4><p class="small mb0">The measured effect belongs to this table and this model. The fault belongs to the procedure, and the procedure will be reused on the next table.</p></div>
+  </div>
+  <aside class="notes"><p>The stretch of the lab rebuilds an honest provider rate from the enrolments that had ended before each prediction day. A holdout that a feature has read is no longer a holdout: had this table gone forward, Day 4's final check would have been spent without anyone noticing.</p></aside>
+</section>
+
+<section class="slide" id="check-instrument" data-lo="LO1" data-n="33" data-session="3">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which instrument first?</h2>
+  <div class="quiz" data-type="single" data-lo="LO1" data-id="check-instrument-q1">
+    <p class="lead">A received table scores far above your ladder. Its data dictionary lists when every recorded column is written. Twelve further columns were computed by a colleague. Where do you start?</p>
+    <div class="opts">
+      <div class="opt" data-why="Starts with the most expensive step: a new search cannot repair a column that knows the answer" data-k="A">Tune the model again on the received table</div>
+      <div class="opt" data-why="Removes everything computed: an audit also clears honest columns, and history is the fund's best information" data-k="B">Drop all twelve computed columns</div>
+      <div class="opt" data-why="Changes the split before the columns: a target leak scores just as well under any split" data-k="C">Switch to a time-ordered split and compare</div>
+      <div class="opt" data-ok data-k="D">Read the dictionary for columns recorded after the prediction time, then rank the rest by importance</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The cheapest instrument goes first. The dictionary costs nothing; importance then tells you which of the twelve computed columns to rebuild first.</div>
+  </div>
+  <aside class="notes"><p>Answer: the fourth option. The third option is worth a minute: a better split does not find a column leak. Lab 3.3 scores 0.882 under any split while trainee_noncompletions is in the table.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-3-3" data-auto="lab" data-lab="3.3" data-label="Lab 3.3" data-n="34" data-session="3">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 3.3 · 25 min</div><h2>Four planted leaks</h2><p class="lead small">Find four planted leaks in a received feature table with timestamps, duplicates and importance scores, removing one at a time with the score before and after.</p><a class="nb" href="../labs/D3_3_leak_hunt.ipynb">D3_3_leak_hunt.ipynb</a></div><ul class="checklist"><li>Score the received table as it came <span class="min">4 min</span></li><li>Timestamps: when is each column written? <span class="min">5 min</span></li><li>Duplicates: the same enrolment under two keys <span class="min">5 min</span></li><li>Importance scores: question the top features <span class="min">7 min</span></li><li>Write the audit note: before and after each removal <span class="min">4 min</span></li><li class="stretch">✱ Stretch: Rebuild the provider rate from past cohorts only</li></ul></div>
+  <aside class="notes"><p>AI-off for the first attempt at tasks 2 to 4: the hunt is the participant's. Each scoring cell fits five models and takes 15 to 30 seconds; the whole lab runs in about three minutes. Typical problems: testing the enrolment key for duplicates; calling earlier_enrolments a leak because it sounds like the other history column. The audit note is the second piece of evidence for the first course outcome.</p></aside>
+</section>
+
+<!-- Session 4 -->
+
+<section class="slide section" id="s4" data-auto="section" data-session="4" data-n="35">
+  <div class="kicker">Session 4</div>
+  <h1>Reading someone else's notebook</h1>
+  <ul class="bullets outcomes"><li>Read a notebook in the order rows, split, preparation, tuning, metric</li><li>List the faults that make a reported score untrustworthy</li><li>Measure which fault moves the score most by repairing one at a time</li></ul>
+  <div class="sess-no">04</div>
+  <aside class="notes"><p>The last session turns the day into a professional habit: reading a notebook you did not write, and telling its author what you found in a way he can act on.</p></aside>
+</section>
+
+<section class="slide" id="first-questions" data-lo="LO1" data-n="36" data-session="4">
+  <div class="kicker">Before any code</div>
+  <h2>Three questions to any reported score</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>On which rows?</h4><p class="small mb0">How many test rows, from which period, with what share of the outcome? Do they look like the population the model will score?</p></div>
+    <div class="card c-cyan"><h4>Against what?</h4><p class="small mb0">What does a constant answer score on the same rows? What did the previous model score?</p></div>
+    <div class="card c-coral"><h4>Chosen how?</h4><p class="small mb0">How many versions were tried, and on which rows was this one chosen?</p></div>
+  </div>
+  <p class="lead mt">"95% accuracy" answers none of them.</p>
+  <aside class="notes"><p>Loay's own output already answers the first two against him: 15,017 test rows when a fifth of 45,000 would be 9,000, and half of them non-completers when the fund's rate is one in six. Reading the printed numbers beside the headline is a review before the review.</p></aside>
+</section>
+
+<section class="slide" id="accuracy-rare" data-lo="LO1 LO5" data-n="37" data-session="4">
+  <div class="kicker">The metric</div>
+  <h2>For a rare outcome, accuracy rewards saying "nothing happens"</h2>
+  <div class="bars">
+    <div class="row"><span>"Everyone completes", all enrolments</span><div class="bar c-navy" style="--w:83%"></div><span class="val">0.83</span></div>
+    <div class="row"><span>"Everyone completes", scorable rows of 2024 H2</span><div class="bar c-navy" style="--w:87%"></div><span class="val">0.87</span></div>
+    <div class="row"><span>Loay's notebook, all five blocks repaired</span><div class="bar c-teal" style="--w:89%"></div><span class="val">0.89</span></div>
+  </div>
+  <ul class="bullets mt">
+    <li>Accuracy counts both classes alike and depends on their share</li>
+    <li>It needs a threshold, and 0.5 is nobody's decision</li>
+    <li>The run log uses average precision and recall at capacity for this reason</li>
+  </ul>
+  <aside class="notes"><p>From Lab 3.4. Two points of accuracy above a constant answer, for a model whose ranking is useful: average precision 0.49 against a base rate of 0.13. Accuracy hides the usefulness as well as the faults. Tomorrow's first session is about the threshold. Sources: Saito and Rehmsmeier (2015).</p></aside>
+</section>
+
+<section class="slide" id="review-order" data-lo="LO1" data-n="38" data-session="4">
+  <div class="kicker">An order to read in</div>
+  <h2>Rows, split, preparation, tuning, metric</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · Rows</b>Who is in the table? Anyone the model never scores?</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>2 · Split</b>Does it rehearse the use?</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>3 · Preparation</b>What was fitted, copied or encoded before the split?</div>
+    <div class="arrow">→</div>
+    <div class="step c-purple"><b>4 · Tuning</b>On which rows was the model chosen?</div>
+    <div class="arrow">→</div>
+    <div class="step c-navy"><b>5 · Metric</b>Does the number mean what the message says?</div>
+  </div>
+  <p class="lead mt">The earlier the fault, the more of what follows it spoils.</p>
+  <aside class="notes"><p>This is the order of the data's journey, not of the notebook's cells: a notebook often prepares before it splits, and that is already a finding. The order is the same one the capstone assessor will use on each repository.</p></aside>
+</section>
+
+<section class="slide" id="balancing" data-lo="LO1" data-n="39" data-session="4">
+  <div class="kicker">The fault that did the damage</div>
+  <h2>"Balancing the classes" before the split copies test rows into training</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Each non-completer is copied four times, then the table is split at random</li>
+      <li>Most test non-completers have a copy in training</li>
+      <li>A tree with five rows per leaf recognises them</li>
+      <li>The test set is half non-completers: no cohort looks like it</li>
+    </ul>
+    <div class="card c-coral"><h4>If you balance at all</h4><p class="small mb0">Inside the training part only, as a step of the pipeline. The test rows keep the real share. Tomorrow shows that a ranking does not need it.</p></div>
+  </div>
+  <aside class="notes"><p>From Lab 3.4, block 2. The same holds for synthetic oversampling: generated neighbours of a test row are near copies of it. This single block accounts for almost the whole of the 95%.</p></aside>
+</section>
+
+<section class="slide" id="repairs" data-lo="LO1" data-n="40" data-session="4">
+  <div class="kicker">Lab 3.4, measured</div>
+  <h2>Repair one fault at a time, then all together</h2>
+  <table class="t small">
+    <tr><th>Run</th><th class="num">Accuracy</th><th class="num">"Everyone completes"</th><th class="num">Average precision</th></tr>
+    <tr><td>As written</td><td class="num">0.948</td><td class="num">0.499</td><td class="num">0.980</td></tr>
+    <tr><td>Repair the rows only</td><td class="num">0.978</td><td class="num">0.490</td><td class="num">0.994</td></tr>
+    <tr class="hl"><td>Repair the balancing only</td><td class="num">0.865</td><td class="num">0.835</td><td class="num">0.569</td></tr>
+    <tr><td>Repair the split only</td><td class="num">0.743</td><td class="num">0.475</td><td class="num">0.843</td></tr>
+    <tr><td>Repair the encoding or the tuning only</td><td class="num">0.95</td><td class="num">0.499</td><td class="num">0.98</td></tr>
+    <tr class="hl"><td>All five repaired</td><td class="num">0.890</td><td class="num">0.874</td><td class="num">0.494</td></tr>
+  </table>
+  <p class="lead mt">One repair makes the number go up. Faults interact.</p>
+  <aside class="notes"><p>From Lab 3.4. Three readings. The balancing does almost all the damage. Repairing the rows alone raises the score, because it removes the hardest honest cases while the copies remain: a single repair is never the verdict. And the split matters here, although it did not for the champion in Lab 3.1: this model has leaves of five rows and a table full of copies. A fault is measured for the model in front of you.</p></aside>
+</section>
+
+<section class="slide" id="review-note" data-lo="LO1 LO6" data-n="41" data-session="4">
+  <div class="kicker">What you send back</div>
+  <h2>A review note names numbers, not character</h2>
+  <div class="callout tip"><b>Five lines.</b> The number as reported. The fault that matters most, with its measured effect. The other faults. The honest number. What to do next.</div>
+  <ul class="bullets mt">
+    <li>"Your split is wrong" starts an argument</li>
+    <li>"With the copies kept out of the test set the accuracy is 0.87, and a constant answer scores 0.84" ends one</li>
+    <li>Offer the next step: one pipeline, the fund's folds, a line in the run log</li>
+  </ul>
+  <aside class="notes"><p>Loay's notebook is not careless: every block is something tutorials teach. That is the reason to review with measurements. The assessors' notes on the capstone repositories follow the same five lines.</p></aside>
+</section>
+
+<section class="slide" id="check-review" data-lo="LO1" data-n="42" data-session="4">
+  <div class="kicker">Checkpoint</div>
+  <h2>What do you ask first?</h2>
+  <div class="quiz" data-type="single" data-lo="LO1" data-id="check-review-q1">
+    <p class="lead">A vendor's slide says: "Our model predicts non-completion with 91% accuracy." Which question tells you most, fastest?</p>
+    <div class="opts">
+      <div class="opt" data-why="Asks about the model family: the algorithm does not tell you whether the number means anything" data-k="A">Which algorithm does the model use?</div>
+      <div class="opt" data-why="Asks about the amount of training data: more rows do not repair a metric that a constant answer can reach" data-k="B">How many rows was it trained on?</div>
+      <div class="opt" data-ok data-k="C">What share of the test rows completed, and what does "everyone completes" score on them?</div>
+      <div class="opt" data-why="Asks for a different summary of the same unknown test: without the rows and the baseline it is as hard to read" data-k="D">What is its area under the curve?</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> If 88% of the test rows completed, 91% accuracy is three points above an answer that needs no model. The baseline on the same rows turns a number into information.</div>
+  </div>
+  <aside class="notes"><p>Answer: the third option. Follow-up questions in the order of the session: which rows, which split, what was fitted before it, how was the version chosen.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-3-4" data-auto="lab" data-lab="3.4" data-label="Lab 3.4" data-n="43" data-session="4">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 3.4 · 25 min</div><h2>A colleague's notebook</h2><p class="lead small">List what makes a colleague's notebook score untrustworthy, check the list, repair the faults one at a time and write the review note.</p><a class="nb" href="../labs/D3_4_colleague_notebook.ipynb">D3_4_colleague_notebook.ipynb</a></div><ul class="checklist"><li>Run the notebook as it is; read the reported number <span class="min">3 min</span></li><li>Read the code and mark what you find <span class="min">9 min</span></li><li>Check your list against the reference <span class="min">3 min</span></li><li>Repair one fault at a time and rescore <span class="min">6 min</span></li><li>Write a five-line review note <span class="min">4 min</span></li><li class="stretch">✱ Stretch: Rewrite the notebook as one pipeline scored on the fund's folds</li></ul></div>
+  <aside class="notes"><p>AI-tutor, with the request to make the list in task 2 before asking an assistant. The seven runs of task 4 take about four minutes on a laptop: start them, then discuss the reference review while they run. Quick mode (DS204_QUICK=1) compares two settings in place of six. Typical problem: calling block 4 the worst fault from memory of the morning; task 4 measures it.</p></aside>
+</section>
+
+<!-- Close -->
+
+<section class="slide" id="wrap-up" data-n="44" data-session="4">
+  <div class="kicker">Day 3</div>
+  <h2>Three things to keep</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>The split rehearses the use</h4><p class="small mb0">For the champion: random 0.521, time-ordered 0.525, new trainees 0.500, one year old −0.016. Gaps are measured and written down with their causes.</p></div>
+    <div class="card c-cyan"><h4>Four kinds, four questions</h4><p class="small mb0">When is it written? What was its value that day? Can the unit be on both sides? Was anything fitted before the split?</p></div>
+    <div class="card c-coral"><h4>One removal at a time</h4><p class="small mb0">1.000, 0.882, 0.881, 0.503, 0.501. And 95% accuracy became 0.89 against a constant 0.87.</p></div>
+  </div>
+  <aside class="notes"><p>Ask: which of today's leaks could be in a table you work with now? Give a minute of silence for it; the answers are usually a computed rate or a status column that is overwritten in place.</p></aside>
+</section>
+
+<section class="slide dark" id="next" data-n="45" data-session="4">
+  <div class="kicker">Next</div>
+  <h1>Day 4 · Errors, groups and documentation</h1>
+  <p class="lead">The score is trusted. Tomorrow it becomes a decision: where to cut the list for 800 support plans, whether the probabilities hold, for whom the model fails, and what goes into the model card.</p>
+  <ul class="bullets">
+    <li>The 2025 cohort is opened, once</li>
+    <li>The first attempt at the subgroup table is without AI assistance</li>
+    <li>You choose your capstone problem in the last lab</li>
+  </ul>
+  <aside class="notes"><p>Day 4 runs on supplied predictions of the champion, so no result of today is needed. Ask participants to look at the capstone shortlist in labs/capstone this evening.</p></aside>
+</section>
+</div>
+<script type="application/json" id="academy-data">{"v":1,"engine":"1.0.0","build":{"at":"2026-11-15T16:02:38Z","version":"2027.1.0","commit":"6acdecd"},"course":{"id":"ds-204","code":"DS-204","title":"Machine Learning for Tabular Data: Baselines and Validation","track":"data-science","lang":"en","dir":"ltr","url":"https://sdaiaacademy.github.io/ds-204/","repo":"SDAIAAcademy/ds-204","home":"../index.html"},"deck":{"id":"day3","kind":"day","day":3,"label":"Day 3","title":"Validation and leakage","prev":"day2.html","next":"day4.html","md":"day3.md","alt":{}},"sessions":[{"n":1,"label":"Session 1","title":"The split decides the score","slide":"s1","outcomes":["Choose the split that mirrors how a model will be used","Implement random, grouped and time-ordered splits on the same rows","Explain each gap between the three scores from the structure of the data"],"minutes":50,"lab":{"id":"3.1","title":"One model, three splits","minutes":25,"href":"../labs/D3_1_three_splits.ipynb"}},{"n":2,"label":"Session 2","title":"Kinds of leakage","slide":"s2","outcomes":["Distinguish target leakage, future information, group or duplicate contamination and preparation leakage","Identify the kind of leak from a description of how the data were collected","Match each case to the validation scheme its use requires"],"minutes":50,"lab":{"id":"3.2","title":"Six leaks from other projects","minutes":25,"href":"../labs/D3_2_six_leaks.ipynb"}},{"n":3,"label":"Session 3","title":"Hunting planted leaks","slide":"s3","outcomes":["Use the time each column is recorded to find features written after the outcome","Find duplicated rows that sit on both sides of a split","Use importance scores to choose which features to question first"],"minutes":50,"lab":{"id":"3.3","title":"Four planted leaks","minutes":25,"href":"../labs/D3_3_leak_hunt.ipynb"}},{"n":4,"label":"Session 4","title":"Reading someone else's notebook","slide":"s4","outcomes":["Read a notebook in the order rows, split, preparation, tuning, metric","List the faults that make a reported score untrustworthy","Measure which fault moves the score most by repairing one at a time"],"minutes":50,"lab":{"id":"3.4","title":"A colleague's notebook","minutes":25,"href":"../labs/D3_4_colleague_notebook.ipynb"}}],"slides":[{"id":"title","n":1,"title":"Validation and leakage","kind":"title","session":0,"hash":"355b4d81","md":"#### [day3#title] Validation and leakage\n\n*SDAIA Academy · Machine Learning for Tabular Data: Baselines and Validation*\n\nDay 3: The split that mirrors use, the four kinds of leakage and how to audit a score\n\nData Science Track · 4 teaching days + capstone day · 4 sessions · 4 labs · DS-204","notes":"Today is about trust in a number. Two days produced an honest ladder that ends at 0.529. Today the room meets a table that scores 1.000 and a notebook that reports 95%, and learns to take both apart. The first attempts at Labs 3.1 and 3.3 are without AI assistance: say so now. Breaks are yours: press B.","minutes":null,"lo":[]},{"id":"agenda","n":2,"title":"Validation and leakage","kind":"content","session":0,"hash":"6914ff04","md":"#### [day3#agenda] Validation and leakage\n\n*Today*\n\n- **Session 1 · The split decides the score**: The same model scores differently under random, grouped and time-ordered splits, and each gap has a cause you can name.\n- **Session 2 · Kinds of leakage**: Four kinds of leakage, each with the question that catches it, practised on cases from other sectors.\n- **Session 3 · Hunting planted leaks**: Three instruments for an audit: when each column is written, whether rows repeat, and which features carry the score.\n- **Session 4 · Reading someone else's notebook**: Reviewing a notebook you did not write: an order to read it in, and the things that make its headline number untrustworthy.","notes":"Session 1 is about the split, sessions 2 to 4 about leakage: its kinds, how to hunt it, and how to review a score someone else produced. Every lab starts from supplied tables and the champion's saved settings.","minutes":null,"lo":[]},{"id":"review-day2","n":3,"title":"What did the challenger's interval decide?","kind":"quiz","session":0,"hash":"8bf080e9","md":"#### [day3#review-day2] What did the challenger's interval decide?\n\n*Review of Day 2*\n\n**Question:** The challenger differed from the champion by −0.007 (95% interval −0.018 to +0.004). The minimum effect was +0.01. Why was the decision \"keep the champion\" and not \"not shown\"?\n\n- A. Because the mean difference is negative\n- B. Because the whole interval lies below the minimum effect\n- C. Because the interval excludes zero\n- D. Because the champion won on three of the five folds","notes":"Answer: the second option. Two minutes. The contrast to recall: champion against logistic was +0.005 with an interval from −0.010 to +0.019, which straddles the minimum effect, so that one was \"not shown\".","minutes":null,"lo":["LO4"]},{"id":"where-we-are","n":4,"title":"The model is fixed; today the score itself is questioned","kind":"content","session":0,"hash":"8c6b4748","md":"#### [day3#where-we-are] The model is fixed; today the score itself is questioned\n\n*Today*\n\n1. **Frame and baseline**: The decision, the rows, three baselines (Day 1)\n2. **Trees and challengers**: Champion 0.529; challenger not adopted (Day 2)\n3. **Validation and leakage**: Three splits, four kinds of leak, an audit (Day 3)\n4. **Errors and documentation**: Threshold, calibration, subgroups, model card (Day 4)","notes":"The champion keeps the settings of Lab 2.2 all day. What changes is how its rows are cut, and then which columns it is given.","minutes":null,"lo":[]},{"id":"s1","n":5,"title":"The split decides the score","kind":"section","session":1,"hash":"2bd00059","md":"#### [day3#s1] The split decides the score\n\n*Session 1*\n\n- Choose the split that mirrors how a model will be used\n- Implement random, grouped and time-ordered splits on the same rows\n- Explain each gap between the three scores from the structure of the data","notes":"FN-105 introduced the three-way split and DS-201 the idea of an interval. This session adds the question FN-105 left open: which rows go on which side, and why.","minutes":null,"lo":["LO3"]},{"id":"rehearsal","n":6,"title":"A validation split is a rehearsal of how the model will be used","kind":"content","session":1,"hash":"5e18aba4","md":"#### [day3#rehearsal] A validation split is a rehearsal of how the model will be used\n\n*The principle*\n\n- **Who is new in use?** New rows of known people, or people the model has never seen? If people are new, they must be new in validation.\n- **What is later in use?** The model is trained once and scores what comes afterwards. Then validation rows come after training rows.\n- **What is known on that day?** An outcome that does not exist yet cannot train a model. Training rows are those whose outcome was known.\n\nThe split is chosen from the use, before any score is seen.","notes":"For Mubakkir: each January and July a model is trained on what the fund knows and scores the intake of the next half-year. Most trainees are new; some return. The fund's folds rehearse exactly that. Sources: scikit-learn user guide, Cross-validation.","minutes":null,"lo":["LO3"]},{"id":"three-splits","n":7,"title":"Random, grouped and time-ordered splits answer different questions","kind":"content","session":1,"hash":"8350ae84","md":"#### [day3#three-splits] Random, grouped and time-ordered splits answer different questions\n\n*Three ways to cut the same rows*\n\n| Split | How it cuts | The question it answers |\n| --- | --- | --- |\n| **Random** | Each row lands in a fold by chance | How well does the model do on more rows like these, from the same period? |\n| **Grouped** | All rows of one trainee stay on one side | How well does it do on a trainee it has never seen? |\n| **Time-ordered** | Train on the past, validate on a later half-year | How well does it do on the next intake? |\n\n> **None is wrong in itself.** A split is wrong for a use. A random split is right when rows are independent and the model is used on rows like them.","notes":"In scikit-learn: StratifiedKFold, GroupKFold and TimeSeriesSplit, or folds you build yourself as the fund does. Participants write the first two in Lab 3.1.","minutes":null,"lo":["LO3"]},{"id":"what-training-knows","n":8,"title":"A random split trains on the future and on outcomes nobody knew yet","kind":"content","session":1,"hash":"46e5a61d","md":"#### [day3#what-training-knows] A random split trains on the future and on outcomes nobody knew yet\n\n*Lab 3.1, before any score*\n\n| For the day a validation row is scored | Random | Grouped | Time-ordered |\n| --- | --- | --- | --- |\n| Validation trainees who also have a training row | 40% | 0% | 30% |\n| Training rows that start later than that day | 47% | 47% | 0% |\n| Training rows whose programme was not yet due to end | 58% | 58% | 0% |\n| Training rows per fold | 25,951 | 25,951 | 17,254 |\n\n> **What goes wrong.** A split is judged by its score only. Describe first what the training part knows; the table costs ten lines and no model.","notes":"From Lab 3.1, task 1. The grouped split solves the first row and none of the others. The time-ordered folds keep 30% shared trainees on purpose: returning trainees are part of the fund's real intake, and their history is built from the past only.","minutes":null,"lo":["LO3"]},{"id":"due-to-end","n":9,"title":"Train on programmes that were due to end, not on those that had ended","kind":"content","session":1,"hash":"2e0d6ecd","md":"#### [day3#due-to-end] Train on programmes that were due to end, not on those that had ended\n\n*A detail that decides the folds*\n\n- On 1 July 2024 a 36-week programme that began in March is still running\n- Its early leavers already have an outcome; its other trainees have none\n- \"Every row with a known outcome\" keeps the leavers and drops their classmates\n- The model then learns that recent long programmes always fail\n\n- **The fund's rule.** A row trains a fold only when its programme's **planned end** lies before the validation half-year begins. The whole class enters together, or not at all.","notes":"This is label maturity: a label needs time to exist, and it arrives at different speeds for the two classes. The trainer's first version of these folds used the exit date and produced a model that was far worse on recent cohorts for no visible reason. It is the most common fault in time-ordered validation of outcomes that take months to settle: churn, default, readmission.","minutes":null,"lo":["LO3"]},{"id":"three-scores","n":10,"title":"For the champion, the random split does not overstate; hiding the history does","kind":"content","session":1,"hash":"6c1be5bc","md":"#### [day3#three-scores] For the champion, the random split does not overstate; hiding the history does\n\n*Lab 3.1, measured*\n\n| Item | Value |\n| --- | --- |\n| Random | 0.521 |\n| Grouped | 0.520 |\n| Grouped, history hidden | 0.500 |\n| Time-ordered | 0.525 |\n\n- Random against time-ordered: −0.004, inside the fold spreads of 0.021 and 0.012\n- Grouping alone changes nothing: the champion does not recognise a trainee\n- A trainee the fund has never seen has no history: −0.020","notes":"From Lab 3.1: the champion with the fund's settings, average precision. Most rooms expect the random split to score far higher. Here it does not, and that is the lesson: the gap is a measurement, and it depends on the table and the model. Seven trainees in ten have a single row, so there is little to memorise. The next slides show where the split does matter for this model.","minutes":null,"lo":["LO3"]},{"id":"new-and-returning","n":11,"title":"One score averages two kinds of trainees","kind":"content","session":1,"hash":"43050473","md":"#### [day3#new-and-returning] One score averages two kinds of trainees\n\n*The grouped gap, explained*\n\n| In the fund's validation folds | Share of rows | Average precision |\n| --- | --- | --- |\n| New to the fund | 66% | 0.491 |\n| Returning | 34% | 0.578 |\n\n- The 0.529 of the ladder is partly earned on returning trainees\n- For a programme where nobody has a history, quote the grouped score with history hidden: 0.500\n- Both numbers go into the model card","notes":"From Lab 3.1, task 3, on the reference validation-fold probabilities of the champion. The base rates differ slightly, 11% and 13%, so the two average precisions are not a pure comparison; the direction is clear. Lab 1.4 found the same split with the logistic model.","minutes":null,"lo":["LO3"]},{"id":"ageing","n":12,"title":"A model one year old scores 0.016 below a fresh one","kind":"content","session":1,"hash":"6c29a4f1","md":"#### [day3#ageing] A model one year old scores 0.016 below a fresh one\n\n*What only time order can show*\n\n| Age of the model | Against a fresh model | Pairs |\n| --- | --- | --- |\n| Fresh | 0.000 | 5 |\n| Half a year | −0.006 | 4 |\n| One year | −0.016 | 3 |\n| One and a half years | −0.020 | 2 |\n\n- Each fold's model, scored on the later half-years too\n- A random split trains and validates on one period: its model never ages\n- The older model also had fewer rows: both are what \"not retraining\" means\n- The number sets the retraining interval","notes":"From Lab 3.1, task 4. This is where a random split overstates for the fund: it reports the score of a model that is always as fresh as its data, and a model in use is not. The fund changed during these years: an employer mandate, a stipend rule, blended delivery. With few pairs these are indications, not intervals; the direction is the same in every column of the grid.","minutes":null,"lo":["LO3"]},{"id":"when-random-overstates","n":13,"title":"When does a random split overstate badly?","kind":"content","session":1,"hash":"dfa7e474","md":"#### [day3#when-random-overstates] When does a random split overstate badly?\n\n*Beyond this table*\n\n- **Many rows per unit.** Thousands of readings per machine, dozens of visits per patient. The model recognises the unit. Here: at most four rows per trainee.\n- **Features built from other rows.** A rate or a count that read the validation rows or the future. The next three sessions.\n- **A world that moves fast.** Prices, fraud patterns, policies. The faster the change, the more a model's age costs.\n\n> **The habit.** Choose the split from the use. Then measure the other splits once, and write the gaps down with their causes.","notes":"The stretch of Lab 3.1 tries a model that can memorise, with leaves of one row: even then no gap opens between random and grouped, because 72% of the trainees have one row. In the pump case of the next lab, the same experiment gives a recall of 0.94 that collapses on new pumps.","minutes":null,"lo":["LO3","LO1"]},{"id":"check-split","n":14,"title":"Which split for which use?","kind":"quiz","session":1,"hash":"e49723a1","md":"#### [day3#check-split] Which split for which use?\n\n*Checkpoint*\n\n**Question:** The fund wants to offer Mubakkir to a partner fund in another country. None of its trainees has ever enrolled with Sullam. Which score from Lab 3.1 comes closest to what the partner should expect?\n\n- A. The time-ordered score, 0.525\n- B. The random score, 0.521\n- C. The grouped score with history hidden, 0.500, and even that with caution\n- D. The score of returning trainees, 0.578","notes":"Answer: the third option. The caution matters: a split can only rehearse differences that exist inside the table. A new country is outside it, and the model card says so under limits.","minutes":null,"lo":["LO3"]},{"id":"lab-3-1","n":15,"title":"One model, three splits","kind":"lab","session":1,"hash":"8d8040b4","md":"#### [day3#lab-3-1] One model, three splits\n\nLab 3.1 · 25 min\n\nScore one model under random, grouped and time-ordered splits, measure how far the random split overstates and explain each gap.\n\n[D3_1_three_splits.ipynb](https://sdaiaacademy.github.io/ds-204/labs/D3_1_three_splits.ipynb)\n\n- [ ] Build the three splits on the same rows (5 min)\n- [ ] Score the same model under each (7 min)\n- [ ] Explain the gap: new and returning trainees (4 min)\n- [ ] What only time order shows: let the model age (5 min)\n- [ ] Write the gap table with one sentence per gap (4 min)\n- [ ] ✱ Stretch: A model that memorises: does the grouped gap grow?","notes":"AI-off for the first attempt at tasks 1 and 2: two short functions and the reading of the first table. Typical problems: forgetting groups= in GroupKFold; grouping by the enrolment key in place of the trainee. Task 2 fits twenty models and takes about a minute. Ask each pair to write what they expect before running task 2. The lab is the evidence for the third course outcome: the gap table with one sentence per gap.","minutes":null,"lo":[]},{"id":"s2","n":16,"title":"Kinds of leakage","kind":"section","session":2,"hash":"13bc2286","md":"#### [day3#s2] Kinds of leakage\n\n*Session 2*\n\n- Distinguish target leakage, future information, group or duplicate contamination and preparation leakage\n- Identify the kind of leak from a description of how the data were collected\n- Match each case to the validation scheme its use requires","notes":"Leakage is information in training that will not be there in use. This session names four kinds and gives each a question; the lab applies them to six cases from other sectors.","minutes":null,"lo":["LO1"]},{"id":"four-kinds","n":17,"title":"Leakage comes in four kinds","kind":"content","session":2,"hash":"62fb18e0","md":"#### [day3#four-kinds] Leakage comes in four kinds\n\n*A taxonomy*\n\n- **Target leakage.** A column written because of the outcome, or together with it.\n- **Future information.** A value computed from records later than the prediction time.\n- **Group or duplicate contamination.** The same person, machine or row on both sides of the split.\n- **Preparation leakage.** A step fitted or chosen on rows that later score the model.\n\nAll four give a score in validation that the model cannot repeat in use.","notes":"The first two are faults of a column, the third of the split, the fourth of the procedure. Real cases often show two at once; the taxonomy tells you where to look. Sources: Kapoor and Narayanan (2023), who found leakage in published work across 17 fields.","minutes":null,"lo":["LO1"]},{"id":"target-leak","n":18,"title":"Target leakage: the column knows the answer","kind":"content","session":2,"hash":"e9afc92a","md":"#### [day3#target-leak] Target leakage: the column knows the answer\n\n*Kind 1*\n\n- Recorded when the outcome happens: `exit_reason`, `weeks_attended`\n- A consequence of the outcome: calls from the collections team after a missed payment\n- Someone's answer to the same question: an antibiotic ordered because the doctor suspects the infection\n\n- **The question.** When is this column written, and by whom? Would a person who already knew the outcome be the one filling it in?\n\n> **What goes wrong.** The model looks brilliant and the top feature is one nobody questioned because it \"obviously matters\".","notes":"Day 1 already removed three such columns with the data dictionary. The hard cases are the indirect ones, like the antibiotic: the column is recorded before the outcome is confirmed, yet it exists only because a human has half-made the prediction.","minutes":null,"lo":["LO1"]},{"id":"future-leak","n":19,"title":"Future information: right column, wrong date","kind":"content","session":2,"hash":"662dda5d","md":"#### [day3#future-leak] Future information: right column, wrong date\n\n*Kind 2*\n\n- A history that counts later records: all non-completions of a trainee, whenever they happened\n- A yearly average attached to a row from March\n- A status column overwritten in place: today's value on an old row\n\n- **The question.** On the day of the prediction, what would the value of this feature have been? Rebuild it with later records hidden and compare.","notes":"The time-travel test of Lab 1.4 is the instrument for this kind. The feature is legitimate in idea, a history, and wrong in construction. Overwritten columns are the quiet version: a database that keeps only the current employment status puts today's status on a row from 2022.","minutes":null,"lo":["LO1"]},{"id":"group-leak","n":20,"title":"Group or duplicate contamination: the model has met the test rows","kind":"content","session":2,"hash":"e7bec118","md":"#### [day3#group-leak] Group or duplicate contamination: the model has met the test rows\n\n*Kind 3*\n\n- Many rows of one unit, split at random: hours of one pump, visits of one patient\n- The same record under two keys after two systems were merged\n- Copies made on purpose: classes \"balanced\" by duplicating rows before the split\n\n- **The question.** What is the unit the model meets in use? Can the same real-world event appear in the table more than once?","notes":"A unique key proves nothing about unique rows. Look for rows that agree on everything that describes the event. The third bullet comes back this afternoon in Loay's notebook.","minutes":null,"lo":["LO1"]},{"id":"preparation-leak","n":21,"title":"Preparation leakage: something was fitted before the split","kind":"content","session":2,"hash":"097a7365","md":"#### [day3#preparation-leak] Preparation leakage: something was fitted before the split\n\n*Kind 4*\n\n- Scaling or imputing with statistics of all rows\n- Encoding a category by its outcome rate over all rows\n- Selecting the \"best\" features with the outcome of all rows\n- Choosing settings on the rows that report the score\n\n- **The question.** Was any step fitted or chosen before the split? Everything that learns from data belongs inside the pipeline, fitted on training rows only.","notes":"The first bullet usually costs little, as Lab 1.3 measured; the third can turn noise into an accuracy of 0.9 when there are hundreds of candidate columns. Tuning on the test rows is the same fault, which is why Day 2 nested its search. Sources: scikit-learn user guide, Common pitfalls and recommended practices.","minutes":null,"lo":["LO1"]},{"id":"scheme-from-use","n":22,"title":"The validation scheme follows from the use","kind":"content","session":2,"hash":"8f6207fa","md":"#### [day3#scheme-from-use] The validation scheme follows from the use\n\n*The second half of each case*\n\n| The model will be used on | Scheme |\n| --- | --- |\n| More independent rows like these, same period | Random |\n| Units it has never seen: new pumps, new patients, a new site | Grouped by that unit |\n| Later records of a population that changes | Time-ordered |\n| New units, later | Grouped and time-ordered |\n\nIn Lab 3.2 the last sentence of each case states the use.","notes":"The same table can need two schemes for two uses: appointments of known patients next month are time-ordered; the same model offered to a new clinic needs a grouped split. This is why the scheme cannot be read off the data alone.","minutes":null,"lo":["LO1","LO3"]},{"id":"check-kind","n":23,"title":"Name the leak","kind":"quiz","session":2,"hash":"2c46f4b6","md":"#### [day3#check-kind] Name the leak\n\n*Checkpoint*\n\n**Question:** A bank predicts which customers will close their account next month. One feature is the number of calls the customer made to the retention desk. Customers are transferred to that desk when they ask to close the account. Which kind of leak is this?\n\n- A. Target leakage\n- B. Preparation leakage\n- C. Group contamination\n- D. No leak: call behaviour is a legitimate feature","notes":"Answer: the first option. The fourth option is the instructive one: the same kind of column, calls, can be honest or a leak depending on who writes it and when. That is why the question is about the process and not about the name of the column.","minutes":null,"lo":["LO1"]},{"id":"lab-3-2","n":24,"title":"Six leaks from other projects","kind":"lab","session":2,"hash":"1da6238c","md":"#### [day3#lab-3-2] Six leaks from other projects\n\nLab 3.2 · 25 min\n\nClassify six leaks from other projects by type, name the validation scheme each case needs and check the table against the reference.\n\n[D3_2_six_leaks.ipynb](https://sdaiaacademy.github.io/ds-204/labs/D3_2_six_leaks.ipynb)\n\n- [ ] Read the six cases and how their data were collected (5 min)\n- [ ] Name the kind of leak in each (8 min)\n- [ ] Name the validation scheme each needs (6 min)\n- [ ] Check the table; read the explanations (3 min)\n- [ ] Write the question that would have caught each (3 min)\n- [ ] ✱ Stretch: Add a seventh case from your own work","notes":"AI-tutor, with the request that each pair decides before asking an assistant. No model is trained. Cases that divide rooms: case 3, where the split is right and the fault is the selection before it; case 6, which is also future information. Accept a reasoned second kind. The checked table is the evidence for the first course outcome.","minutes":null,"lo":[]},{"id":"s3","n":25,"title":"Hunting planted leaks","kind":"section","session":3,"hash":"bd432930","md":"#### [day3#s3] Hunting planted leaks\n\n*Session 3*\n\n- Use the time each column is recorded to find features written after the outcome\n- Find duplicated rows that sit on both sides of a split\n- Use importance scores to choose which features to question first","notes":"From classifying described leaks to finding real ones. The session gives three instruments and one discipline: one removal at a time, with the score before and after.","minutes":null,"lo":["LO1"]},{"id":"too-good","n":26,"title":"A score far above your ladder is the start of an audit","kind":"content","session":3,"hash":"92d268e8","md":"#### [day3#too-good] A score far above your ladder is the start of an audit\n\n*The trigger*\n\n**1.000** average precision of the table Loay Al-Kadi sent, on his random five-fold split\n\n- The honest ladder ends at 0.529\n- The outcome depends on months of a trainee's life after week 2\n- No table of week-2 columns can know that perfectly\n- So some column is not a week-2 column","notes":"From Lab 3.3. The ladder is what makes the alarm possible: without honest rungs, 1.000 is just a good day. In practice the suspicious score is rarely 1.000; a jump of 0.2 over the previous best with no new idea behind it deserves the same treatment.","minutes":null,"lo":["LO1"]},{"id":"instrument-timestamps","n":27,"title":"Timestamps: when is each column written?","kind":"content","session":3,"hash":"2cd371b3","md":"#### [day3#instrument-timestamps] Timestamps: when is each column written?\n\n*Instrument 1*\n\n| Column | Recorded at |\n| --- | --- |\n| `aptitude_score` | Registration |\n| `absences_w2` | End of week 2 |\n| `weeks_attended` | Exit |\n| `provider_rate` | Not in the dictionary |\n| `trainee_noncompletions` | Not in the dictionary |\n\n- The data dictionary answers for recorded columns\n- Removing `weeks_attended`: 1.000 falls to 0.882\n- A column missing from the dictionary was **computed**: ask from which rows","notes":"From Lab 3.3, task 2. When no dictionary exists, the instrument is a conversation with whoever owns the system: Hamza Al-Babtain for the providers' registers. A column's missingness can also carry a timestamp: a field that is blank until exit.","minutes":null,"lo":["LO1"]},{"id":"instrument-duplicates","n":28,"title":"Duplicates: a new key on an old row","kind":"content","session":3,"hash":"c3ed4a99","md":"#### [day3#instrument-duplicates] Duplicates: a new key on an old row\n\n*Instrument 2*\n\n- 33,491 rows, 33,491 different enrolment keys\n- 2,104 rows agree with another row on trainee, provider, programme and start date\n- Two provider systems were merged; 1,052 enrolments were entered twice\n- Removing the copies: 0.882 becomes 0.881\n\n- **How to look.** Do not test the key. Test the columns that describe the real event. Then ask the owner of the data why they repeat.","notes":"From Lab 3.3, task 3. The effect on the score is small here: three rows in a hundred, and a larger leak still in the table. The copies also count twice in every rate and interval, which is reason enough. In the insurer's case of Lab 3.2 the share was double and the model was scored on rows it had seen.","minutes":null,"lo":["LO1"]},{"id":"instrument-importance","n":29,"title":"Importance scores: question the feature that carries the score","kind":"content","session":3,"hash":"4946c84d","md":"#### [day3#instrument-importance] Importance scores: question the feature that carries the score\n\n*Instrument 3*\n\n| Item | Value |\n| --- | --- |\n| trainee_noncompletions | 80% |\n| absences_w2 | 8% |\n| aptitude_score | 5% |\n| provider_rate | 2% |\n\n- Share of gain after the first two removals\n- One computed column carries four fifths of the model\n- Importance does not prove a leak: it says where to look first","notes":"From Lab 3.3, task 4. Compare with Lab 2.1, where the strongest honest feature, early absences, held 39% of the gain. A history of non-completion is a plausible strong feature, which is exactly why it has to be tested and not just believed or thrown out.","minutes":null,"lo":["LO1"]},{"id":"rebuild","n":30,"title":"Rebuild the column and see which rows it must have read","kind":"content","session":3,"hash":"5b64db77","md":"#### [day3#rebuild] Rebuild the column and see which rows it must have read\n\n*Testing a computed column*\n\n| Computed column | It equals, on every row | Verdict |\n| --- | --- | --- |\n| `trainee_noncompletions` | All non-completions of the trainee, this enrolment and later ones included. It equals the past-only count on 84% of rows. | **Leak**: future information |\n| `provider_rate` | The provider's rate over all rows, 2021 to 2025 | **Leak**: preparation |\n| `earlier_enrolments` | The trainee's enrolments that started earlier, without their outcome | **Keep** |\n\n> **An audit also clears columns.** The third one reads only what the fund knows on the prediction day.","notes":"From Lab 3.3. The 84% is the dangerous part: on most rows the leaking column and the honest one agree, so a glance at a sample shows nothing. The other 16% are the rows where the count includes the outcome being predicted, or a later one.","minutes":null,"lo":["LO1"]},{"id":"one-at-a-time","n":31,"title":"One removal at a time, with the score before and after","kind":"content","session":3,"hash":"c4760de2","md":"#### [day3#one-at-a-time] One removal at a time, with the score before and after\n\n*The discipline*\n\n| Removal | Before | After | Kind |\n| --- | --- | --- | --- |\n| `weeks_attended` | 1.000 | 0.882 | Target leakage |\n| The copied rows | 0.882 | 0.881 | Duplicate contamination |\n| `trainee_noncompletions` | 0.881 | 0.503 | Future information |\n| `provider_rate` | 0.503 | 0.501 | Preparation leakage |\n\n- Each leak hid the ones behind it\n- On the fund's folds the cleaned table scores 0.505; the champion, with a past-only history, 0.529","notes":"From Lab 3.3: the audit note. While weeks_attended was in the table, nothing else seemed to matter; an analyst who removes it and sees 0.88 may well stop there, pleased. The audit ends when the score is back in the range the ladder explains, and every remaining feature has an answer to \"when is it written\".","minutes":null,"lo":["LO1"]},{"id":"size-and-seriousness","n":32,"title":"The size of a leak is measured; whether it is a leak is decided by how the column was made","kind":"content","session":3,"hash":"6a5d5ab8","md":"#### [day3#size-and-seriousness] The size of a leak is measured; whether it is a leak is decided by how the column was made\n\n*A judgment*\n\n- `provider_rate` moved the score by 0.002\n- Each provider has several hundred rows: one row's own outcome hardly changes the rate\n- With five rows per provider the same column would dominate\n- And it read the 2025 cohort, the holdout\n\n- **Why remove a small leak.** The measured effect belongs to this table and this model. The fault belongs to the procedure, and the procedure will be reused on the next table.","notes":"The stretch of the lab rebuilds an honest provider rate from the enrolments that had ended before each prediction day. A holdout that a feature has read is no longer a holdout: had this table gone forward, Day 4's final check would have been spent without anyone noticing.","minutes":null,"lo":["LO1"]},{"id":"check-instrument","n":33,"title":"Which instrument first?","kind":"quiz","session":3,"hash":"bc50d038","md":"#### [day3#check-instrument] Which instrument first?\n\n*Checkpoint*\n\n**Question:** A received table scores far above your ladder. Its data dictionary lists when every recorded column is written. Twelve further columns were computed by a colleague. Where do you start?\n\n- A. Tune the model again on the received table\n- B. Drop all twelve computed columns\n- C. Switch to a time-ordered split and compare\n- D. Read the dictionary for columns recorded after the prediction time, then rank the rest by importance","notes":"Answer: the fourth option. The third option is worth a minute: a better split does not find a column leak. Lab 3.3 scores 0.882 under any split while trainee_noncompletions is in the table.","minutes":null,"lo":["LO1"]},{"id":"lab-3-3","n":34,"title":"Four planted leaks","kind":"lab","session":3,"hash":"069930eb","md":"#### [day3#lab-3-3] Four planted leaks\n\nLab 3.3 · 25 min\n\nFind four planted leaks in a received feature table with timestamps, duplicates and importance scores, removing one at a time with the score before and after.\n\n[D3_3_leak_hunt.ipynb](https://sdaiaacademy.github.io/ds-204/labs/D3_3_leak_hunt.ipynb)\n\n- [ ] Score the received table as it came (4 min)\n- [ ] Timestamps: when is each column written? (5 min)\n- [ ] Duplicates: the same enrolment under two keys (5 min)\n- [ ] Importance scores: question the top features (7 min)\n- [ ] Write the audit note: before and after each removal (4 min)\n- [ ] ✱ Stretch: Rebuild the provider rate from past cohorts only","notes":"AI-off for the first attempt at tasks 2 to 4: the hunt is the participant's. Each scoring cell fits five models and takes 15 to 30 seconds; the whole lab runs in about three minutes. Typical problems: testing the enrolment key for duplicates; calling earlier_enrolments a leak because it sounds like the other history column. The audit note is the second piece of evidence for the first course outcome.","minutes":null,"lo":[]},{"id":"s4","n":35,"title":"Reading someone else's notebook","kind":"section","session":4,"hash":"264fae31","md":"#### [day3#s4] Reading someone else's notebook\n\n*Session 4*\n\n- Read a notebook in the order rows, split, preparation, tuning, metric\n- List the faults that make a reported score untrustworthy\n- Measure which fault moves the score most by repairing one at a time","notes":"The last session turns the day into a professional habit: reading a notebook you did not write, and telling its author what you found in a way he can act on.","minutes":null,"lo":["LO1"]},{"id":"first-questions","n":36,"title":"Three questions to any reported score","kind":"content","session":4,"hash":"15f8ff73","md":"#### [day3#first-questions] Three questions to any reported score\n\n*Before any code*\n\n- **On which rows?** How many test rows, from which period, with what share of the outcome? Do they look like the population the model will score?\n- **Against what?** What does a constant answer score on the same rows? What did the previous model score?\n- **Chosen how?** How many versions were tried, and on which rows was this one chosen?\n\n\"95% accuracy\" answers none of them.","notes":"Loay's own output already answers the first two against him: 15,017 test rows when a fifth of 45,000 would be 9,000, and half of them non-completers when the fund's rate is one in six. Reading the printed numbers beside the headline is a review before the review.","minutes":null,"lo":["LO1"]},{"id":"accuracy-rare","n":37,"title":"For a rare outcome, accuracy rewards saying \"nothing happens\"","kind":"content","session":4,"hash":"4220aa71","md":"#### [day3#accuracy-rare] For a rare outcome, accuracy rewards saying \"nothing happens\"\n\n*The metric*\n\n| Item | Value |\n| --- | --- |\n| \"Everyone completes\", all enrolments | 0.83 |\n| \"Everyone completes\", scorable rows of 2024 H2 | 0.87 |\n| Loay's notebook, all five blocks repaired | 0.89 |\n\n- Accuracy counts both classes alike and depends on their share\n- It needs a threshold, and 0.5 is nobody's decision\n- The run log uses average precision and recall at capacity for this reason","notes":"From Lab 3.4. Two points of accuracy above a constant answer, for a model whose ranking is useful: average precision 0.49 against a base rate of 0.13. Accuracy hides the usefulness as well as the faults. Tomorrow's first session is about the threshold. Sources: Saito and Rehmsmeier (2015).","minutes":null,"lo":["LO1","LO5"]},{"id":"review-order","n":38,"title":"Rows, split, preparation, tuning, metric","kind":"content","session":4,"hash":"16465580","md":"#### [day3#review-order] Rows, split, preparation, tuning, metric\n\n*An order to read in*\n\n1. **1 · Rows** Who is in the table? Anyone the model never scores?\n2. **2 · Split** Does it rehearse the use?\n3. **3 · Preparation** What was fitted, copied or encoded before the split?\n4. **4 · Tuning** On which rows was the model chosen?\n5. **5 · Metric** Does the number mean what the message says?\n\nThe earlier the fault, the more of what follows it spoils.","notes":"This is the order of the data's journey, not of the notebook's cells: a notebook often prepares before it splits, and that is already a finding. The order is the same one the capstone assessor will use on each repository.","minutes":null,"lo":["LO1"]},{"id":"balancing","n":39,"title":"\"Balancing the classes\" before the split copies test rows into training","kind":"content","session":4,"hash":"7cc0cb0d","md":"#### [day3#balancing] \"Balancing the classes\" before the split copies test rows into training\n\n*The fault that did the damage*\n\n- Each non-completer is copied four times, then the table is split at random\n- Most test non-completers have a copy in training\n- A tree with five rows per leaf recognises them\n- The test set is half non-completers: no cohort looks like it\n\n- **If you balance at all.** Inside the training part only, as a step of the pipeline. The test rows keep the real share. Tomorrow shows that a ranking does not need it.","notes":"From Lab 3.4, block 2. The same holds for synthetic oversampling: generated neighbours of a test row are near copies of it. This single block accounts for almost the whole of the 95%.","minutes":null,"lo":["LO1"]},{"id":"repairs","n":40,"title":"Repair one fault at a time, then all together","kind":"content","session":4,"hash":"3e31ea3a","md":"#### [day3#repairs] Repair one fault at a time, then all together\n\n*Lab 3.4, measured*\n\n| Run | Accuracy | \"Everyone completes\" | Average precision |\n| --- | --- | --- | --- |\n| As written | 0.948 | 0.499 | 0.980 |\n| Repair the rows only | 0.978 | 0.490 | 0.994 |\n| Repair the balancing only | 0.865 | 0.835 | 0.569 |\n| Repair the split only | 0.743 | 0.475 | 0.843 |\n| Repair the encoding or the tuning only | 0.95 | 0.499 | 0.98 |\n| All five repaired | 0.890 | 0.874 | 0.494 |\n\nOne repair makes the number go up. Faults interact.","notes":"From Lab 3.4. Three readings. The balancing does almost all the damage. Repairing the rows alone raises the score, because it removes the hardest honest cases while the copies remain: a single repair is never the verdict. And the split matters here, although it did not for the champion in Lab 3.1: this model has leaves of five rows and a table full of copies. A fault is measured for the model in front of you.","minutes":null,"lo":["LO1"]},{"id":"review-note","n":41,"title":"A review note names numbers, not character","kind":"content","session":4,"hash":"3278a28f","md":"#### [day3#review-note] A review note names numbers, not character\n\n*What you send back*\n\n> **Five lines.** The number as reported. The fault that matters most, with its measured effect. The other faults. The honest number. What to do next.\n\n- \"Your split is wrong\" starts an argument\n- \"With the copies kept out of the test set the accuracy is 0.87, and a constant answer scores 0.84\" ends one\n- Offer the next step: one pipeline, the fund's folds, a line in the run log","notes":"Loay's notebook is not careless: every block is something tutorials teach. That is the reason to review with measurements. The assessors' notes on the capstone repositories follow the same five lines.","minutes":null,"lo":["LO1","LO6"]},{"id":"check-review","n":42,"title":"What do you ask first?","kind":"quiz","session":4,"hash":"2fc3d8c6","md":"#### [day3#check-review] What do you ask first?\n\n*Checkpoint*\n\n**Question:** A vendor's slide says: \"Our model predicts non-completion with 91% accuracy.\" Which question tells you most, fastest?\n\n- A. Which algorithm does the model use?\n- B. How many rows was it trained on?\n- C. What share of the test rows completed, and what does \"everyone completes\" score on them?\n- D. What is its area under the curve?","notes":"Answer: the third option. Follow-up questions in the order of the session: which rows, which split, what was fitted before it, how was the version chosen.","minutes":null,"lo":["LO1"]},{"id":"lab-3-4","n":43,"title":"A colleague's notebook","kind":"lab","session":4,"hash":"b865ff85","md":"#### [day3#lab-3-4] A colleague's notebook\n\nLab 3.4 · 25 min\n\nList what makes a colleague's notebook score untrustworthy, check the list, repair the faults one at a time and write the review note.\n\n[D3_4_colleague_notebook.ipynb](https://sdaiaacademy.github.io/ds-204/labs/D3_4_colleague_notebook.ipynb)\n\n- [ ] Run the notebook as it is; read the reported number (3 min)\n- [ ] Read the code and mark what you find (9 min)\n- [ ] Check your list against the reference (3 min)\n- [ ] Repair one fault at a time and rescore (6 min)\n- [ ] Write a five-line review note (4 min)\n- [ ] ✱ Stretch: Rewrite the notebook as one pipeline scored on the fund's folds","notes":"AI-tutor, with the request to make the list in task 2 before asking an assistant. The seven runs of task 4 take about four minutes on a laptop: start them, then discuss the reference review while they run. Quick mode (DS204_QUICK=1) compares two settings in place of six. Typical problem: calling block 4 the worst fault from memory of the morning; task 4 measures it.","minutes":null,"lo":[]},{"id":"wrap-up","n":44,"title":"Three things to keep","kind":"content","session":4,"hash":"391d7080","md":"#### [day3#wrap-up] Three things to keep\n\n*Day 3*\n\n- **The split rehearses the use.** For the champion: random 0.521, time-ordered 0.525, new trainees 0.500, one year old −0.016. Gaps are measured and written down with their causes.\n- **Four kinds, four questions.** When is it written? What was its value that day? Can the unit be on both sides? Was anything fitted before the split?\n- **One removal at a time.** 1.000, 0.882, 0.881, 0.503, 0.501. And 95% accuracy became 0.89 against a constant 0.87.","notes":"Ask: which of today's leaks could be in a table you work with now? Give a minute of silence for it; the answers are usually a computed rate or a status column that is overwritten in place.","minutes":null,"lo":[]},{"id":"next","n":45,"title":"Day 4 · Errors, groups and documentation","kind":"content","session":4,"hash":"f8b8ef25","md":"#### [day3#next] Day 4 · Errors, groups and documentation\n\n*Next*\n\nThe score is trusted. Tomorrow it becomes a decision: where to cut the list for 800 support plans, whether the probabilities hold, for whom the model fails, and what goes into the model card.\n\n- The 2025 cohort is opened, once\n- The first attempt at the subgroup table is without AI assistance\n- You choose your capstone problem in the last lab","notes":"Day 4 runs on supplied predictions of the champion, so no result of today is needed. Ask participants to look at the capstone shortlist in labs/capstone this evening.","minutes":null,"lo":[]}],"activities":[{"id":"review-day2-q1","slide":"review-day2","type":"single","prompt":"The challenger differed from the champion by −0.007 (95% interval −0.018 to +0.004). The minimum effect was +0.01. Why was the decision \"keep the champion\" and not \"not shown\"?","options":[{"key":"A","text":"Because the mean difference is negative"},{"key":"B","text":"Because the whole interval lies below the minimum effect"},{"key":"C","text":"Because the interval excludes zero"},{"key":"D","text":"Because the champion won on three of the five folds"}],"correct":[1],"explanation":"The upper end, +0.004, is below +0.01: even the most favourable value the data allow is not worth a blend of seven models.","misconceptions":["Reads the sign of the mean alone: a negative mean with an interval reaching above the minimum effect would be 'not shown'","","Requires the interval to exclude zero: the rule compares the interval with the minimum effect, not with zero","Counts folds: three of five is not a rule that was stated, and it ignores the size of the differences"],"lo":["LO4"]},{"id":"check-split-q1","slide":"check-split","type":"single","prompt":"The fund wants to offer Mubakkir to a partner fund in another country. None of its trainees has ever enrolled with Sullam. Which score from Lab 3.1 comes closest to what the partner should expect?","options":[{"key":"A","text":"The time-ordered score, 0.525"},{"key":"B","text":"The random score, 0.521"},{"key":"C","text":"The grouped score with history hidden, 0.500, and even that with caution"},{"key":"D","text":"The score of returning trainees, 0.578"}],"correct":[2],"explanation":"In that use every trainee is new. The grouped split with hidden history rehearses it; other providers and another country are further differences no split of this table can rehearse.","misconceptions":["Picks the highest honest score: it includes returning trainees with a history, which the partner does not have","Assumes rows like these from the same period: the partner's trainees are all new, with no history","","Takes the score of returning trainees for everyone: it is the best case, earned with history columns"],"lo":["LO3"]},{"id":"check-kind-q1","slide":"check-kind","type":"single","prompt":"A bank predicts which customers will close their account next month. One feature is the number of calls the customer made to the retention desk. Customers are transferred to that desk when they ask to close the account. Which kind of leak is this?","options":[{"key":"A","text":"Target leakage"},{"key":"B","text":"Preparation leakage"},{"key":"C","text":"Group contamination"},{"key":"D","text":"No leak: call behaviour is a legitimate feature"}],"correct":[0],"explanation":"The column is a consequence of the outcome: a call to that desk is made after the customer has decided. Calls to the general helpline would be a fair feature.","misconceptions":["","Looks for a step fitted before the split: nothing was fitted here, the column itself carries the outcome","Looks for repeated customers across the split: the fault would remain with every customer on one side","Treats call counts as ordinary behaviour: these calls exist only because the customer has asked to leave"],"lo":["LO1"]},{"id":"check-instrument-q1","slide":"check-instrument","type":"single","prompt":"A received table scores far above your ladder. Its data dictionary lists when every recorded column is written. Twelve further columns were computed by a colleague. Where do you start?","options":[{"key":"A","text":"Tune the model again on the received table"},{"key":"B","text":"Drop all twelve computed columns"},{"key":"C","text":"Switch to a time-ordered split and compare"},{"key":"D","text":"Read the dictionary for columns recorded after the prediction time, then rank the rest by importance"}],"correct":[3],"explanation":"The cheapest instrument goes first. The dictionary costs nothing; importance then tells you which of the twelve computed columns to rebuild first.","misconceptions":["Starts with the most expensive step: a new search cannot repair a column that knows the answer","Removes everything computed: an audit also clears honest columns, and history is the fund's best information","Changes the split before the columns: a target leak scores just as well under any split",""],"lo":["LO1"]},{"id":"check-review-q1","slide":"check-review","type":"single","prompt":"A vendor's slide says: \"Our model predicts non-completion with 91% accuracy.\" Which question tells you most, fastest?","options":[{"key":"A","text":"Which algorithm does the model use?"},{"key":"B","text":"How many rows was it trained on?"},{"key":"C","text":"What share of the test rows completed, and what does \"everyone completes\" score on them?"},{"key":"D","text":"What is its area under the curve?"}],"correct":[2],"explanation":"If 88% of the test rows completed, 91% accuracy is three points above an answer that needs no model. The baseline on the same rows turns a number into information.","misconceptions":["Asks about the model family: the algorithm does not tell you whether the number means anything","Asks about the amount of training data: more rows do not repair a metric that a constant answer can reach","","Asks for a different summary of the same unknown test: without the rows and the baseline it is as hard to read"],"lo":["LO1"]}],"ai":{"context":{"course":"../context/course.md","courseJs":"../context/course.js","day":"day3.md","llms":"../llms.txt"},"tasks":[],"tools":[]},"bridge":{"allowedOrigins":[]},"features":{},"strings":{}}</script>
+<script src="../_engine/academy.js"></script>
+</body>
+</html>

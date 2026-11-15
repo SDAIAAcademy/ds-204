@@ -1,0 +1,21 @@
+{
+ "__series__": {
+  "name": null,
+  "index": [
+   "trainee_noncompletions",
+   "absences_w2",
+   "aptitude_score",
+   "provider_rate",
+   "age",
+   "distance_km"
+  ],
+  "data": [
+   0.8047867277,
+   0.0748030622,
+   0.0473856808,
+   0.0241751829,
+   0.0066987653,
+   0.0064833414
+  ]
+ }
+}

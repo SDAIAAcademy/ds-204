@@ -1,0 +1,59 @@
+{
+  "note": "Six short cases for Lab 3.2. Organisations and figures are invented for teaching.",
+  "kinds": {
+    "target": "Target leakage: a column that is written because of the outcome, or together with it",
+    "future": "Future information: a value computed from records later than the prediction time",
+    "group": "Group or duplicate contamination: the same person, machine or row on both sides of the split",
+    "preparation": "Preparation leakage: a step fitted or chosen on rows that later score the model"
+  },
+  "schemes": {
+    "random": "Random split: every row is one independent unit and the model is used on units like them, in the same period",
+    "grouped": "Grouped split: all rows of one unit stay on the same side, because the model is used on units it has not seen",
+    "time": "Time-ordered split: train on the past, validate on what comes later, because the model is used on later records",
+    "grouped+time": "Grouped and time-ordered: both conditions hold"
+  },
+  "cases": [
+    {
+      "id": 1,
+      "title": "Late repayment at a microfinance lender",
+      "problem": "A lender wants to score each new loan application for the risk of a missed repayment in the first six months. The analyst reports an area under the curve of 0.97.",
+      "collection": "One row per loan granted from 2022 to 2025; each borrower has one loan. The columns come from the application form and from the lender's operations system. One column, collection_calls, counts the calls made to the borrower by the collections team. The model will score next quarter's applications.",
+      "split_used": "Random 80/20 split of all loans"
+    },
+    {
+      "id": 2,
+      "title": "Pump failures at a water utility",
+      "problem": "A utility wants to warn of a bearing failure within seven days from vibration readings. The analyst reports a recall of 0.94 at the alert threshold.",
+      "collection": "Forty pumps, each with one sensor. Every hour of readings is summarised into one row, about 8,000 rows per pump over one year. Failures are rare events of a few pumps. The model will be installed on sixty pumps of the same type that are being commissioned now.",
+      "split_used": "Random split of the hourly rows"
+    },
+    {
+      "id": 3,
+      "title": "Sorting dates at a packing plant",
+      "problem": "A packing plant wants to reject defective fruit from 300 measurements taken by a scanner on the line. The analyst reports an accuracy of 0.96 in five-fold cross-validation.",
+      "collection": "Six thousand fruit from this season's harvest, each scanned once and graded by an inspector. The model will sort the rest of this season's harvest from the same farms. Before the cross-validation the analyst standardised all columns and kept the 20 measurements most correlated with the inspector's grade, using all six thousand rows.",
+      "split_used": "Five random folds, after the selection of the 20 measurements"
+    },
+    {
+      "id": 4,
+      "title": "Missed appointments at a clinic network",
+      "problem": "A clinic network wants to send a reminder call for the appointments most likely to be missed, scored three days before each appointment.",
+      "collection": "One row per appointment of 2025; most patients have several. One feature is patient_no_show_rate: the share of the patient's appointments in the whole of 2025 that were missed. Booking rules changed in the middle of the year. The model will score next month's appointments, most of them for patients already known to the network.",
+      "split_used": "Random split of appointments"
+    },
+    {
+      "id": 5,
+      "title": "Suspicious motor claims at an insurer",
+      "problem": "An insurer wants to send the motor claims most likely to be irregular to an investigator. The analyst reports that the model finds 80% of the confirmed cases in the top 5% of claims.",
+      "collection": "One row per claim of three years. In 2024 two claims systems were merged, and about 6% of the claims were entered again under a new claim number: same policy, same date, same amount, same investigator's finding. Nothing else is unusual in the table. The claims come from all over the period in similar numbers.",
+      "split_used": "Random split of the rows by claim number"
+    },
+    {
+      "id": 6,
+      "title": "Early warning of a serious infection in a hospital",
+      "problem": "A hospital group wants to flag admitted patients at risk of a serious infection within 48 hours, from the first six hours of their record. The analyst reports an area under the curve of 0.93.",
+      "collection": "One row per admission; a patient can be admitted several times. One feature is broad_antibiotic_ordered, taken from the pharmacy system for the whole stay: doctors order it when they already suspect the infection. The model will be used at two hospitals that open next year, none of whose patients are in the data.",
+      "split_used": "Random split of admissions"
+    }
+  ]
+}

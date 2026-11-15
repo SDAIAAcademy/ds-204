@@ -1,0 +1,32 @@
+{
+ "__frame__": {
+  "columns": [
+   "gap",
+   "cause"
+  ],
+  "index": [
+   "random against time-ordered",
+   "grouped against random",
+   "history hidden against random",
+   "one year old against fresh"
+  ],
+  "data": [
+   [
+    -0.0042137361,
+    "none shown: inside the fold spread"
+   ],
+   [
+    -0.0001699051,
+    "none: the model does not recognise trainees"
+   ],
+   [
+    -0.0202326483,
+    "a new trainee has no history"
+   ],
+   [
+    -0.0155833332,
+    "the fund changes; the model does not"
+   ]
+  ]
+ }
+}

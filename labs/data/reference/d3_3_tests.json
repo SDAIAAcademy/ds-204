@@ -1,0 +1,31 @@
+{
+ "__frame__": {
+  "columns": [
+   "equals",
+   "match",
+   "equals the past-only version"
+  ],
+  "index": [
+   "trainee_noncompletions",
+   "provider_rate",
+   "earlier_enrolments"
+  ],
+  "data": [
+   [
+    "all enrolments of the trainee, this one and later ones included",
+    1.0,
+    0.8430592805
+   ],
+   [
+    "all rows of the provider, 2021 to 2025",
+    1.0,
+    null
+   ],
+   [
+    "enrolments of the trainee that started earlier",
+    1.0,
+    null
+   ]
+  ]
+ }
+}
