@@ -1,0 +1,75 @@
+{
+  "note": "The capstone shortlist. The three synthetic cases are written by capstone/make_datasets.py; their organisations and figures are invented for teaching. The three public tables are downloaded by the participant from the UCI Machine Learning Repository (Creative Commons Attribution 4.0, checked November 2026): cite the dataset page in your README.",
+  "problems": [
+    {
+      "id": "bayader",
+      "kind": "synthetic",
+      "title": "Bayader Microfinance: missed repayments",
+      "decision": "Field officers can visit 600 new borrowers a year before the first instalment. Which ones?",
+      "file": "capstone/data/bayader_loans.csv.gz",
+      "dictionary": "capstone/data/bayader_loans_columns.csv",
+      "target": "missed_repayment",
+      "unit": "borrower_id",
+      "date": "approval_date",
+      "think_about": "Borrowers return for further loans. The lender scores next year's applications. Two columns were computed by a previous analyst."
+    },
+    {
+      "id": "awtad",
+      "kind": "synthetic",
+      "title": "Awtad Equipment Rental: late returns",
+      "decision": "The scheduling team can call 500 customers a year before the return date. Which contracts?",
+      "file": "capstone/data/awtad_rentals.csv.gz",
+      "dictionary": "capstone/data/awtad_rentals_columns.csv",
+      "target": "returned_late",
+      "unit": "customer_id",
+      "date": "contract_date",
+      "think_about": "Customers hold many contracts. Two depot systems were merged in the period. Two columns were computed by a previous analyst."
+    },
+    {
+      "id": "nasaim",
+      "kind": "synthetic",
+      "title": "Nasaim Home Care: discontinued care plans",
+      "decision": "Care coordinators can review 450 new care plans a year after the first week. Which ones?",
+      "file": "capstone/data/nasaim_care_plans.csv.gz",
+      "dictionary": "capstone/data/nasaim_care_plans_columns.csv",
+      "target": "plan_discontinued",
+      "unit": "patient_id",
+      "date": "plan_start",
+      "think_about": "Patients have several plans over the years. The prediction is made at the end of week 1. Two columns were computed by a previous analyst."
+    },
+    {
+      "id": "uci-students",
+      "kind": "public",
+      "title": "Predict Students' Dropout and Academic Success (UCI 697)",
+      "decision": "A polytechnic can offer tutoring to a limited number of students. You fix the prediction time and the capacity, and say why.",
+      "url": "https://archive.ics.uci.edu/dataset/697/predict+students+dropout+and+academic+success",
+      "target": "Target (recode: dropout against the rest)",
+      "unit": "one row per student",
+      "date": "none: one snapshot",
+      "think_about": "Some columns are results of the first and second semester. Which of them exist at your prediction time? With no date, which split is honest, and which use can it rehearse?"
+    },
+    {
+      "id": "uci-bank",
+      "kind": "public",
+      "title": "Bank Marketing (UCI 222)",
+      "decision": "A bank's call centre can make a limited number of calls in a campaign. Whom does it call?",
+      "url": "https://archive.ics.uci.edu/dataset/222/bank+marketing",
+      "target": "y (the client subscribed a term deposit)",
+      "unit": "one row per contact",
+      "date": "the rows are in time order (May 2008 to November 2010); month is a column",
+      "think_about": "Read the dataset page about the column duration before you train anything. The period spans a financial crisis: what does a random split hide?"
+    },
+    {
+      "id": "uci-credit",
+      "kind": "public",
+      "title": "Default of Credit Card Clients (UCI 350)",
+      "decision": "A card issuer can review a limited number of accounts next month. Which ones?",
+      "url": "https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients",
+      "target": "default payment next month",
+      "unit": "one row per client",
+      "date": "none: six months of history in columns, one outcome month",
+      "think_about": "All rows share one outcome month, so no split can rehearse a later month: say so under limits. Sex, age, education and marriage are in the table: decide what the model may use and what the audit needs."
+    }
+  ],
+  "own_problem": "A problem from your own work is welcome when the trainer approves it on Day 4: tabular, a binary outcome, at least 5,000 rows, no personal data that may not be published, and a decision with a capacity or a cost."
+}

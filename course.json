@@ -660,7 +660,7 @@
             ],
             "stretch": "An interval for the precision at the chosen threshold"
           },
-          "summary": "A score becomes a decision at a threshold. For a rare outcome the threshold comes from capacity and costs, never from 0.5."
+          "summary": "A score becomes a decision at a threshold, and the threshold comes from capacity and costs, never from 0.5."
         },
         {
           "title": "Calibration",
@@ -702,7 +702,7 @@
             ],
             "stretch": "Calibrate inside the time-ordered folds"
           },
-          "summary": "A calibrated score can be read as a probability. Calibration is measured by decile, repaired on unseen rows and lost again under drift."
+          "summary": "Calibration: measured by decile, repaired on unseen rows, lost again under drift."
         },
         {
           "title": "Errors by subgroup",
@@ -744,7 +744,7 @@
             ],
             "stretch": "The same table by provider: how many slices can carry an interval?"
           },
-          "summary": "The model ranks people, so its errors are harms to people: who is represented, who is missed, and how sure a small slice lets you be."
+          "summary": "Errors are harms to people: who is represented, who is missed, and how sure a small slice lets you be."
         },
         {
           "title": "The model card",

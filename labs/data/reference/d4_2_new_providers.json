@@ -1,0 +1,34 @@
+{
+ "__frame__": {
+  "columns": [
+   "trainees",
+   "expected",
+   "observed",
+   "observed low",
+   "observed high",
+   "average precision"
+  ],
+  "index": [
+   "providers open before 2025",
+   "providers that opened in 2025"
+  ],
+  "data": [
+   [
+    8214.0,
+    0.1304804261,
+    0.1194302411,
+    0.1125944266,
+    0.1266218528,
+    0.5378257591
+   ],
+   [
+    1903.0,
+    0.1630150184,
+    0.203888597,
+    0.186392142,
+    0.2225781241,
+    0.6088368572
+   ]
+  ]
+ }
+}

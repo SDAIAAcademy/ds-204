@@ -1,0 +1,18 @@
+column,meaning,recorded_at
+contract_id,Key of the record,creation
+customer_id,Key of the unit; a unit can have several records,registration
+depot_id,Site that handled the record,creation
+contract_date,Date of the record: the prediction is made on this day,creation
+region,Region of the unit,registration
+gender,"F or M, as registered; kept for the audit of errors",registration
+age,Age in years on the date of the record,creation
+rental_days,Days of rental agreed in the contract (standardised),contract
+customer_years,Years since the customer's first contract; blank for walk-in customers,contract
+open_contracts,Other contracts of the customer that are open on the contract date,contract
+equipment_class,Class of the equipment rented,contract
+customer_type,Type of customer,contract
+late_fee_sar,"Late fee invoiced for the contract, in riyals",return
+returned_late,TARGET: 1 when the outcome happened,after the outcome
+customer_late_count,Computed by the previous analyst; no documentation,unknown
+depot_late_rate,Computed by the previous analyst; no documentation,unknown
+earlier_records,Computed by the previous analyst: records of the unit with an earlier date,unknown

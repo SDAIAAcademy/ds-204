@@ -1,0 +1,46 @@
+{
+ "__frame__": {
+  "columns": [
+   "trainees",
+   "left",
+   "missed",
+   "miss_rate",
+   "miss_low",
+   "miss_high",
+   "listed",
+   "precision",
+   "mean_absences_w2",
+   "non_completion"
+  ],
+  "index": [
+   "electronic registers",
+   "paper registers (Jazan, Najran)"
+  ],
+  "data": [
+   [
+    9507.0,
+    1232.0,
+    752.0,
+    0.6103896104,
+    0.5828557945,
+    0.6372371616,
+    750.0,
+    0.64,
+    0.5347638582,
+    0.1295887241
+   ],
+   [
+    610.0,
+    137.0,
+    101.0,
+    0.7372262774,
+    0.6577785895,
+    0.8037332447,
+    50.0,
+    0.72,
+    0.2672131148,
+    0.2245901639
+   ]
+  ]
+ }
+}

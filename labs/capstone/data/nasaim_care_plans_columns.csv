@@ -1,0 +1,18 @@
+column,meaning,recorded_at
+plan_id,Key of the record,creation
+patient_id,Key of the unit; a unit can have several records,registration
+team_id,Site that handled the record,creation
+plan_start,Date of the record: the prediction is made on this day (for the first-week column: seven days later),creation
+region,Region of the unit,registration
+gender,"F or M, as registered; kept for the audit of errors",registration
+age,Age in years on the date of the record,creation
+visits_per_week,Home visits per week in the care plan (standardised),plan start
+carer_at_home_hours,Hours a family carer is at home per day; blank when not assessed,plan start
+missed_first_visits,Visits missed in the first week of the plan,end of week 1
+referral_source,Who referred the patient,plan start
+care_type,Type of care,plan start
+closure_code,Code entered when a plan is closed (0 when not entered),plan closure
+plan_discontinued,TARGET: 1 when the outcome happened,after the outcome
+patient_discontinued_count,Computed by the previous analyst; no documentation,unknown
+team_discontinued_rate,Computed by the previous analyst; no documentation,unknown
+earlier_records,Computed by the previous analyst: records of the unit with an earlier date,unknown

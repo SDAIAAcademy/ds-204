@@ -1,158 +1,546 @@
 <section class="slide title" id="title" data-auto="title">
-  <aside class="notes">REPLACE: welcome; introduce yourself; one question to the room that calibrates the pace; the rhythm of the day</aside>
+  <aside class="notes"><p>Three days produced a score that can be trusted. Today it becomes a decision about people: 800 names on a list. The 2025 cohort is opened today, once, in Lab 4.1. The first attempt at Lab 4.3 is without AI assistance. The last lab frames the capstone problem. Breaks are yours: press B.</p></aside>
 </section>
 
-<section class="slide" id="agenda" data-auto="agenda"></section>
+<section class="slide" id="agenda" data-auto="agenda">
+  <aside class="notes"><p>Three sessions on the fifth outcome, one on the sixth. Every lab works on supplied predictions of the champion for the cohorts of 2024 and 2025, so nobody trains a model before the capstone.</p></aside>
+</section>
+
+<section class="slide" id="review-day3" data-lo="LO1">
+  <div class="kicker">Review of Day 3</div>
+  <h2>Which kind of leak was it?</h2>
+  <div class="quiz" data-type="single" data-lo="LO1">
+    <p class="lead">In the received table, <code>trainee_noncompletions</code> equalled the past-only count on 84% of the rows and carried 80% of the model's gain. Which kind of leak is it?</p>
+    <div class="opts">
+      <div class="opt" data-why="Looks for a repeated row or person across the split: the column would leak under any split, with every trainee on one side">Group or duplicate contamination</div>
+      <div class="opt" data-why="Looks for a step fitted before the split: nothing was fitted, the column was counted from the wrong records">Preparation leakage</div>
+      <div class="opt" data-why="Trusts the 84% of rows where it agrees with the honest count: the other 16% hold the outcome being predicted">No leak: a history of non-completion is a fair feature</div>
+      <div class="opt" data-ok>Future information</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The idea of the feature is fair; its construction counted this enrolment and later ones. On the prediction day those outcomes did not exist.</div>
+  </div>
+  <aside class="notes"><p>Answer: the fourth option. Two minutes. Removing it took the score from 0.881 to 0.503. The honest version of the same idea, built in Lab 1.4, is worth +0.023.</p></aside>
+</section>
+
+<section class="slide" id="where-we-are">
+  <div class="kicker">Today</div>
+  <h2>From a trusted score to a decision and a page that travels with it</h2>
+  <div class="ladder" style="--n:4">
+    <div class="rung c-teal off"><b>Frame and baseline</b>The decision, the rows, three baselines<small>Day 1</small></div>
+    <div class="rung c-cyan off"><b>Trees and challengers</b>Champion 0.529; challenger not adopted<small>Day 2</small></div>
+    <div class="rung c-coral off"><b>Validation and leakage</b>Gaps measured; four leaks removed<small>Day 3</small></div>
+    <div class="rung c-purple on"><b>Errors and documentation</b>Threshold, calibration, subgroups, model card<small>Day 4</small></div>
+  </div>
+  <aside class="notes"><p>Until now every number was an average over trainees. Today's numbers are about which trainees: who is on the list, who is missed, and whether that differs by region, gender or age.</p></aside>
+</section>
 
 <!-- Session 1 -->
 
-<section class="slide section" id="s1" data-auto="section" data-session="1"></section>
-
-<section class="slide" id="s1-idea" data-lo="LO5">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
-  </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+<section class="slide section" id="s1" data-auto="section" data-session="1">
+  <aside class="notes"><p>FN-105 set one threshold on a held-out set. This session makes the threshold a consequence of the decision that Day 1 framed: 800 plans a year, 450 riyals a plan.</p></aside>
 </section>
 
-<section class="slide" id="s1-steps" data-lo="LO5">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
+<section class="slide" id="score-to-decision" data-lo="LO5">
+  <div class="kicker">The step nobody trains</div>
+  <h2>A model gives a score; a threshold turns it into an action</h2>
   <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+    <div class="step c-teal"><b>Score</b>0.47 for this trainee, at the end of week 2</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>Threshold</b>On the list when the score is at or above the cut</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>Action</b>An adviser calls in week 3</div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <ul class="bullets mt">
+    <li>Average precision judged the ranking over every possible threshold</li>
+    <li>The fund runs one threshold, and lives with its two kinds of error</li>
+    <li>The threshold is a decision of the fund, informed by the model</li>
+  </ul>
+  <aside class="notes"><p>The model does not know that there are 800 plans. The threshold is where the organisation enters: capacity, costs, and who carries each error. Sources: scikit-learn user guide, Tuning the decision threshold for class prediction.</p></aside>
+</section>
+
+<section class="slide" id="precision-recall" data-lo="LO5">
+  <div class="kicker">Two sentences for Ghassan</div>
+  <h2>Precision speaks for the advisers, recall for the trainees</h2>
+  <div class="cols cols-2 mid">
+    <div class="stat center"><div class="big">476 of 800</div><div class="lbl">plans on the 2024 list go to a trainee who then left: precision 0.60</div></div>
+    <div class="stat center"><div class="big">476 of 1,190</div><div class="lbl">trainees who left were on the list: recall 0.40</div></div>
+  </div>
+  <ul class="bullets mt">
+    <li>A random list of 800 would find about 103</li>
+    <li>Six in ten trainees who left were <b>not</b> on the list</li>
+    <li>Say both sentences; either one alone misleads</li>
+  </ul>
+  <aside class="notes"><p>From Lab 4.1: cohort 2024, 9,276 trainees, 12.8% left. The list is almost five times better than chance and still misses most of those who leave. An adviser who hears only "60% precision" will treat a missing name as good news.</p></aside>
+</section>
+
+<section class="slide" id="three-thresholds" data-lo="LO5">
+  <div class="kicker">Lab 4.1, measured</div>
+  <h2>Three thresholds, three different lists</h2>
+  <table class="t small">
+    <tr><th>Threshold</th><th class="num">On the list</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">Net value, thousand riyals</th></tr>
+    <tr><td>0.5, the library default</td><td class="num">582</td><td class="num">0.65</td><td class="num">0.32</td><td class="num">589</td></tr>
+    <tr class="hl"><td>0.41, fits 800 plans</td><td class="num">800</td><td class="num">0.60</td><td class="num">0.40</td><td class="num">711</td></tr>
+    <tr><td>0.20, break-even</td><td class="num">1,679</td><td class="num">0.41</td><td class="num">0.58</td><td class="num">790</td></tr>
+  </table>
+  <ul class="bullets mt">
+    <li>0.5 leaves 218 plans unused: nothing in the decision says 0.5</li>
+    <li>Break-even: a plan costs 450, prevents one loss of 9,000 in four</li>
+    <li>Capacity picks the middle row</li>
+  </ul>
+  <aside class="notes"><p>From Lab 4.1, cohort 2024. Net value: non-completers found, times 0.25, times 9,000, minus 450 per plan. The break-even row is worth 79,000 riyals more and needs twice the advisers. That is a number for Dr. Haya Al-Mogren's budget discussion; it is not a list the advisers can work this year.</p></aside>
+</section>
+
+<section class="slide" id="weights" data-lo="LO5">
+  <div class="kicker">A common remedy</div>
+  <h2>Class weights move the scores; they do not choose a threshold</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Model, cut at 0.5</th><th class="num">On the list</th><th class="num">Average precision</th></tr>
+      <tr><td>Champion</td><td class="num">582</td><td class="num">0.516</td></tr>
+      <tr><td>Champion with class weights</td><td class="num">2,916</td><td class="num">0.520</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>"The outcome is rare, so weight it": the ranking stays as good</li>
+      <li>The scores shift upward, so 0.5 now flags a third of the cohort</li>
+      <li>Rarity is handled by the metric and the threshold, not by changing what the scores mean</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 4.1, cohort 2024. Weighting, like the oversampling of Loay's notebook, tells the model the outcome is eight times as common as it is. For a ranking it changes little; for a probability it does harm, which the next session measures.</p></aside>
+</section>
+
+<section class="slide" id="holdout" data-lo="LO5">
+  <div class="kicker">The 2025 cohort, opened once</div>
+  <h2>The same threshold gives a different list on the next cohort</h2>
+  <table class="t">
+    <tr><th>Rule</th><th class="num">On the list</th><th class="num">Precision</th><th class="num">Recall</th></tr>
+    <tr><td>2024, threshold 0.41, where it was chosen</td><td class="num">800</td><td class="num">0.60</td><td class="num">0.40</td></tr>
+    <tr><td>2025, the same threshold</td><td class="num">897</td><td class="num">0.61</td><td class="num">0.40</td></tr>
+    <tr class="hl"><td>2025, the top 800</td><td class="num">800</td><td class="num">0.65</td><td class="num">0.38</td></tr>
+  </table>
+  <div class="callout note mt"><b>The model did not get worse.</b> The cohort is larger and its scores sit a little higher. A threshold on a probability and a capacity in plans are two different things.</div>
+  <aside class="notes"><p>From Lab 4.1: cohort 2025, 10,117 trainees, 13.5% left, average precision 0.554. This is the only time the holdout is scored for a choice; everything after this describes it. 97 names above capacity is a week of adviser time nobody has.</p></aside>
+</section>
+
+<section class="slide" id="rule" data-lo="LO5">
+  <div class="kicker">The choice to write down</div>
+  <h2>A fixed threshold or a fixed list length</h2>
+  <div class="cols cols-2">
+    <div class="card c-teal"><h4>Fixed list length</h4><p class="small mb0">Always fits the advisers. The weakest name on the list varies: in a hard intake, trainees at higher risk are left out.</p></div>
+    <div class="card c-coral"><h4>Fixed threshold</h4><p class="small mb0">Equal risk is treated equally across intakes. The list overruns or underuses capacity, and depends on the probabilities staying calibrated.</p></div>
+  </div>
+  <ul class="bullets mt">
+    <li>Either can be defended; the fund chose the list length</li>
+    <li>Write down which rule runs, and who may change it</li>
+  </ul>
+  <aside class="notes"><p>The fund's reason: capacity is a number of plans. A mixed rule is common in practice: a fixed length, with a floor below which nobody is listed. Whatever the rule, it is part of the model card, because the deployment team will implement exactly what is written.</p></aside>
+</section>
+
+<section class="slide" id="check-threshold" data-lo="LO5">
+  <div class="kicker">Checkpoint</div>
+  <h2>What happens to the list next year?</h2>
+  <div class="quiz" data-type="single" data-lo="LO5">
+    <p class="lead">The fund keeps the threshold of 0.41. Next year a new programme doubles the intake, with trainees much like this year's. What happens?</p>
+    <div class="opts">
+      <div class="opt" data-ok>The list roughly doubles to 1,600 names, twice what the advisers can support</div>
+      <div class="opt" data-why="Assumes the threshold adapts to capacity: a threshold is a fixed number and knows nothing about plans">The list stays at 800, because the threshold was chosen for 800</div>
+      <div class="opt" data-why="Confuses the size of the cohort with the quality of the ranking: similar trainees give similar precision">Precision halves, because there are twice as many trainees</div>
+      <div class="opt" data-why="Assumes more rows change the scores of individual trainees: each score depends on the trainee's own columns">The scores fall, so fewer trainees pass the threshold</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A threshold lists everyone above a risk level. Twice the trainees at the same risk levels means twice the names. Only a rule on the list length follows capacity.</div>
+  </div>
+  <aside class="notes"><p>Answer: the first option. Follow-up: and with a fixed length of 800? The list stays at 800 and the cut rises, so trainees who would have been listed this year are left out. Neither rule removes the problem; each puts it in a different place.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-4-1" data-auto="lab" data-lab="4.1">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-tutor. One short function and one written choice. The holdout is opened in task 4: say it aloud, it happens once. Typical problem: an off-by-one in the k-th highest probability, which the check catches. Ask each pair to say the two sentences of the list to each other without the words precision and recall.</p></aside>
 </section>
 
 <!-- Session 2 -->
 
-<section class="slide section" id="s2" data-auto="section" data-session="2"></section>
-
-<section class="slide" id="s2-idea" data-lo="LO5">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
-  </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+<section class="slide section" id="s2" data-auto="section" data-session="2">
+  <aside class="notes"><p>A ranking is enough for a list of fixed length. The moment someone reads the number, or compares it with a break-even, the number has to mean what it says.</p></aside>
 </section>
 
-<section class="slide" id="s2-steps" data-lo="LO5">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="promise" data-lo="LO5">
+  <div class="kicker">The idea</div>
+  <h2>A calibrated score keeps a promise: of those given 0.3, three in ten leave</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Calibration is about what the numbers <b>mean</b></li>
+      <li>Ranking is about their <b>order</b></li>
+      <li>A model can be good at one and bad at the other</li>
+      <li>It matters when the number is shown to an adviser, compared with a break-even, or multiplied by a cost</li>
+    </ul>
+    <div class="card c-teal"><h4>How to measure it</h4><p class="small mb0">Sort the trainees by score and cut them into ten groups. In each: the mean score (expected) beside the share that left (observed). One summary number: the Brier score, the mean squared gap between score and outcome.</p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>Deciles and not finer bins: with 9,276 trainees each decile has 928 and a stable observed rate. The Brier score rewards both ranking and calibration, so it is read together with the decile table and never alone. Sources: scikit-learn user guide, Probability calibration.</p></aside>
+</section>
+
+<section class="slide" id="deciles" data-lo="LO5">
+  <div class="kicker">Lab 4.2, cohort 2024</div>
+  <h2>Same ranking, very different promises</h2>
+  <table class="t small">
+    <tr><th>Decile</th><th class="num">Champion expects</th><th class="num">Observed</th><th class="num">Weighted model expects</th><th class="num">Observed</th></tr>
+    <tr><td>1, lowest</td><td class="num">0.013</td><td class="num">0.017</td><td class="num">0.071</td><td class="num">0.016</td></tr>
+    <tr><td>5</td><td class="num">0.050</td><td class="num">0.071</td><td class="num">0.297</td><td class="num">0.073</td></tr>
+    <tr><td>8</td><td class="num">0.144</td><td class="num">0.144</td><td class="num">0.573</td><td class="num">0.133</td></tr>
+    <tr><td>9</td><td class="num">0.254</td><td class="num">0.219</td><td class="num">0.723</td><td class="num">0.231</td></tr>
+    <tr class="hl"><td>10, highest</td><td class="num">0.603</td><td class="num">0.558</td><td class="num">0.902</td><td class="num">0.554</td></tr>
+  </table>
+  <div class="callout warn mt"><b>What goes wrong.</b> An adviser reads "0.90" beside a name. Of the trainees given that number, 55% left.</div>
+  <aside class="notes"><p>From Lab 4.2. The champion is close in every decile and a little high at the top. The weighted model says nine in ten where fewer than six in ten left: it was trained as if non-completers were eight times as common. Boosted trees with a log-loss objective and the real class shares are often calibrated as delivered; that is a measurement to make, not a property to assume.</p></aside>
+</section>
+
+<section class="slide" id="calibrators" data-lo="LO5">
+  <div class="kicker">The repair</div>
+  <h2>A calibrator is a small model from score to probability</h2>
+  <div class="cols cols-2">
+    <div class="card c-cyan"><h4>Sigmoid</h4><p class="small mb0">A logistic regression on the log-odds of the score: two numbers, a shift and a stretch. Works with few rows; cannot bend.</p></div>
+    <div class="card c-purple"><h4>Isotonic</h4><p class="small mb0">A rising step function. Takes any rising shape; needs more rows, and trainees on one step become tied.</p></div>
+  </div>
+  <ul class="bullets mt">
+    <li>Fitted on rows the scoring model was <b>not</b> trained on: here the 2024 cohort</li>
+    <li>Tested on rows neither has seen: the 2025 cohort</li>
+    <li>For the weighted model the sigmoid's shift is −2.0; for the champion, −0.2</li>
+  </ul>
+  <aside class="notes"><p>From Lab 4.2. A calibrator fitted on training rows learns to trust scores that have partly memorised their outcomes: the same reason a training score is not logged. In scikit-learn, CalibratedClassifierCV does the fitting inside folds; the lab does it by hand so that the two numbers of the sigmoid can be read.</p></aside>
+</section>
+
+<section class="slide" id="calibration-result" data-lo="LO5">
+  <div class="kicker">Lab 4.2, on the 2025 cohort</div>
+  <h2>Calibration repairs what the weights broke, and adds nothing to a calibrated model</h2>
+  <table class="t small">
+    <tr><th>Model</th><th>Calibration</th><th class="num">Brier</th><th class="num">Mean expected</th><th class="num">Average precision</th></tr>
+    <tr><td>Champion</td><td>as delivered</td><td class="num">0.0852</td><td class="num">0.137</td><td class="num">0.554</td></tr>
+    <tr><td>Champion</td><td>sigmoid</td><td class="num">0.0853</td><td class="num">0.133</td><td class="num">0.554</td></tr>
+    <tr><td>Weighted</td><td>as delivered</td><td class="num">0.1717</td><td class="num">0.399</td><td class="num">0.553</td></tr>
+    <tr class="hl"><td>Weighted</td><td>sigmoid</td><td class="num">0.0854</td><td class="num">0.131</td><td class="num">0.553</td></tr>
+    <tr><td>Weighted</td><td>isotonic</td><td class="num">0.0858</td><td class="num">0.131</td><td class="num">0.526</td></tr>
+  </table>
+  <p class="lead mt">Observed: 0.135. The sigmoid never changes the order; isotonic ties cost 0.03 here.</p>
+  <aside class="notes"><p>From Lab 4.2. Three readings. The weighted model, calibrated, equals the champion as delivered: weights bought nothing. The champion gains nothing from a calibrator, so none is applied, and the 2024 cohort is not spent on one. And a calibrator never changes who is at risk, only what the number means: the list of Lab 4.1 is the same before and after a sigmoid.</p></aside>
+</section>
+
+<section class="slide" id="drift" data-lo="LO5">
+  <div class="kicker">Where the promise breaks</div>
+  <h2>Calibration holds for a population; eight providers are new</h2>
+  <table class="t">
+    <tr><th>Cohort 2025</th><th class="num">Trainees</th><th class="num">Expected</th><th class="num">Observed (95% interval)</th></tr>
+    <tr><td>Providers open before 2025</td><td class="num">8,214</td><td class="num">0.130</td><td class="num">0.119 (0.113 to 0.127)</td></tr>
+    <tr class="hl"><td>Providers that opened in 2025</td><td class="num">1,903</td><td class="num">0.163</td><td class="num">0.204 (0.186 to 0.223)</td></tr>
+  </table>
+  <ul class="bullets mt">
+    <li>For the new providers the probabilities are four points too low</li>
+    <li>The ranking inside them is as good as elsewhere</li>
+    <li>A provider the model does not know is scored like an average one</li>
+  </ul>
+  <aside class="notes"><p>From Lab 4.2. The overall figures, 13.7% expected and 13.5% observed, hide two errors that cancel. No calibrator fitted on 2024 could have known about providers that did not exist. This goes into the card as a limit with an instruction: at a provider that opened after training, use the rank, not the number.</p></aside>
+</section>
+
+<section class="slide" id="check-calibration" data-lo="LO5">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which score may be read as a probability?</h2>
+  <div class="quiz" data-type="single" data-lo="LO5">
+    <p class="lead">Two models have the same average precision. Model A's scores average 0.14, model B's 0.40; 13.5% of the cohort left. The fund wants to list everyone above the break-even probability, 0.20. Which statement holds?</p>
+    <div class="opts">
+      <div class="opt" data-why="Takes equal ranking for equal meaning: above 0.20, model B lists most of the cohort">Either model can be used: they rank equally well</div>
+      <div class="opt" data-ok>Only model A's scores can be compared with 0.20, after checking them by decile</div>
+      <div class="opt" data-why="Prefers higher scores as if they were stronger signals: B's scores are high because of how it was trained">Model B is better: it is more confident about the trainees at risk</div>
+      <div class="opt" data-why="Averages two scales that mean different things: the result is calibrated on neither">Use the mean of the two scores</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A break-even probability is a statement about real rates. Only a calibrated score can be compared with it.</div>
+  </div>
+  <aside class="notes"><p>Answer: the second option. Model B is the weighted model of the lab. For a list of fixed length, A and B would produce the same names; the difference appears only when the number itself is used.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-4-2" data-auto="lab" data-lab="4.2">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-tutor. One function, the decile table, and one written line for the model card. The lab runs in seconds. Typical problem: qcut on scores with many ties, which the rank in the instruction avoids. Have pairs read the two sigmoid numbers aloud before they look at the results on 2025.</p></aside>
 </section>
 
 <!-- Session 3 -->
 
-<section class="slide section" id="s3" data-auto="section" data-session="3"></section>
-
-<section class="slide" id="s3-idea" data-lo="LO5">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
-  </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+<section class="slide section" id="s3" data-auto="section" data-session="3">
+  <aside class="notes"><p>The session that connects the model to the people it ranks. It leans on two national references: the SDAIA Principles of AI Ethics, for why, and the AI Bias Reference Guide, for the names of what is found.</p></aside>
 </section>
 
-<section class="slide" id="s3-steps" data-lo="LO5">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="two-harms" data-lo="LO5">
+  <div class="kicker">Errors are not symmetric</div>
+  <h2>Two errors, two different harms</h2>
+  <div class="cols cols-2">
+    <div class="card c-coral"><h4>Missed</h4><p class="small mb0">A trainee leaves and was not on the list. Nobody called. The harm falls on the trainee. Measured among those who left: the <b>miss rate</b>, 0.62 for the 2025 list.</p></div>
+    <div class="card c-cyan"><h4>Listed without need</h4><p class="small mb0">A trainee on the list would have completed anyway. An adviser's hour is spent; the trainee gets a friendly call. Measured on the list: one minus <b>precision</b>.</p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <ul class="bullets mt">
+    <li>The first harm leads the audit</li>
+    <li>The question: is the miss rate the same for everyone?</li>
+  </ul>
+  <aside class="notes"><p>Which error matters most depends on the action. Here the action is support, so being missed is the harm. If the action were a penalty, being listed without need would lead. Decide this before looking at any table. Sources: SDAIA Principles of AI Ethics, the fairness principle.</p></aside>
+</section>
+
+<section class="slide" id="represented" data-lo="LO5">
+  <div class="kicker">Before any error</div>
+  <h2>Who is in the data the model learnt from?</h2>
+  <table class="t small">
+    <tr><th>Group</th><th class="num">In training data</th><th class="num">In eligible population</th><th class="num">Ratio</th></tr>
+    <tr class="hl"><td>Age 35 and over</td><td class="num">4.7%</td><td class="num">20%</td><td class="num">0.24</td></tr>
+    <tr><td>Age 17 to 19</td><td class="num">6.8%</td><td class="num">16%</td><td class="num">0.42</td></tr>
+    <tr><td>Najran</td><td class="num">2.2%</td><td class="num">3.6%</td><td class="num">0.61</td></tr>
+    <tr><td>Jazan</td><td class="num">4.2%</td><td class="num">6.8%</td><td class="num">0.62</td></tr>
+    <tr><td>Women</td><td class="num">43%</td><td class="num">52%</td><td class="num">0.82</td></tr>
+    <tr><td>Age 20 to 24</td><td class="num">45%</td><td class="num">31%</td><td class="num">1.44</td></tr>
+  </table>
+  <p class="lead mt">Every validation score of this week describes the people who enrolled, not the people the fund serves.</p>
+  <aside class="notes"><p>From Lab 4.3, task 1: scorable rows of 2021 to 2024 against the fund's own figures for its eligible population. Gender is not a feature of Mubakkir; it is kept in the table so that this question, and the next ones, can be asked at all.</p></aside>
+</section>
+
+<section class="slide" id="intervals" data-lo="LO5">
+  <div class="kicker">The tool</div>
+  <h2>A rate from a small slice needs an interval that knows its size</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Slice</th><th class="num">Left</th><th class="num">Missed</th><th class="num">95% interval</th></tr>
+      <tr><td>Riyadh</td><td class="num">444</td><td class="num">0.58</td><td class="num">0.53 to 0.62</td></tr>
+      <tr><td>Jazan</td><td class="num">86</td><td class="num">0.73</td><td class="num">0.63 to 0.82</td></tr>
+      <tr><td>Qassim</td><td class="num">21</td><td class="num">0.81</td><td class="num">0.60 to 0.92</td></tr>
+      <tr><td>Al-Baha</td><td class="num">12</td><td class="num">0.75</td><td class="num">0.47 to 0.91</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>The miss rate is a share of those who left: that count sets the width</li>
+      <li>The Wilson interval stays inside 0 and 1 and behaves for small counts</li>
+      <li>Read the width before the position</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 4.3. DS-201 taught intervals for a proportion; the Wilson form is used here because slices are small and rates sit far from one half. Qassim has the highest rate in the table and the least to say: 21 trainees. Sources: SciPy manual, proportion_ci (Wilson method).</p></aside>
+</section>
+
+<section class="slide" id="by-region" data-lo="LO5">
+  <div class="kicker">Lab 4.3, measured</div>
+  <h2>By the rule stated in advance, two regional gaps are supported</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li><b>The rule:</b> a gap is supported when the whole interval lies above or below the cohort's miss rate, 0.62</li>
+      <li><b>Jazan:</b> 0.73, interval 0.63 to 0.82: above</li>
+      <li><b>Riyadh:</b> 0.58, interval 0.53 to 0.62: below</li>
+      <li>Najran, 0.75: its interval starts at 0.61</li>
+      <li>Qassim, 0.81: too few cases to tell</li>
+    </ul>
+    <div class="card c-purple"><h4>Nineteen slices</h4><p class="small mb0">Thirteen regions, two genders, four age bands. With that many, one can cross the line by chance. A rule fixed in advance limits the damage; a cause you can check does more.</p></div>
+  </div>
+  <aside class="notes"><p>From Lab 4.3, cohort 2025, list of 800. The rule is deliberately simple. It ignores that the cohort's rate is itself uncertain and that many slices are tested at once; say so. What it prevents is the worst habit: reading thirteen rates and naming the largest.</p></aside>
+</section>
+
+<section class="slide" id="gender-age" data-lo="LO5">
+  <div class="kicker">The other two attributes</div>
+  <h2>A five-point gap between women and men is not supported, and not dismissed</h2>
+  <table class="t small">
+    <tr><th>Slice</th><th class="num">Left</th><th class="num">Missed</th><th class="num">95% interval</th></tr>
+    <tr><td>Women</td><td class="num">625</td><td class="num">0.65</td><td class="num">0.61 to 0.69</td></tr>
+    <tr><td>Men</td><td class="num">744</td><td class="num">0.60</td><td class="num">0.57 to 0.64</td></tr>
+    <tr><td>Age 17 to 19</td><td class="num">91</td><td class="num">0.55</td><td class="num">0.45 to 0.65</td></tr>
+    <tr><td>Age 35 and over</td><td class="num">123</td><td class="num">0.57</td><td class="num">0.48 to 0.65</td></tr>
+  </table>
+  <ul class="bullets mt">
+    <li>Both gender intervals contain 0.62</li>
+    <li>Women are also under-represented in the training data</li>
+    <li>So this row is read first on the next cohort's table</li>
+  </ul>
+  <aside class="notes"><p>From Lab 4.3. "Not supported" is the same kind of result as "not shown" on Day 2: it is not "shown to be equal". The two youngest and oldest bands are missed slightly less, on about a hundred cases each. Ask the room what they would say to someone who quotes only 0.65 and 0.60.</p></aside>
+</section>
+
+<section class="slide" id="cause" data-lo="LO5">
+  <div class="kicker">A gap with a cause</div>
+  <h2>Where attendance is kept on paper, the model's best signal is weakest</h2>
+  <table class="t small">
+    <tr><th>Registers</th><th class="num">Left</th><th class="num">Missed (95% interval)</th><th class="num">Recorded absences, mean</th><th class="num">Non-completion</th></tr>
+    <tr><td>Electronic, eleven regions</td><td class="num">1,232</td><td class="num">0.61 (0.58 to 0.64)</td><td class="num">0.54</td><td class="num">13%</td></tr>
+    <tr class="hl"><td>Paper, Jazan and Najran</td><td class="num">137</td><td class="num">0.74 (0.66 to 0.80)</td><td class="num">0.27</td><td class="num">23%</td></tr>
+  </table>
+  <ul class="bullets mt">
+    <li>More trainees leave there, and fewer early absences are recorded</li>
+    <li>The model is right about what the registers say</li>
+    <li>Retraining changes nothing: the fault is in the measurement</li>
+  </ul>
+  <aside class="notes"><p>From Lab 4.3. Hamza Al-Babtain, provider relations, confirms the paper registers. The two regions together form a slice with a reason behind it, and their interval lies clear of the rest. The action is with the providers. Until the registers change, advisers in those regions are told that a missing name there means less.</p></aside>
+</section>
+
+<section class="slide" id="bias-types" data-lo="LO5">
+  <div class="kicker">Naming what was found</div>
+  <h2>Four findings, four bias types of the SDAIA guide, one action each</h2>
+  <table class="t small">
+    <tr><th>Finding</th><th>Bias type</th><th>One action</th></tr>
+    <tr><td>Trainees who leave in Jazan and Najran are missed more</td><td><b>Measurement</b></td><td>Electronic registers; advisers there do not rely on the list alone</td></tr>
+    <tr><td>Trainees of 35 and over are a quarter as present as in the population</td><td><b>Coverage</b></td><td>State it in the card; validate again before use on programmes for this group</td></tr>
+    <tr><td>The highest miss rate rests on 21 cases</td><td><b>Sample size</b></td><td>Report intervals; pool small regions or cohorts</td></tr>
+    <tr><td>One miss rate, 0.62, was all that had been reported</td><td><b>Aggregation</b></td><td>Report by region, gender and age band with every cohort</td></tr>
+  </table>
+  <aside class="notes"><p>From Lab 4.3, task 5. The guide describes more types; these four fit what was measured. A name is useful because it points to where the remedy lies: in the measurement, the sampling, the reporting. None of the four is repaired by a different algorithm. Sources: SDAIA AI Bias Reference Guide.</p></aside>
+</section>
+
+<section class="slide" id="not-blind" data-lo="LO5">
+  <div class="kicker">A common belief</div>
+  <h2>Leaving a column out does not make a model blind to it</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Gender is not a feature of Mubakkir</li>
+      <li>Other features differ between women and men: programme, employment, distance</li>
+      <li>And who is in the data differs: 43% against 52%</li>
+      <li>So errors can still differ by gender</li>
+    </ul>
+    <div class="card c-coral"><h4>What follows</h4><p class="small mb0">The attribute stays in the table, outside the model, so that errors can be audited. Under the Personal Data Protection Law personal data serve a stated purpose: here the audit of errors, agreed with the fund's data protection officer.</p></div>
+  </div>
+  <aside class="notes"><p>Day 1 made this choice with Maram Al-Rasheed, the fund's data protection officer: gender is recorded for the audit and for nothing else. A team that deletes the column to be safe can no longer find out whether the model fails one group. Sources: Personal Data Protection Law; SDAIA Principles of AI Ethics.</p></aside>
+</section>
+
+<section class="slide" id="check-slice" data-lo="LO5">
+  <div class="kicker">Checkpoint</div>
+  <h2>Reading a small slice</h2>
+  <div class="quiz" data-type="single" data-lo="LO5">
+    <p class="lead">In one region 12 trainees left and 9 of them were not on the list: a miss rate of 0.75, interval 0.47 to 0.91. The cohort's rate is 0.62. What do you report?</p>
+    <div class="opts">
+      <div class="opt" data-why="Reads the rate without its interval: nine of twelve is compatible with the cohort's rate">The model fails this region: 0.75 is far above 0.62</div>
+      <div class="opt" data-why="Reads an interval that contains 0.62 as proof of no difference: it also contains 0.90">The region is fine: its interval contains 0.62</div>
+      <div class="opt" data-why="Removes the evidence that the slice is small: a table without it would hide that nothing is known">Leave the region out of the table: the slice is too small</div>
+      <div class="opt" data-ok>The rate with its interval, and that 12 cases cannot tell; pool with later cohorts</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The interval is the finding: with 12 cases the data are compatible with a rate below the cohort's and with one far above it. Saying so, and how to learn more, is the honest report.</div>
+  </div>
+  <aside class="notes"><p>Answer: the fourth option. This is Al-Baha in the lab. The third option is tempting and harmful: small groups are exactly the ones a model may fail, and a table that drops them reports that nobody looked.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-4-3" data-auto="lab" data-lab="4.3">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-off for the first attempt at tasks 2 to 4: the slice table, its reading and the supported gaps. Typical problems: dividing the misses by all trainees of the slice and not by those who left; passing the rate to the interval function in place of the two counts. With Labs 4.1 and 4.2 this lab is the evidence for the fifth course outcome.</p></aside>
 </section>
 
 <!-- Session 4 -->
 
-<section class="slide section" id="s4" data-auto="section" data-session="4"></section>
-
-<section class="slide" id="s4-idea" data-lo="LO6">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
-  </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+<section class="slide section" id="s4" data-auto="section" data-session="4">
+  <aside class="notes"><p>The last teaching session: the page that leaves with the model, and the framing of the capstone.</p></aside>
 </section>
 
-<section class="slide" id="s4-steps" data-lo="LO6">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="card-holds" data-lo="LO6">
+  <div class="kicker">The hand-over</div>
+  <h2>A model card is the one page that travels with the model</h2>
+  <div class="cols cols-2">
+    <div class="card c-teal"><h4>Measured: filled from results</h4><p class="small mb0">Intended use · data · validation scheme · results on held-out rows · calibration · errors by subgroup.</p></div>
+    <div class="card c-coral"><h4>Written: no number writes them</h4><p class="small mb0">What the model is not for · where the scores do not hold · who decides · what the next team needs.</p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <ul class="bullets mt">
+    <li>Its readers were not in the room: an adviser, an auditor, the deployment team</li>
+    <li>Every number in it can be traced to a run</li>
+  </ul>
+  <aside class="notes"><p>The card is short on purpose. If it needs three pages, it will not be read by the people who need it. In Lab 4.4 the measured half is assembled from the reference results; the participants write the other half. Sources: Mitchell and others (2019).</p></aside>
+</section>
+
+<section class="slide" id="honest-results" data-lo="LO6 LO4">
+  <div class="kicker">What the card admits</div>
+  <h2>The results section says what was not shown</h2>
+  <ul class="bullets">
+    <li>Champion 0.529 on the folds; against the logistic rung +0.005, interval −0.010 to +0.019: <b>an advantage is not shown</b></li>
+    <li>New trainees 0.491, returning trainees 0.578: the headline is an average</li>
+    <li>Expected 13.7%, observed 13.5% overall; four points too low at new providers</li>
+  </ul>
+  <div class="callout tip mt"><b>Why write it down.</b> The next team may need a model an adviser can read, or one that is cheaper to run. The card tells them a simpler one does as well within the uncertainty.</div>
+  <aside class="notes"><p>A card that reports only its best number invites the reader to find the rest. The three sentences here come from Labs 2.4, 3.1 and 4.2. They make the card more useful and its author more credible.</p></aside>
+</section>
+
+<section class="slide" id="limits" data-lo="LO6">
+  <div class="kicker">The written half</div>
+  <h2>A useful limit names a situation and what to do in it</h2>
+  <table class="t small">
+    <tr><th>Weak</th><th>Useful</th></tr>
+    <tr><td>"May not generalise to new data."</td><td>"At a provider that opened after training the probabilities are about four points too low: use the rank, not the number."</td></tr>
+    <tr><td>"Performance may degrade over time."</td><td>"A model one year old scored 0.016 lower: retrain every half-year, on programmes due to end."</td></tr>
+    <tr><td>"Use with care in some regions."</td><td>"Where attendance is kept on paper, a trainee who is not on the list is not thereby low-risk."</td></tr>
+  </table>
+  <p class="lead mt">A reader should recognise the situation when they are in it.</p>
+  <aside class="notes"><p>All three useful limits come from measurements of this week. Limits also include uses the validation never rehearsed: another fund, another country, programmes for an age group that is hardly in the data, trainees in their first two weeks.</p></aside>
+</section>
+
+<section class="slide" id="human" data-lo="LO6">
+  <div class="kicker">The sentence to keep</div>
+  <h2>The score puts a name on a list; a person decides</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>An adviser decides whether and how to contact a trainee</li>
+      <li>An adviser may add any trainee who is not on the list</li>
+      <li>No trainee is refused, ranked for funding or told a score</li>
+      <li>Providers are not ranked by it</li>
+    </ul>
+    <div class="card c-purple"><h4>What the score does not answer</h4><p class="small mb0">It says who is likely to leave. It does not say whether a support plan helps, or whom it helps most. That needs a comparison of supported and unsupported trainees, which the fund has not run.</p></div>
+  </div>
+  <aside class="notes"><p>The first column restates the note of the decision file from Day 1. The second is the one causal remark of the course: the figure "one in four" for the effect of a plan is the fund's assumption. A model that predicts leaving is not a model of what support changes. Sources: SDAIA Principles of AI Ethics, the principles of humanity and of accountability and responsibility.</p></aside>
+</section>
+
+<section class="slide" id="handover" data-lo="LO6">
+  <div class="kicker">After this course</div>
+  <h2>What a deployment team cannot guess</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>The code version, the seed and the lock file</li>
+      <li>The date of training and the rule for training rows</li>
+      <li>Each feature, when it is recorded, and how history is built</li>
+      <li>The list rule, and who may change it</li>
+      <li>What to monitor each intake, and when to retrain</li>
+    </ul>
+    <div class="card c-teal"><h4>Where it continues</h4><p class="small mb0">Serving, monitoring and retraining are not in this course. AE-205 deploys a model as a service; AE-305 operates it. Both start from a card like this one.</p></div>
+  </div>
+  <aside class="notes"><p>The monitoring list follows from today's labs: list precision once outcomes arrive, expected against observed, miss rate by region, gender and age band. A change of register system or a new kind of programme is a reason to stop and validate again, not only to retrain.</p></aside>
+</section>
+
+<section class="slide" id="capstone-brief" data-lo="LO6">
+  <div class="kicker">Day 5</div>
+  <h2>The capstone: one problem, the whole path, eight minutes</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Six problems on the shortlist: three synthetic cases, three public tables</li>
+      <li>A public repository of your own, AI-full, with prompts and transcripts committed</li>
+      <li>A README that reports ladder, validation, leakage audit, threshold, subgroup errors and one paired comparison</li>
+    </ul>
+    <div class="card c-coral"><h4>The defence</h4><p class="small mb0">Four minutes are yours. Then the assessor swaps the split or removes a feature, and you say what will happen to the score, and why, before it is run.</p></div>
+  </div>
+  <aside class="notes"><p>The brief, the rubric and the README template are in labs/capstone. The last task of Lab 4.4 is the framing: decision and owner, unit and prediction time, target, validation scheme, metric, first suspects. Each synthetic case has units that repeat, a date, and two columns a previous analyst computed.</p></aside>
+</section>
+
+<section class="slide" id="check-card" data-lo="LO6">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which sentence belongs in the card?</h2>
+  <div class="quiz" data-type="single" data-lo="LO6">
+    <p class="lead">You may add one sentence to the limits of Mubakkir's card. Which one helps its readers most?</p>
+    <div class="opts">
+      <div class="opt" data-why="States a method, not a limit: it tells the reader nothing about when the scores fail">"The model uses gradient-boosted trees with 400 trees of 8 leaves."</div>
+      <div class="opt" data-why="Is true of every model: the reader cannot recognise a situation or act on it">"Results may vary on new data."</div>
+      <div class="opt" data-ok>"Not validated for trainees in their first two weeks: they have no early-absence record."</div>
+      <div class="opt" data-why="Repeats a result as if it were a guarantee: the card should say where it does not hold">"The model achieves an average precision of 0.55 on held-out data."</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A limit names a situation the validation never covered, in words a reader can recognise. Mubakkir scores trainees still enrolled at the end of week 2 and was never tested on anyone else.</div>
+  </div>
+  <aside class="notes"><p>Answer: the third option. It goes back to the first decision of Day 1: the scorable population. A third of the trainees who do not complete leave in the first two weeks and are outside the model entirely; the card must say so.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-4-4" data-auto="lab" data-lab="4.4">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-tutor; the limits and the human-decision statement are the participant's own. The lab runs in seconds. Keep ten minutes for the last task: everyone leaves with a chosen problem and a written framing, and you approve own problems now. The card and the framing are the first evidence for the sixth course outcome; the capstone is the rest.</p></aside>
 </section>
+
+<!-- Close -->
 
 <section class="slide" id="wrap-up">
-  <div class="kicker">Day 4 · wrap-up</div>
+  <div class="kicker">Day 4</div>
   <h2>Three things to keep</h2>
   <div class="cols cols-3">
-    <div class="card c-teal"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-coral"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-purple"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
+    <div class="card c-teal"><h4>The decision sets the threshold</h4><p class="small mb0">800 plans: precision 0.65, recall 0.38 on the 2025 cohort. The same threshold listed 897. Write down the rule.</p></div>
+    <div class="card c-cyan"><h4>Check what the numbers mean</h4><p class="small mb0">The champion's probabilities hold by decile; the weighted model's do not; at new providers they run four points low.</p></div>
+    <div class="card c-coral"><h4>An average hides people</h4><p class="small mb0">Miss rate 0.62 overall, 0.74 where registers are on paper. Intervals for every slice, a bias type and an action for every finding.</p></div>
   </div>
+  <aside class="notes"><p>Ask: which sentence of your card would you least like to defend tomorrow? That is the one to work on tonight.</p></aside>
 </section>
 
-<section class="slide dark" id="next" data-label="Next">
+<section class="slide dark" id="next">
   <div class="kicker">Next</div>
-  <h2>Capstone: Capstone project presentations</h2>
-  <p class="lead">REPLACE: what participants prepare before then; unfinished labs can be finished at home</p>
-  <aside class="notes">REPLACE: accounts, installs or reading participants need before the next unit</aside>
+  <h1>Day 5 · Capstone</h1>
+  <p class="lead">Your problem, your repository, the same path: frame, ladder, validation, audit, threshold, subgroups, card. Then eight minutes in which a change is named and you predict its effect.</p>
+  <ul class="bullets">
+    <li>Start from your framing of Lab 4.4 and the README template</li>
+    <li>Hold some rows back now; score them once</li>
+  </ul>
+  <aside class="notes"><p>Remind the room of the pass rule and of the AI-full policy with committed prompts and transcripts. Assessors read the README before the defence, in the review order of Day 3.</p></aside>
 </section>
