@@ -252,7 +252,7 @@ U.save("D4_3_subgroups.md", "# Lab 4.3: errors by subgroup, cohort 2025\n\n" + f
 # dismissed either. Women are 43% of the training data and 52% of the eligible population, so the next cohort's
 # table is read with that row first.
 #
-# ## ✱ Stretch · x
+# ## ✱ Stretch · The same table by provider: how many slices can carry an interval?
 #
 # Build the same table by provider. How many of the 60 providers have at least 30 trainees who left? What does
 # that say about a provider league table built from this model's errors?

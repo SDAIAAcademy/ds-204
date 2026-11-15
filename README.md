@@ -1,7 +1,7 @@
 <!-- academy:title -->
 # Machine Learning for Tabular Data: Baselines and Validation
 
-تعلم الآلة للبيانات الجدولية: خطوط الأساس والتحقق من الصحة
+تعلّم الآلة للبيانات الجدولية: خطوط الأساس والتحقق من الصحة
 
 Data Science Track · SDAIA Academy · DS-204 · Level 200
 

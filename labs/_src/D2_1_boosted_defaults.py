@@ -188,7 +188,7 @@ U.save("D2_1_boosted.md", "# Lab 2.1: boosted trees with defaults\n\n" + line + 
 # importance; and neither number says in which direction a column acts, or that changing it would change the
 # outcome.
 #
-# ## ✱ Stretch · x
+# ## ✱ Stretch · Stop adding trees early, without touching the validation fold
 #
 # Choose the number of trees without touching the validation rows of fold 5: hold out the last half-year of the
 # **training** rows, find the peak there, refit on all training rows with that number, and score fold 5 once.

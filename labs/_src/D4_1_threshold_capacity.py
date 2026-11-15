@@ -185,7 +185,7 @@ U.save("D4_1_threshold.md", "# Lab 4.1: a threshold that fits capacity\n\n" + U.
 # vary from intake to intake. A fixed threshold treats equal risk equally and overruns or underuses capacity.
 # What cannot be defended is not saying which rule runs, and who may change it.
 #
-# ## ✱ Stretch · x
+# ## ✱ Stretch · An interval for the precision at the chosen threshold
 #
 # The precision of the 2025 list is a share of 800 trainees. Put a 95% interval on it with `U.wilson(found, 800)`.
 # Is the precision of 2024 inside it?

@@ -193,7 +193,7 @@ U.save("D3_4_review.md", "# Lab 3.4: review of a colleague's notebook\n\n" + U.m
 # A review note names numbers, not character. "Your split is wrong" starts an argument. "With the copies kept
 # out of the test set the accuracy is 0.87, and a constant answer scores 0.84" ends one.
 #
-# ## ✱ Stretch · x
+# ## ✱ Stretch · Rewrite the notebook as one pipeline scored on the fund's folds
 #
 # Rewrite the notebook as one pipeline: `U.make_pipeline(U.boosted(num_leaves=15, min_child_samples=5))` on the
 # scorable rows, scored with `U.score_folds` on the fund's folds. Where does it land on the ladder of Day 2?

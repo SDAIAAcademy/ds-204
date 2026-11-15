@@ -7,7 +7,7 @@
   "lang": "en",
   "title": {
     "en": "Machine Learning for Tabular Data: Baselines and Validation",
-    "ar": "تعلم الآلة للبيانات الجدولية: خطوط الأساس والتحقق من الصحة"
+    "ar": "تعلّم الآلة للبيانات الجدولية: خطوط الأساس والتحقق من الصحة"
   },
   "tagline": "Take a tabular prediction from the decision it serves to a model card: a logged baseline ladder, validation that mirrors use, a leakage audit, a threshold that fits capacity and errors by subgroup with intervals",
   "description": "Participants predict which trainees of a fictional vocational training fund are likely not to complete, so that advisers can offer support early. On synthetic enrolment data with repeated trainees and cohorts, they climb a baseline ladder to tuned gradient-boosted trees, test an automated or pretrained challenger, choose validation that mirrors use, audit for leakage, set a threshold, break errors down by subgroup and write a model card. Deployment is left to AE-205 and AE-305.",

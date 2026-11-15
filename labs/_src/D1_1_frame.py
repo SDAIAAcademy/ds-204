@@ -225,7 +225,7 @@ U.save("D1_1_framing.md", sheet)
 # 🔍 **Look at** the two numbers together. The base rate of the scorable rows is below the break-even: supporting
 # everyone would cost more than it saves, and the advisers could not do it anyway. The fund needs a ranking.
 #
-# ## ✱ Stretch · x
+# ## ✱ Stretch · Frame the same question on the enrolment day: what is gained and what is lost
 #
 # Frame the same question on the enrolment day. Which candidate column disappears? How many more trainees could
 # be reached? Write two lines under the framing sheet.

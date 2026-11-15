@@ -227,7 +227,7 @@ except NotImplementedError:
 U.save("capstone_framing.md", "# Capstone framing\n\n" + "\n".join(f"- **{k}:** {v}" for k, v in framing.items()) + "\n")
 
 # %% [markdown]
-# ## ✱ Stretch · x
+# ## ✱ Stretch · Exchange cards with a neighbour: one question each
 #
 # Give your card to a neighbour and take theirs. Ask one question the card does not answer. Add the answer to
 # your own card.

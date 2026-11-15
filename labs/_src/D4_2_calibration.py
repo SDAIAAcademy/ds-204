@@ -213,7 +213,7 @@ U.save("D4_2_calibration.md", "# Lab 4.2: calibration\n\n" + U.md(delivered) + "
        + U.md(drift) + "\n\n" + line + "\n")
 
 # %% [markdown]
-# ## ✱ Stretch · x
+# ## ✱ Stretch · Calibrate inside the time-ordered folds
 #
 # The calibrators here were fitted on one cohort. Fit a sigmoid calibrator for the weighted model inside each of
 # the fund's five folds instead, on the last half-year of each training part, and score the calibrated

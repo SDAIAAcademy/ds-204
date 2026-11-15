@@ -96,7 +96,7 @@ for k, v in SCHEMES.items():
 # %%
 def my_schemes() -> dict:
     # BEGIN SOLUTION
-    return {1: "time", 2: "grouped", 3: "random", 4: "time", 5: "grouped", 6: "grouped"}
+    return {1: "time", 2: "grouped", 3: "random", 4: "time", 5: "grouped", 6: "grouped+time"}
     # END SOLUTION
 
 
@@ -156,7 +156,7 @@ for c in cases:
 # These six questions are the start of the leakage checklist in `followup/leakage_checklist.md`. You use it on
 # the fund's own table in Lab 3.3 and in the capstone.
 #
-# ## ✱ Stretch · x
+# ## ✱ Stretch · Add a seventh case from your own work
 #
 # Describe a case from your own work in the same form: the problem, how the data were collected, the split that
 # was used. Give it to a neighbour to classify.

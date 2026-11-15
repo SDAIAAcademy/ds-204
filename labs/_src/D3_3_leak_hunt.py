@@ -246,7 +246,7 @@ if not U.QUICK:
 # ones behind it: while `weeks_attended` was in the table, nothing else seemed to matter. That is why an audit
 # removes **one thing at a time** and writes the score down each time.
 #
-# ## ✱ Stretch · x
+# ## ✱ Stretch · Rebuild the provider rate from past cohorts only
 #
 # Build an honest provider rate: for each row, the non-completion rate of its provider among the enrolments that
 # had **ended** before the row's prediction date. Add it and score on the fund's folds. Does it help beyond

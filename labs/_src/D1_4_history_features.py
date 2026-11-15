@@ -179,7 +179,7 @@ print(line)
 U.save("D1_4_history.md", "# Lab 1.4: history features\n\n" + U.md(both, 4) + "\n\n" + U.md(parts) + "\n\n" + line + "\n")
 
 # %% [markdown]
-# ## ✱ Stretch · x
+# ## ✱ Stretch · A third feature: days since the last exit
 #
 # Add `days_since_last_exit` (a large number for a trainee with no earlier exit). Run the time-travel test on it
 # before you look at its score.

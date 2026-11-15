@@ -1,6 +1,6 @@
 # Machine Learning for Tabular Data: Baselines and Validation: labs
 
-Hands-on notebooks for the SDAIA Academy course **DS-204 Machine Learning for Tabular Data: Baselines and Validation (تعلم الآلة للبيانات الجدولية: خطوط الأساس والتحقق من الصحة)**. Every lab works on **Mubakkir**, a model that ranks the trainees of the fictional Sullam Vocational Training Fund by their risk of not completing, so that advisers can offer support early.
+Hands-on notebooks for the SDAIA Academy course **DS-204 Machine Learning for Tabular Data: Baselines and Validation (تعلّم الآلة للبيانات الجدولية: خطوط الأساس والتحقق من الصحة)**. Every lab works on **Mubakkir**, a model that ranks the trainees of the fictional Sullam Vocational Training Fund by their risk of not completing, so that advisers can offer support early.
 
 No lab calls a language model, needs a key or downloads a model. Everything runs on a laptop processor or on a free Colab runtime. The data are synthetic and are in the repository.
 

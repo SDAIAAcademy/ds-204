@@ -157,7 +157,7 @@ U.save("D1_2_baselines.md", "# Lab 1.2: the first two rungs\n\n" + U.md(summary)
 U.check(gain > 2 * r_rules["spread"], "the gain of the rules over the constant is larger than twice the fold spread")
 
 # %% [markdown]
-# ## ✱ Stretch · x
+# ## ✱ Stretch · A fourth rule from the provider's past non-completion rate
 #
 # Add a rule from the provider: the provider's non-completion rate in the **training rows** is in the top quarter.
 # Compute the rate inside the function, from `train` only. Does a fourth rule earn its line in the log?

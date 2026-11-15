@@ -236,7 +236,7 @@ if not U.QUICK:
 # fresh rows. With 20 trials and ten thousand rows the difference is small. With 500 rows it is not. More trials
 # push it the same way. Nested folds remove the question whatever its size.
 #
-# ## ✱ Stretch · x
+# ## ✱ Stretch · Spend 40 trials: what does the second half of the budget buy?
 #
 # Set `N_TRIALS = 40` and run tasks 2 to 4 again. Log it as a new line. What did the second half of the budget
 # buy, and what did it cost in seconds?

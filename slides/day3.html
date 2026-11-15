@@ -159,7 +159,7 @@
     <div class="card c-coral"><h4>A world that moves fast</h4><p class="small mb0">Prices, fraud patterns, policies. The faster the change, the more a model's age costs.</p></div>
   </div>
   <div class="callout tip mt"><b>The habit.</b> Choose the split from the use. Then measure the other splits once, and write the gaps down with their causes.</div>
-  <aside class="notes"><p>The stretch of Lab 3.1 tries a model that can memorise, with leaves of one row: even then no gap opens between random and grouped, because 72% of the trainees have one row. In the pump case of the next lab, the same experiment gives a recall of 0.94 that collapses on new pumps.</p></aside>
+  <aside class="notes"><p>The stretch of Lab 3.1 tries a model that can memorise, with leaves of one row: even then no gap opens between random and grouped, because 72% of the trainees have one row. The pump case of the next lab is the opposite: about 8,000 hourly rows per pump, split at random, behind a reported recall of 0.94 for pumps the model will never have seen.</p></aside>
 </section>
 
 <section class="slide" id="check-split" data-lo="LO3">
@@ -185,7 +185,7 @@
 <!-- Session 2 -->
 
 <section class="slide section" id="s2" data-auto="section" data-session="2">
-  <aside class="notes"><p>Leakage is information in training that will not be there in use. This session names four kinds and gives each a question; the lab applies them to six cases from other sectors.</p></aside>
+  <aside class="notes"><p>Leakage is information in training that will not be there in use. FN-105 found three planted leaks in one table; this session names four kinds and gives each a question; the lab applies them to six cases from other sectors.</p></aside>
 </section>
 
 <section class="slide" id="four-kinds" data-lo="LO1">
@@ -207,13 +207,13 @@
   <div class="cols cols-2">
     <ul class="bullets">
       <li>Recorded when the outcome happens: <code>exit_reason</code>, <code>weeks_attended</code></li>
-      <li>A consequence of the outcome: calls from the collections team after a missed payment</li>
-      <li>Someone's answer to the same question: an antibiotic ordered because the doctor suspects the infection</li>
+      <li>A consequence of the outcome: a cancellation fee, in a table that predicts which bookings are cancelled</li>
+      <li>Someone's answer to the same question: a specialist referral written because the doctor suspects the condition</li>
     </ul>
     <div class="card c-coral"><h4>The question</h4><p class="small mb0">When is this column written, and by whom? Would a person who already knew the outcome be the one filling it in?</p></div>
   </div>
   <div class="callout warn mt"><b>What goes wrong.</b> The model looks brilliant and the top feature is one nobody questioned because it "obviously matters".</div>
-  <aside class="notes"><p>Day 1 already removed three such columns with the data dictionary. The hard cases are the indirect ones, like the antibiotic: the column is recorded before the outcome is confirmed, yet it exists only because a human has half-made the prediction.</p></aside>
+  <aside class="notes"><p>Day 1 already removed three such columns with the data dictionary. The examples here are not the six cases of Lab 3.2, so the lab still tests the reading. The hard cases are the indirect ones, like the referral: the column is recorded before the outcome is confirmed, yet it exists only because a human has half-made the prediction.</p></aside>
 </section>
 
 <section class="slide" id="future-leak" data-lo="LO1">
@@ -290,7 +290,7 @@
 </section>
 
 <section class="slide lab" id="lab-3-2" data-auto="lab" data-lab="3.2">
-  <aside class="notes"><p>AI-tutor, with the request that each pair decides before asking an assistant. No model is trained. Cases that divide rooms: case 3, where the split is right and the fault is the selection before it; case 6, which is also future information. Accept a reasoned second kind. The checked table is the evidence for the first course outcome.</p></aside>
+  <aside class="notes"><p>AI-tutor, with the request that each pair decides before asking an assistant. No model is trained. Cases that divide rooms: case 3, where the split is right and the fault is the selection before it; case 6, which is also future information, and whose use (new patients, at hospitals that open next year) needs a split that is both grouped and time-ordered, as the scheme table says. Accept a reasoned second kind. The checked table is the evidence for the first course outcome.</p></aside>
 </section>
 
 <!-- Session 3 -->

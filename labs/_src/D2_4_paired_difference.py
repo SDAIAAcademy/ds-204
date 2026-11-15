@@ -204,7 +204,7 @@ U.save("D2_4_decision.md", "# Lab 2.4: is the challenger better?\n\n" + U.md(pai
 # a legitimate result. It is not the same as "shown to be equal", and the rule says in advance what happens
 # then: the simpler model stays.
 #
-# ## ✱ Stretch · x
+# ## ✱ Stretch · The same comparison between the champion and the logistic rung
 #
 # Run the same comparison between the champion and the rung "logistic + history" (`U.oof()` holds its
 # probabilities as `logistic`). What would you tell Dr. Haya Al-Mogren about the value of the boosted trees?

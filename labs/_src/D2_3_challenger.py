@@ -163,7 +163,7 @@ U.save("D2_3_challenger.md", "# Lab 2.3: the challenger\n\n" + "\n".join(f"- {k}
 # 🔍 **Look at** the last column and resist a verdict. Two means and five differences are not yet a decision.
 # Lab 2.4 turns them into one.
 #
-# ## ✱ Stretch · x
+# ## ✱ Stretch · Give the challenger the fund's inner split in place of its own
 #
 # The tool chooses its blend on a random part of the training rows. Pass it the fund's inner split in place of
 # its own: `tuning_data=` the last half-year of the training part, `train_data=` the rest. Same budget. Does

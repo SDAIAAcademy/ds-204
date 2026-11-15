@@ -230,7 +230,7 @@ U.save("D3_1_three_splits.md", "# Lab 3.1: one model, three splits\n\n" + U.md(t
        + "\n".join("- " + s for s in sentences) + "\n")
 
 # %% [markdown]
-# ## ✱ Stretch · x
+# ## ✱ Stretch · A model that memorises: does the grouped gap grow?
 #
 # Replace the champion by a model that can memorise: `U.make_pipeline(U.boosted(num_leaves=255,
 # min_child_samples=1, n_estimators=300), scale=False)`. Score it under the random and the grouped split, history

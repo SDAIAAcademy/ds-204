@@ -187,7 +187,7 @@ U.save("D1_3_logistic.md", "# Lab 1.3: the logistic rung\n\n" + line + "\n\n" + 
 # against the rest, **with the other inputs held fixed**. It ranks what the model leans on. It does not say that
 # changing the column would change the outcome.
 #
-# ## ✱ Stretch · x
+# ## ✱ Stretch · Add one interaction by hand and log it
 #
 # The rule of Lab 1.2 worked on absence. Does absence mean the same for everyone? Add one column by hand,
 # `absences_w2` times an indicator for `enrolled_via == "employer"`, and log the run. Keep the answer for Day 2.
