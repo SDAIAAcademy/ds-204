@@ -1,19 +1,36 @@
 <section class="slide title" id="title" data-auto="title">
-  <aside class="notes">Today is theirs: keep your own talking to the opening and the closing. Confirm the running order and the demo setup (screen sharing, accounts, a recorded backup) first.</aside>
+  <aside class="notes"><p>Today is theirs: keep your own talking to the opening and the closing. Before the room arrives, read each README in the review order of Day 3 (rows, split, preparation, tuning, metric) and choose the one change you will ask each participant for. Confirm the running order and that every repository is public.</p></aside>
 </section>
 
 <section class="slide" id="agenda" data-label="Agenda">
   <div class="kicker">Capstone</div>
-  <h2>How the presentations run</h2>
+  <h2>How the day runs</h2>
   <div class="agenda">
-    <div class="item now"><div><b>Expectations and final prep</b><small>the rubric, a last rehearsal, then the first presentations</small></div></div>
-    <div class="item"><div><b>Presentations</b><small>each one timed, with questions after it</small></div></div>
-    <div class="item"><div><b>Review and closing</b><small>peer feedback, the trainer's review, what next</small></div></div>
+    <div class="item now"><div><b>Build and finish</b><small>your problem from framing to model card; the README is the deliverable</small></div></div>
+    <div class="item"><div><b>Supervised exit check</b><small>without AI assistance, items in the style of the badge exam</small></div></div>
+    <div class="item"><div><b>Defences</b><small>eight minutes each, one timer, one change named by the assessor</small></div></div>
+    <div class="item"><div><b>Review and closing</b><small>what the repositories showed, the follow-up task, what comes next</small></div></div>
   </div>
+  <aside class="notes"><p>The split between building and defences depends on the size of the group: with twelve participants the defences need about two hours with changeovers. The exit check is not in this repository; it is drawn from the private bank.</p></aside>
+</section>
+
+<section class="slide" id="deliverable" data-label="The deliverable">
+  <div class="kicker">What you hand in</div>
+  <h2>A public repository whose README reports six things</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>Ladder and validation</h4><p class="small mb0">Baselines and models on identical folds; the split and the use it rehearses.</p></div>
+    <div class="card c-coral"><h4>Audit and comparison</h4><p class="small mb0">Leaks removed one at a time; one paired difference with an interval and a decision.</p></div>
+    <div class="card c-purple"><h4>Threshold and subgroups</h4><p class="small mb0">The rule for the list on rows held out to the end; errors by subgroup with intervals.</p></div>
+  </div>
+  <ul class="bullets mt">
+    <li>A fixed seed and a lock file: a fresh clone reproduces every number</li>
+    <li>The model card, and the prompts and agent transcripts you used, in <code>ai/</code></li>
+  </ul>
+  <aside class="notes"><p>The template is labs/capstone/TEMPLATE_README.md. AI assistants and agents are allowed without limit today; what is assessed is whether every choice can be defended by the person who made it.</p></aside>
 </section>
 
 <section class="slide" id="rubric" data-label="The rubric">
-  <div class="kicker">How presentations are scored</div>
+  <div class="kicker">How the repository is scored</div>
   <h2>The rubric</h2>
   <div class="bars">
     <div class="row"><span>Framing and baseline</span><div class="bar c-teal" style="--w:60%"></div><span class="val">15%</span></div>
@@ -22,77 +39,107 @@
     <div class="row"><span>Threshold, calibration and subgroup errors</span><div class="bar c-purple" style="--w:100%"></div><span class="val">25%</span></div>
     <div class="row"><span>Model card and reproducibility</span><div class="bar c-amber" style="--w:60%"></div><span class="val">15%</span></div>
   </div>
-  <div class="callout tip mt"><b>Show results from at least two measured runs.</b> A claim without a number is a plan, not a result.</div>
-  <aside class="notes">Walk through each criterion with one example of what full marks look like.</aside>
+  <div class="callout tip mt"><b>A modest score that is validated beats a high one that is not.</b> No criterion rewards the size of the number.</div>
+  <aside class="notes"><p>Full marks, one example each. Framing: a decision with an owner and a capacity, and a rule baseline on the same folds. Validation: the split argued from the use, other splits measured once, an audit table. Models: a stated budget and a paired interval. Threshold: a rule tested on rows opened once, a decile table, slices with intervals and a bias type per finding. Card: limits a reader can recognise, and a clone that runs.</p></aside>
 </section>
 
 <section class="slide" id="format" data-label="Format">
-  <div class="kicker">Format</div>
-  <h2>8 minutes for each presentation</h2>
-  <div class="cols cols-3">
-    <div class="card c-teal"><h4>1 · The problem</h4><p class="small mb0">Who, what, why now. One slide.</p></div>
-    <div class="card c-cyan"><h4>2 · What you built</h4><p class="small mb0">Design, decisions, trade-offs. Then the live demo.</p></div>
-    <div class="card c-coral"><h4>3 · What you measured</h4><p class="small mb0">Baseline, improvement, failures found, what comes next.</p></div>
+  <div class="kicker">The defence</div>
+  <h2>Eight minutes: four are yours, four belong to one change</h2>
+  <div class="cols cols-2">
+    <div class="card c-teal"><h4>Minutes 0 to 4 · You present</h4><p class="small mb0">The decision. The validation scheme and why. The ladder in one table. The finding you are least comfortable with.</p></div>
+    <div class="card c-coral"><h4>Minutes 4 to 8 · One change</h4><p class="small mb0">The assessor swaps the split or removes a feature. You say what will happen to the score, and why, <b>before</b> it is run. Then it is run, or the result is shown.</p></div>
   </div>
-  <div class="callout note mt"><b>Peer feedback.</b> After each talk, everyone writes one strength, one question and one suggestion.</div>
+  <div class="callout note mt"><b>One timer, no separate question time.</b> The change and your prediction are the questions.</div>
+  <aside class="notes"><p>The catalog gives eight minutes and no question time, so the change sits inside the eight. A prediction that turns out wrong and is then explained well earns more than a lucky one: the criterion is the reasoning about the validation choice.</p></aside>
+</section>
+
+<section class="slide" id="the-change" data-label="The change">
+  <div class="kicker">What the assessor may ask</div>
+  <h2>Predict the effect before it is run</h2>
+  <table class="t">
+    <tr><th>The change</th><th>What a good answer contains</th></tr>
+    <tr><td>"Score it under a random split."</td><td>The direction, a rough size, and which rows the training part would then know</td></tr>
+    <tr><td>"Keep each unit on one side."</td><td>Whether the model can recognise a unit, and what history is worth</td></tr>
+    <tr><td>"Remove your strongest feature."</td><td>What the feature carries, and which others can stand in for it</td></tr>
+    <tr><td>"Put back the column you removed."</td><td>The kind of leak, and why the higher score cannot be repeated in use</td></tr>
+  </table>
+  <aside class="notes"><p>Choose the change from the README: the weakest argued choice is the best one to ask about. When re-running takes longer than a minute, ask participants to have the alternative split ready as a switch, as Loay's notebook had, or show the result you prepared.</p></aside>
 </section>
 
 <section class="slide order" id="running-order" data-label="Running order">
   <div class="kicker">Running order</div>
-  <h2>Who presents when</h2>
+  <h2>Who defends when</h2>
   <table class="t small">
-    <tr><th>#</th><th>Presenter</th><th>Project</th></tr>
-    <tr><td>1</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
-    <tr><td>2</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
-    <tr><td>3</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
-    <tr><td>4</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
-    <tr><td>5</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
-    <tr><td>6</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
-    <tr><td>7</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
-    <tr><td>8</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
+    <tr><th>#</th><th>Presenter</th><th>Problem</th></tr>
+    <tr><td>1</td><td><input placeholder="name"></td><td><input placeholder="Problem"></td></tr>
+    <tr><td>2</td><td><input placeholder="name"></td><td><input placeholder="Problem"></td></tr>
+    <tr><td>3</td><td><input placeholder="name"></td><td><input placeholder="Problem"></td></tr>
+    <tr><td>4</td><td><input placeholder="name"></td><td><input placeholder="Problem"></td></tr>
+    <tr><td>5</td><td><input placeholder="name"></td><td><input placeholder="Problem"></td></tr>
+    <tr><td>6</td><td><input placeholder="name"></td><td><input placeholder="Problem"></td></tr>
+    <tr><td>7</td><td><input placeholder="name"></td><td><input placeholder="Problem"></td></tr>
+    <tr><td>8</td><td><input placeholder="name"></td><td><input placeholder="Problem"></td></tr>
   </table>
-  <aside class="notes">Type the names in at the start; the fields can be edited live and are not saved, so keep the list in your notes too.</aside>
+  <aside class="notes"><p>Type the names in at the start; the fields can be edited live and are not saved, so keep the list in your notes too.</p></aside>
 </section>
 
-<section class="slide dark" id="final-prep" data-label="Before the first presentation">
-  <div class="kicker">Before the first presentation</div>
+<section class="slide dark" id="final-prep" data-label="Before the first defence">
+  <div class="kicker">Before the first defence</div>
   <h1>Final prep · 20 minutes</h1>
   <div class="timer" data-minutes="20"></div>
-  <p class="lead">Rehearse once, record a backup, try the demo on this screen.</p>
-  <aside class="notes">Press T to start the timer. Breaks are not slides: press B when the room needs one.</aside>
+  <p class="lead">Clone your repository into a new folder and run it once. Have a second split ready as a switch.</p>
+  <aside class="notes"><p>Press T to start the timer. Breaks are not slides: press B when the room needs one.</p></aside>
 </section>
 
 <section class="slide dark presenting" id="now-presenting" data-label="Now presenting">
   <div class="kicker center">Now presenting</div>
-  <div class="center"><input placeholder="Presenter · project"></div>
+  <div class="center"><input placeholder="Presenter · problem"></div>
   <div class="timers mt">
-    <div><h3>Talk and demo</h3><div class="timer" data-minutes="8"></div></div>
+    <div><h3>Defence, with the change at minute 4</h3><div class="timer" data-minutes="8"></div></div>
   </div>
-  <aside class="notes">Type the presenter's name and press T to start the timer. Reuse this slide for every presenter.</aside>
+  <aside class="notes"><p>Type the presenter's name and press T. Name the change when the timer shows four minutes left, whatever the presenter is saying. Reuse this slide for every presenter.</p></aside>
 </section>
 
 <section class="slide" id="review" data-label="Trainer review">
   <div class="kicker">Trainer review</div>
-  <h2>What the presentations showed</h2>
+  <h2>What the repositories showed</h2>
   <div class="cols cols-3">
-    <div class="card c-teal"><h4>Strongest patterns</h4><p class="small mb0">What several projects got right.</p></div>
-    <div class="card c-coral"><h4>Common gaps</h4><p class="small mb0">What most projects would fix next.</p></div>
-    <div class="card c-purple"><h4>One surprise</h4><p class="small mb0">Something nobody expected.</p></div>
+    <div class="card c-teal"><h4>Strongest patterns</h4><p class="small mb0">What several repositories got right.</p></div>
+    <div class="card c-coral"><h4>Common gaps</h4><p class="small mb0">What most would repair next.</p></div>
+    <div class="card c-purple"><h4>One surprise</h4><p class="small mb0">A prediction that failed, and what it taught.</p></div>
   </div>
-  <aside class="notes">Fill these in from your scoring notes during the last break. Name projects for strengths; keep gaps anonymous.</aside>
+  <aside class="notes"><p>Fill these in from your scoring notes during the last break. Name repositories for strengths; keep gaps anonymous. Write each participant the five-line review note of Lab 3.4.</p></aside>
+</section>
+
+<section class="slide" id="follow-up" data-label="The follow-up task">
+  <div class="kicker">In the next four weeks</div>
+  <h2>The follow-up: the leakage checklist on a model that is not yours</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Choose one model from your own work, or a public notebook</li>
+      <li>Work through <code>labs/followup/leakage_checklist.md</code></li>
+      <li>Send the one-page note of <code>note_template.md</code> to your trainer</li>
+    </ul>
+    <div class="card c-teal"><h4>What the note holds</h4><p class="small mb0">The reported score, the split and the use, each checklist question with its answer, what you would remove or measure next. Numbers, not opinions.</p></div>
+  </div>
+  <aside class="notes"><p>The follow-up is tracked: record who sent a note. A note about a colleague's work model is shared only with that colleague's agreement; a public notebook needs none.</p></aside>
 </section>
 
 <section class="slide" id="what-next" data-label="After the course">
   <div class="kicker">After the course</div>
   <h2>Keep going</h2>
   <ul class="bullets">
-    <li><b>Your project stays yours:</b> keep it reproducible and add the next improvement you named today</li>
-    <li><b>Next Academy course:</b> REPLACE: the course that follows this one</li>
+    <li><b>Your repository stays yours:</b> keep it reproducible, and add the one measurement you named today</li>
+    <li><b>AE-205 Deploying AI Services:</b> a model like yours as a service, with containers, serving and monitoring</li>
+    <li><b>AE-305 Operating Machine Learning and Language Model Systems:</b> retraining, drift and operations, starting from a model card</li>
   </ul>
+  <aside class="notes"><p>This course stops at the model card on purpose. The hand-over list of Lab 4.4 is the first page of both follow-on courses.</p></aside>
 </section>
 
 <section class="slide dark" id="thanks" data-label="Thank you">
   <div class="kicker">SDAIA Academy</div>
   <h1>Thank you</h1>
   <p class="lead">Machine Learning for Tabular Data: Baselines and Validation</p>
+  <aside class="notes"><p>Close with the sentence of the week: a score is a claim about rows the model has not seen, and the work is making that claim true.</p></aside>
 </section>

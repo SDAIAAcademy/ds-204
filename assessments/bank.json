@@ -204,6 +204,818 @@
       "level": "apply",
       "pool": "practice",
       "weight": 1
+    },
+    {
+      "id": "q-trees-training-score",
+      "type": "single",
+      "prompt": "A boosted model scores 0.90 on its training rows and 0.48 on the validation rows of the same fold. A logistic model scores 0.52 and 0.50. Which model goes further up the ladder?",
+      "options": [
+        "The boosted model: its training score shows what it can reach",
+        "The boosted model, after averaging its two scores",
+        "Neither: the gap of the boosted model proves a leak",
+        "The logistic model: only validation scores are compared"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "A rung is its score on rows the model has not seen. On those the logistic model is ahead, 0.50 to 0.48.",
+      "misconceptions": [
+        "Reads a training score as potential: it measures how much the model memorised",
+        "Averages memory and generalisation into a number that estimates neither",
+        "Takes a large train-validation gap for leakage: a leak inflates the validation score, not the training score",
+        ""
+      ],
+      "lo": [
+        "LO2"
+      ],
+      "day": "day2",
+      "session": 1,
+      "level": "understand",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-tuning-budget",
+      "type": "single",
+      "prompt": "A team wants to tune a boosted model on a table of 30,000 rows. Which plan keeps the reported score honest?",
+      "options": [
+        "Try settings until the validation score stops improving, then report it",
+        "Tune on the test set, since it is the most recent data",
+        "Run a full grid of 2,000 settings and report the best mean over the folds",
+        "Fix 20 random trials in advance, choose on inner folds, report on the outer folds"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "A stated budget fixes how often the validation rows are looked at, and nested folds keep the rows that choose apart from the rows that report.",
+      "misconceptions": [
+        "Stops when the score looks good: the number of looks is undefined, so the best score cannot be interpreted",
+        "Spends the test set on choosing: nothing is left to report on",
+        "Reports the best of 2,000 on the folds that chose it: part of that score is luck",
+        ""
+      ],
+      "lo": [
+        "LO2"
+      ],
+      "day": "day2",
+      "session": 2,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-tuning-nested-meaning",
+      "type": "single",
+      "prompt": "A nested search picks different settings in each of five outer folds and reports a mean of 0.53. What does 0.53 describe?",
+      "options": [
+        "The settings that were chosen most often",
+        "Nothing usable, because the settings disagree",
+        "The best of the five sets of settings",
+        "The procedure: search under this budget, then fit"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "Nested validation scores the whole procedure. The model that is used comes from running that procedure once on all development rows.",
+      "misconceptions": [
+        "Looks for one winner among the folds: the nested score is not the score of any single set of settings",
+        "Expects the folds to agree: different training parts may reasonably choose different settings",
+        "Reads a mean as a maximum",
+        ""
+      ],
+      "lo": [
+        "LO2"
+      ],
+      "day": "day2",
+      "session": 2,
+      "level": "understand",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-challenger-licence",
+      "type": "single",
+      "prompt": "A colleague proposes a pretrained tabular model, called through its vendor's hosted service, as a challenger for a model on patient records. What do you settle before any score is computed?",
+      "options": [
+        "Whether its published benchmark results are better than yours",
+        "Whether it runs faster than your tuned model",
+        "Whether it supports the same number of features",
+        "Whether the licence allows this use and whether the records may leave your machines"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "A challenger that may not be used, or that needs data to go where they may not go, has lost before the contest starts, whatever it scores.",
+      "misconceptions": [
+        "Trusts a benchmark on other tables: it says nothing about permission to use the model or about your data",
+        "Compares speed before legality and data protection",
+        "Checks a technical detail first: it matters only if the model may be used at all",
+        ""
+      ],
+      "lo": [
+        "LO4"
+      ],
+      "day": "day2",
+      "session": 3,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-challenger-fair",
+      "type": "single",
+      "prompt": "An automated tool is given two hours and reports 0.58 from its own internal validation. Your tuned model took three minutes and scores 0.53 on your five time-ordered folds. What does the comparison show?",
+      "options": [
+        "The tool is better by 0.05",
+        "Your model is better, because it is faster",
+        "Nothing: different rows, different budgets",
+        "The tool overfits, because its score is higher"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "A contest fixes the folds and the budget for both sides. The tool's own number sits on a split it chose, and it had forty times the time.",
+      "misconceptions": [
+        "Subtracts scores measured on different rows under different budgets",
+        "Declares a winner on speed alone, without a score on common rows",
+        "",
+        "Infers overfitting from a higher number: it may or may not be true, and only your folds can tell"
+      ],
+      "lo": [
+        "LO4"
+      ],
+      "day": "day2",
+      "session": 3,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-paired-why",
+      "type": "single",
+      "prompt": "Two models are scored on the same five folds. Model A: mean 0.530, fold spread 0.020. Model B: mean 0.540, fold spread 0.021. B is ahead on all five folds, by 0.008 to 0.012. What do you conclude?",
+      "options": [
+        "B is ahead: the five paired differences are all positive and close together",
+        "No difference: 0.010 is inside both spreads",
+        "A is better: its spread is smaller",
+        "Nothing can be said with five folds"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "The folds pair the models. Most of each spread is the difficulty of the fold, shared by both; the differences vary far less than the scores.",
+      "misconceptions": [
+        "",
+        "Compares two means with their spreads and throws the pairing away",
+        "Chooses on the spread and ignores the paired differences",
+        "Gives up on few folds: five consistent differences are informative, and an interval says how much"
+      ],
+      "lo": [
+        "LO4"
+      ],
+      "day": "day2",
+      "session": 4,
+      "level": "understand",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-paired-decision",
+      "type": "single",
+      "prompt": "A challenger's mean paired difference is +0.021 with a 95% interval from +0.013 to +0.029. The minimum effect stated in advance is +0.01. What is the decision?",
+      "options": [
+        "Not shown: keep the champion",
+        "Keep the champion",
+        "Adopt the challenger",
+        "Lower the minimum effect and test again"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "The whole interval lies above the minimum effect, so the gain is both shown and large enough to matter.",
+      "misconceptions": [
+        "Calls it not shown although the interval does not contain the minimum effect",
+        "Ignores an interval that lies entirely above the bar set in advance",
+        "",
+        "Changes a rule after seeing the result, when the result already meets the rule"
+      ],
+      "lo": [
+        "LO4"
+      ],
+      "day": "day2",
+      "session": 4,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-paired-minimum",
+      "type": "single",
+      "prompt": "Why is the minimum effect for adopting a challenger written down before the contest is run?",
+      "options": [
+        "So that the bar cannot drift to just below whatever was measured",
+        "So that the interval becomes narrower",
+        "Because the t distribution requires it",
+        "So that fewer folds are needed"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "A rule chosen after the result is not a rule. The minimum effect is a judgment about cost and benefit, made without knowing who won.",
+      "misconceptions": [
+        "",
+        "Expects a written threshold to change the statistics: the interval depends on the data only",
+        "Looks for a mathematical requirement where the reason is honesty of the procedure",
+        "Confuses the decision rule with the amount of evidence"
+      ],
+      "lo": [
+        "LO4"
+      ],
+      "day": "day2",
+      "session": 4,
+      "level": "understand",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-split-use",
+      "type": "single",
+      "prompt": "A model predicts equipment failure from daily readings of 50 machines, a year of rows per machine. It will be installed on 30 machines that are delivered next month. Which validation split rehearses that use?",
+      "options": [
+        "A grouped split: all rows of a machine on one side",
+        "A random split of the daily rows",
+        "A time-ordered split of all machines together",
+        "A random split, stratified by failure"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "In use every machine is new to the model. Validation rows therefore have to come from machines that are in no training row.",
+      "misconceptions": [
+        "",
+        "Lets the model meet each machine in training and in validation: it is scored on machines it knows",
+        "Orders time and keeps every machine on both sides: the unit that is new in use is the machine",
+        "Balances the outcome across folds and leaves the shared machines in place"
+      ],
+      "lo": [
+        "LO3"
+      ],
+      "day": "day3",
+      "session": 1,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-split-maturity",
+      "type": "single",
+      "prompt": "Loans are repaid over twelve months, and default is recorded when it happens. On 1 July a team trains on \"all loans with a known outcome\". Which loans from the last twelve months are in the training rows?",
+      "options": [
+        "All of them",
+        "None of them",
+        "Only those that have already defaulted",
+        "A random sample of them"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "A recent loan has a known outcome only if it has already defaulted; the good ones are still running. The model then learns that recent loans always fail. Training rows should be loans whose twelve months had passed.",
+      "misconceptions": [
+        "Assumes every recent loan has an outcome: the ones still being repaid have none yet",
+        "Assumes no recent loan has an outcome: the early defaults do",
+        "",
+        "Treats the selection as random: it depends on the outcome itself"
+      ],
+      "lo": [
+        "LO3"
+      ],
+      "day": "day3",
+      "session": 1,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-split-gap-measure",
+      "type": "single",
+      "prompt": "On one table a model scores 0.52 under a random split and 0.53 under time-ordered folds, with fold spreads of 0.02. What do you write in the validation section?",
+      "options": [
+        "The random split overstates performance, as it always does",
+        "The time-ordered folds are faulty: they should score lower",
+        "Both were measured; no gap is shown for this model; the time-ordered folds are kept because they rehearse the use",
+        "The splits are interchangeable from now on"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "A gap between splits is measured, and here none is shown. The scheme is still chosen from the use, and the result holds only for this model and these features.",
+      "misconceptions": [
+        "Repeats a rule of thumb against the measurement",
+        "Expects a direction and doubts the folds when it does not appear",
+        "",
+        "Generalises one measurement to every later model and feature"
+      ],
+      "lo": [
+        "LO3"
+      ],
+      "day": "day3",
+      "session": 1,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-split-age",
+      "type": "single",
+      "prompt": "Why can a random split not show how much a model loses when it is used a year after training?",
+      "options": [
+        "Because it trains and validates on rows from the same period",
+        "Because random folds are smaller",
+        "Because it does not stratify by year",
+        "Because it uses fewer trees"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "Under a random split the training rows are as recent as the validation rows, so the model is always fresh. Only a split ordered in time can score an old model on later rows.",
+      "misconceptions": [
+        "",
+        "Looks at the size of the folds: the issue is which period the rows come from",
+        "Asks for the same mix of years on both sides, which is the opposite of what an ageing test needs",
+        "Confuses a setting of the model with the design of the split"
+      ],
+      "lo": [
+        "LO3"
+      ],
+      "day": "day3",
+      "session": 1,
+      "level": "understand",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-split-new-units",
+      "type": "single",
+      "prompt": "A churn model uses each customer's past complaints as features. Time-ordered folds give 0.55. The company wants to use it in a new country where no customer has any past. Which estimate is the most relevant?",
+      "options": [
+        "0.55, the time-ordered score",
+        "The score with history features hidden for the validation rows",
+        "The score of the customers with the longest history",
+        "The training score"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "In the new use nobody has a history. Hiding it for validation customers rehearses that; even then another country differs in ways no split of this table can show.",
+      "misconceptions": [
+        "Quotes a score that was partly earned with features the new customers will not have",
+        "",
+        "Picks the best-served group as if it stood for everyone",
+        "Reports how well the model fits rows it has seen"
+      ],
+      "lo": [
+        "LO3"
+      ],
+      "day": "day3",
+      "session": 1,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-leak-target",
+      "type": "single",
+      "prompt": "A model predicts which insurance claims are fraudulent when they are filed. One feature is \"assigned to the special investigations unit\". Claims are sent to that unit when a handler suspects fraud. What is this?",
+      "options": [
+        "A legitimate feature",
+        "Preparation leakage",
+        "Group contamination",
+        "Target leakage"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "The column records a person's answer to the question the model is asked, and it is written after filing. It will not exist when a new claim is scored.",
+      "misconceptions": [
+        "Accepts a column because it is strongly related to the outcome, which is exactly the warning sign",
+        "Looks for a step fitted before the split: the fault is in the column itself",
+        "Looks for the same claim on both sides: the column leaks under any split",
+        ""
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": "day3",
+      "session": 2,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-leak-future",
+      "type": "single",
+      "prompt": "A model scores each order for the risk of a return on the day it ships. One feature is the customer's return rate, computed over all of the customer's orders in the table. What is the fault?",
+      "options": [
+        "Preparation leakage: the rate should be scaled inside the pipeline",
+        "None: the rate describes the customer",
+        "Group contamination: customers repeat",
+        "Future information: the rate includes later orders and this one"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "On the shipping day only earlier orders have an outcome. The rate has to be rebuilt for each row from orders whose outcome was known by then.",
+      "misconceptions": [
+        "Sees a preparation problem in a feature that reads the future",
+        "Accepts the feature for its meaning without asking from which rows it was computed",
+        "Names the repeated customers: grouping them would not remove what the column has read",
+        ""
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": "day3",
+      "session": 2,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-leak-scheme",
+      "type": "single",
+      "prompt": "A table has one row per student, measured in one term. A model will be used on next term's students of the same schools; teaching and grading rules change little. Before cross-validation, the analyst kept the 15 of 400 columns most correlated with the outcome, using all rows. Which pair is right?",
+      "options": [
+        "Target leakage; a time-ordered split",
+        "Preparation leakage; a random split with the selection inside each fold",
+        "No leak; a random split",
+        "Group contamination; a grouped split by student"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "The selection is a step fitted on rows that later score the model. The split itself is sound here: each student is one independent row.",
+      "misconceptions": [
+        "Calls a selection step a target leak and asks for time order where there is one term",
+        "",
+        "Overlooks a step that used the outcome of the held-out rows",
+        "Looks for repeated students where each has one row"
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": "day3",
+      "session": 2,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-leak-instrument",
+      "type": "single",
+      "prompt": "A received table has unique record keys. You suspect that some records were entered twice when two systems were merged. How do you check?",
+      "options": [
+        "Count duplicated keys",
+        "Look for rows that agree on the columns describing the real event",
+        "Sort by importance and inspect the top feature",
+        "Switch to a time-ordered split"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "A copy made under a new key passes any test of the key. The test is on what identifies the event: who, where, when.",
+      "misconceptions": [
+        "Tests the key, which the merge made unique",
+        "",
+        "Uses the instrument for column leaks on a problem of rows",
+        "Changes the split: copies with the same date stay together and still count twice"
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": "day3",
+      "session": 3,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-leak-order",
+      "type": "single",
+      "prompt": "During an audit a team removes five suspicious columns at once, and the score falls from 0.95 to 0.55. What is lost by doing it this way?",
+      "options": [
+        "Which columns were leaks, how much each mattered, and whether an honest one was thrown out",
+        "Nothing: the final score is what matters",
+        "The reproducibility of the run",
+        "The calibration of the model"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "One removal at a time, with the score before and after, tells you what each column carried and lets an audit clear the honest ones.",
+      "misconceptions": [
+        "",
+        "Settles for the end result and learns nothing for the next table",
+        "Confuses the audit trail with the seed",
+        "Names an unrelated property of the model"
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": "day3",
+      "session": 3,
+      "level": "understand",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-review-accuracy",
+      "type": "single",
+      "prompt": "A notebook reports 94% accuracy for predicting a fault that occurs in 5% of units. What do you ask first?",
+      "options": [
+        "What a constant answer scores on the same test rows, and what share of them had the fault",
+        "Which library was used",
+        "Whether the learning rate was tuned",
+        "How long training took"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "If 5% of the test rows have the fault, \"no fault\" is 95% accurate. A baseline on the same rows turns the number into information.",
+      "misconceptions": [
+        "",
+        "Asks about tools before asking whether the number means anything",
+        "Asks about tuning a model whose score may be below a constant answer",
+        "Asks about cost before value"
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": "day3",
+      "session": 4,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-threshold-capacity",
+      "type": "single",
+      "prompt": "A team of nurses can make 300 follow-up calls a month. A model scores 4,000 patients a month for the risk of readmission, which happens to 8% of them. Where does the threshold come from?",
+      "options": [
+        "0.5, the default of the library",
+        "0.08, the base rate",
+        "The score of the 300th highest-ranked patient",
+        "The score that maximises accuracy"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "Capacity decides the length of the list, and the list decides the cut. The precision and recall of that list are then reported.",
+      "misconceptions": [
+        "Uses a default that nothing in the decision produces",
+        "Takes the base rate for a threshold: about half the patients may lie above it",
+        "",
+        "Optimises a metric that rewards calling nobody when the outcome is rare"
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day4",
+      "session": 1,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-threshold-say-it",
+      "type": "single",
+      "prompt": "A list of 500 names has precision 0.60 and recall 0.35. Which sentence is right?",
+      "options": [
+        "60% of the people at risk are on the list",
+        "The model is right 60% of the time",
+        "35% of the list had the outcome",
+        "Of the people who went on to have the outcome, about a third were on the list"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "Recall is counted among those who had the outcome; precision among those on the list. Here 300 of 500 on the list had the outcome, and they are 35% of all who did.",
+      "misconceptions": [
+        "Reads precision as if it were recall",
+        "Reads precision as accuracy over everyone",
+        "Reads recall as if it were precision",
+        ""
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day4",
+      "session": 1,
+      "level": "understand",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-calibration-weights",
+      "type": "single",
+      "prompt": "A model trained with class weights ranks as well as an unweighted one. Its scores average 0.38 where 12% have the outcome. For which use is it unfit as it is?",
+      "options": [
+        "Listing the 500 highest-ranked people",
+        "Comparing average precision between the two models",
+        "Listing everyone whose probability exceeds a break-even of 0.25",
+        "Sorting people for a first review"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "A break-even probability is a statement about real rates. Scores that average three times the observed rate cannot be compared with it until they are calibrated.",
+      "misconceptions": [
+        "Picks a use that needs only the order, which is intact",
+        "Picks a metric that depends only on the order",
+        "",
+        "Picks another use of the order alone"
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day4",
+      "session": 2,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-calibration-rows",
+      "type": "single",
+      "prompt": "On which rows should a calibrator be fitted?",
+      "options": [
+        "The training rows of the model, which are the most numerous",
+        "The final test rows, which are the most recent",
+        "Rows the model was not trained on, kept apart from the final test rows",
+        "Any rows, since a calibrator has only two parameters"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "On its own training rows a model's scores fit too well, and a calibrator fitted there learns to trust them too much. The final test rows must stay unseen by every fitted step.",
+      "misconceptions": [
+        "Fits on rows the model has partly memorised",
+        "Spends the test rows on fitting, so nothing honest is left to report",
+        "",
+        "Assumes a small model cannot overfit to the wrong rows"
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day4",
+      "session": 2,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-subgroup-interval",
+      "type": "single",
+      "prompt": "Among people who had the outcome, the model missed 9 of 12 in district A (75%) and 300 of 500 in district B (60%). The overall miss rate is 61%. What can you say about district A?",
+      "options": [
+        "The model is unfair to district A",
+        "District A should be dropped from the report",
+        "District A is fine, because its interval contains 61%",
+        "With 12 cases the interval is wide and contains 61%: too few to tell"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "The 95% interval for 9 of 12 runs from about 47% to 91%. It is compatible with the overall rate and with far worse; the honest report gives the interval and says more cases are needed.",
+      "misconceptions": [
+        "Reads a rate without its interval",
+        "Removes the evidence that the slice is small, and with it the reason to keep looking",
+        "Takes an interval that contains the overall rate as proof of no difference",
+        ""
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day4",
+      "session": 3,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-subgroup-bias-type",
+      "type": "single",
+      "prompt": "A model that predicts missed medical appointments uses the number of earlier reminders sent to each patient. In rural clinics reminders are made by phone and are often not logged. Rural patients who miss appointments are flagged less often. Which bias type of the SDAIA AI Bias Reference Guide fits?",
+      "options": [
+        "Measurement bias",
+        "Coverage bias",
+        "Sample size bias",
+        "Aggregation bias"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "The feature is recorded differently for one group, so it means something different there. The remedy is in the recording, not in the algorithm.",
+      "misconceptions": [
+        "",
+        "Names under-representation: the rural patients are in the data, their feature is mis-recorded",
+        "Names small numbers: the finding is about how a column is recorded",
+        "Names a hidden average: that describes the reporting, not the cause"
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day4",
+      "session": 3,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-subgroup-blind",
+      "type": "single",
+      "prompt": "A team deletes the gender column from its table \"so that the model cannot discriminate\". What is the consequence?",
+      "options": [
+        "The model's errors are now equal for women and men",
+        "Nothing changes, because gender was not predictive",
+        "The model becomes less accurate for everyone",
+        "Errors can still differ by gender, and the team can no longer measure whether they do"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "Other features and the make-up of the data can carry differences between groups. The attribute is kept outside the model, with a stated purpose, so that errors can be audited.",
+      "misconceptions": [
+        "Believes that an unused column guarantees equal errors",
+        "Assumes the column mattered only as a feature, not for the audit",
+        "Predicts a general loss of accuracy from removing one column",
+        ""
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day4",
+      "session": 3,
+      "level": "understand",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-card-limit",
+      "type": "single",
+      "prompt": "Which sentence is the most useful limit in a model card?",
+      "options": [
+        "\"At sites that opened after training, probabilities ran four points low: use the rank there, not the number.\"",
+        "\"The model may not generalise to all settings.\"",
+        "\"The model was trained with gradient-boosted trees.\"",
+        "\"The model reaches an average precision of 0.55.\""
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "A useful limit names a situation the reader can recognise and says what to do in it, with the measurement behind it.",
+      "misconceptions": [
+        "",
+        "Is true of every model and tells the reader nothing to act on",
+        "States a method, not a limit",
+        "States a result, not where it stops holding"
+      ],
+      "lo": [
+        "LO6"
+      ],
+      "day": "day4",
+      "session": 4,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-card-human",
+      "type": "single",
+      "prompt": "A model ranks benefit applicants by the risk of an incomplete file, so that case workers can call them first. Which statement belongs in the card under \"the human decision\"?",
+      "options": [
+        "\"Applicants above 0.7 are rejected automatically.\"",
+        "\"The model is 91% accurate.\"",
+        "\"The score orders a case worker's call list; it never decides eligibility, and a case worker may call anyone.\"",
+        "\"Case workers must follow the ranking.\""
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "The statement says who decides and what the score may never decide. It keeps a ranking for support from turning into a decision about a person.",
+      "misconceptions": [
+        "Turns a support ranking into an automatic decision about a person",
+        "Gives a number where a responsibility is asked for",
+        "",
+        "Removes the judgment of the person who is accountable"
+      ],
+      "lo": [
+        "LO6"
+      ],
+      "day": "day4",
+      "session": 4,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
     }
   ]
 }
