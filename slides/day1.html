@@ -147,7 +147,7 @@
   <div class="kicker">The action has a size</div>
   <h2>Capacity turns a probability into a list of 800 names</h2>
   <div class="cols cols-2 mid">
-    <div class="stat center"><div class="big">8 in 100</div><div class="lbl">trainees a year can get a support plan: 800 plans for 6,800 to 10,100 scorable enrolments</div></div>
+    <div class="stat center"><div class="big">8 in 100</div><div class="lbl">scorable enrolments can get a support plan in the largest cohort: 800 plans for 10,100. Smaller cohorts, from 6,800, reach 12 in 100; the run log scores the top 8%</div></div>
     <ul class="bullets">
       <li>The advisers do not ask "who is above 0.5?"</li>
       <li>They ask "which 800 first?"</li>
@@ -255,7 +255,7 @@
       <li>For a rare outcome and a short list, average precision is the stricter judge</li>
     </ul>
   </div>
-  <aside class="notes"><p>From Lab 1.2: the constant scores exactly the base rate on each fold, 0.108 to 0.130. Why average precision and not AUC: with 12% positives, AUC rewards ordering the 88% among themselves, which the advisers never look at. Sources: Saito and Rehmsmeier (2015).</p></aside>
+  <aside class="notes"><p>From Lab 1.2: the constant scores exactly the base rate on each fold, 0.108 to 0.130. Why average precision and not AUC: AUC counts every pair of a non-completer and a completer equally, including pairs far down the ranking that the advisers never reach; average precision weighs the top of the list, where the 800 names are. Sources: Saito and Rehmsmeier (2015).</p></aside>
 </section>
 
 <section class="slide" id="three-rules" data-lo="LO2">
