@@ -1,0 +1,19 @@
+[
+ "provider_id",
+ "programme",
+ "programme_weeks",
+ "delivery_mode",
+ "start_date",
+ "cohort_year",
+ "region",
+ "gender",
+ "age",
+ "education",
+ "aptitude_score",
+ "has_dependants",
+ "distance_km",
+ "employment",
+ "enrolled_via",
+ "stipend",
+ "absences_w2"
+]
