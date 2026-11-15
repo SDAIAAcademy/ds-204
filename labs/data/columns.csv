@@ -1,0 +1,24 @@
+column,meaning,recorded_at,known_at_end_of_week_2
+enrolment_id,Key of the enrolment,enrolment,yes
+trainee_id,Key of the trainee; the same trainee can enrol several times,registration,yes
+provider_id,Training provider (60); see providers.csv,enrolment,yes
+programme,Programme of study (10),enrolment,yes
+programme_weeks,"Planned length in weeks: 12, 24 or 36",enrolment,yes
+delivery_mode,"in person, or blended (offered from 2024)",enrolment,yes
+start_date,First day of the programme,enrolment,yes
+cohort_year,Year of the start date: 2021 to 2025,enrolment,yes
+region,Region of residence (13),registration,yes
+gender,"F or M, as registered",registration,yes
+age,Age in years at the start date,enrolment,yes
+education,Highest level completed; blank when not recorded,registration,yes
+aptitude_score,"Entry test, 0 to 100; blank for walk-in registrations",registration,yes
+has_dependants,1 when the trainee declared dependants,registration,yes
+distance_km,Road distance from home to the provider; blank when the address did not geocode,enrolment,yes
+employment,"not working, part-time or full-time, at the start date",enrolment,yes
+enrolled_via,"self, employer, or social support referral",enrolment,yes
+stipend,1 when the trainee receives the fund's monthly stipend,enrolment,yes
+absences_w2,"Days absent in the first two weeks (0 to 10), from the provider's register",end of week 2,yes
+weeks_attended,Weeks attended before leaving or finishing,exit,no
+exit_date,Day the trainee left or finished,exit,no
+exit_reason,Reason given for leaving; blank for those who completed,exit,no
+not_completed,TARGET: 1 when the trainee left without completing,exit,no

@@ -1,0 +1,17 @@
+{
+ "__series__": {
+  "name": "mean_ap",
+  "index": [
+   "pipeline fitted inside each fold",
+   "imputer and scaler fitted on all rows",
+   "provider rate from training rows",
+   "provider rate from all rows"
+  ],
+  "data": [
+   0.5021059994,
+   0.5021773716,
+   0.5027738812,
+   0.5045994754
+  ]
+ }
+}

@@ -3,164 +3,205 @@
   "version": 1,
   "questions": [
     {
-      "id": "q-example-1",
+      "id": "q-frame-moment",
       "type": "single",
-      "prompt": "REPLACE: a practice question on LO1, as a short scenario",
+      "prompt": "A hospital wants to phone patients who are likely to miss a follow-up visit. The phone team works two days before each visit. When is the prediction made?",
       "options": [
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: the right answer",
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: a wrong option that a common misconception makes tempting"
+        "When the patient is first registered",
+        "On the morning of the visit",
+        "Two days before the visit",
+        "After the visit, when attendance is recorded"
       ],
       "correct": [
-        1
+        2
       ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
+      "explanation": "The prediction time is the moment the action is taken: the calls are made two days before the visit, so everything the model reads must exist by then.",
       "misconceptions": [
-        "REPLACE: the misconception behind this option",
+        "Chooses the earliest moment: most of what predicts a missed visit (the booking, earlier visits) does not exist at registration",
+        "Chooses a moment after the action: the phone team has already finished its calls",
         "",
-        "REPLACE: the misconception behind this option",
-        "REPLACE: the misconception behind this option"
-      ],
-      "lo": [
-        "LO1"
-      ],
-      "day": "day1",
-      "session": 1,
-      "level": "apply",
-      "pool": "practice",
-      "weight": 1
-    },
-    {
-      "id": "q-example-2",
-      "type": "tf",
-      "prompt": "REPLACE: a statement on LO2 that is true",
-      "options": [
-        "True",
-        "False"
-      ],
-      "correct": [
-        0
-      ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
-      "misconceptions": [
-        "",
-        "REPLACE: the misconception behind this option"
-      ],
-      "lo": [
-        "LO2"
-      ],
-      "day": "day1",
-      "session": 1,
-      "level": "understand",
-      "pool": "practice",
-      "weight": 1
-    },
-    {
-      "id": "q-example-3",
-      "type": "single",
-      "prompt": "REPLACE: a practice question on LO3, as a short scenario",
-      "options": [
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: the right answer",
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: a wrong option that a common misconception makes tempting"
-      ],
-      "correct": [
-        1
-      ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
-      "misconceptions": [
-        "REPLACE: the misconception behind this option",
-        "",
-        "REPLACE: the misconception behind this option",
-        "REPLACE: the misconception behind this option"
-      ],
-      "lo": [
-        "LO3"
-      ],
-      "day": "day1",
-      "session": 1,
-      "level": "apply",
-      "pool": "practice",
-      "weight": 1
-    },
-    {
-      "id": "q-example-4",
-      "type": "tf",
-      "prompt": "REPLACE: a statement on LO4 that is true",
-      "options": [
-        "True",
-        "False"
-      ],
-      "correct": [
-        0
-      ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
-      "misconceptions": [
-        "",
-        "REPLACE: the misconception behind this option"
-      ],
-      "lo": [
-        "LO4"
-      ],
-      "day": "day1",
-      "session": 1,
-      "level": "understand",
-      "pool": "practice",
-      "weight": 1
-    },
-    {
-      "id": "q-example-5",
-      "type": "single",
-      "prompt": "REPLACE: a practice question on LO5, as a short scenario",
-      "options": [
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: the right answer",
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: a wrong option that a common misconception makes tempting"
-      ],
-      "correct": [
-        1
-      ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
-      "misconceptions": [
-        "REPLACE: the misconception behind this option",
-        "",
-        "REPLACE: the misconception behind this option",
-        "REPLACE: the misconception behind this option"
-      ],
-      "lo": [
-        "LO5"
-      ],
-      "day": "day1",
-      "session": 1,
-      "level": "apply",
-      "pool": "practice",
-      "weight": 1
-    },
-    {
-      "id": "q-example-6",
-      "type": "tf",
-      "prompt": "REPLACE: a statement on LO6 that is true",
-      "options": [
-        "True",
-        "False"
-      ],
-      "correct": [
-        0
-      ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
-      "misconceptions": [
-        "",
-        "REPLACE: the misconception behind this option"
+        "Takes the moment the outcome is recorded: nothing is left to decide then"
       ],
       "lo": [
         "LO6"
       ],
       "day": "day1",
       "session": 1,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-frame-population",
+      "type": "single",
+      "prompt": "Of 45,000 enrolments, 16.7% are not completed. A model scores trainees at the end of week 2; 2,444 trainees have left by then. Which base rate does the model have to beat?",
+      "options": [
+        "16.7%, the rate of all enrolments",
+        "The rate among the trainees still enrolled at the end of week 2",
+        "The rate among the 2,444 who left early",
+        "50%, because there are two classes"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "The model is judged on the rows it can score. The trainees who have already left are outside its population, and the rate of the rest is lower (11.9%).",
+      "misconceptions": [
+        "Uses the whole export: a third of the non-completers are gone before the model can score them",
+        "",
+        "Looks at the rows the model never sees: all of them are non-completers by definition",
+        "Confuses the number of classes with their frequencies"
+      ],
+      "lo": [
+        "LO6"
+      ],
+      "day": "day1",
+      "session": 1,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-frame-breakeven",
+      "type": "single",
+      "prompt": "A support plan costs SAR 450. A lost place costs SAR 9,000. One supported non-completer in four then completes. Above which probability of not completing does a plan pay for itself?",
+      "options": [
+        "0.05",
+        "0.20",
+        "0.25",
+        "0.50"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "A plan pays when p x 0.25 x 9,000 is more than 450, so when p is above 0.20.",
+      "misconceptions": [
+        "Divides the cost of the plan by the cost of the place and forgets that support works only one time in four",
+        "",
+        "Takes the success rate of support as the threshold",
+        "Falls back on the default threshold of a classifier, which ignores the costs"
+      ],
+      "lo": [
+        "LO6"
+      ],
+      "day": "day1",
+      "session": 1,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-ladder-ap-floor",
+      "type": "single",
+      "prompt": "In a validation fold 11% of trainees do not complete. A predictor gives every trainee the same score. What is its average precision?",
+      "options": [
+        "0.00",
+        "0.89",
+        "0.50",
+        "0.11"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "With no information the precision is the base rate at every position of the ranking, so the average precision is the base rate.",
+      "misconceptions": [
+        "Assumes that a useless ranking finds nobody: at any depth it still finds the base rate",
+        "Reports the accuracy of predicting the majority class",
+        "Uses the floor of ROC AUC, which is 0.5 whatever the base rate",
+        ""
+      ],
+      "lo": [
+        "LO2"
+      ],
+      "day": "day1",
+      "session": 2,
       "level": "understand",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-ladder-same-folds",
+      "type": "single",
+      "prompt": "Model A scores 0.52 on five time-ordered folds. A colleague scores model B at 0.55 on five random folds of the same table. What can you say?",
+      "options": [
+        "B is better by 0.03",
+        "A is better, because time-ordered folds are harder",
+        "Nothing yet: the two models were scored on different rows",
+        "They are equal within the fold spread"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "Scores compare only on the same folds: different rows have different base rates and different difficulty.",
+      "misconceptions": [
+        "Subtracts two numbers that were measured on different rows",
+        "Guesses the size of the difference between the schemes; it has to be measured",
+        "",
+        "Uses a spread that neither run has shown"
+      ],
+      "lo": [
+        "LO2"
+      ],
+      "day": "day1",
+      "session": 2,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-ladder-pipeline-fit",
+      "type": "single",
+      "prompt": "An analyst fills missing ages with the median of the whole table, then cross-validates a model. What kind of fault is this?",
+      "options": [
+        "Target leakage: the median is computed from the outcome",
+        "Preparation leakage: a statistic was fitted on rows that are later held out",
+        "Group contamination: the same person is on both sides",
+        "No fault: a median does not use the outcome"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "The median has read the held-out rows. The harm is usually small for a statistic that ignores the outcome, but the step belongs inside the pipeline, fitted on training rows only.",
+      "misconceptions": [
+        "Mistakes the kind: the median of age does not involve the outcome",
+        "",
+        "Names a fault of the split, which is not described here",
+        "Treats \"does not use the outcome\" as \"has not seen the held-out rows\": the rule is about the rows"
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": "day1",
+      "session": 3,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-history-known",
+      "type": "single",
+      "prompt": "A row is scored on 20 April. The same trainee has an earlier enrolment that started in January and ended in September of the same year. May its outcome be used as a history feature for the April row?",
+      "options": [
+        "Yes, it started earlier",
+        "Yes, if the model is validated on time-ordered folds",
+        "No, its outcome was not known on 20 April",
+        "Only if the trainee completed it"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "A history feature may read records whose outcome was known at the prediction time. This one ended five months later.",
+      "misconceptions": [
+        "Reads \"earlier\" as \"started earlier\": the outcome is what matters, and it came in September",
+        "Expects the split to repair a feature: no split removes information that is inside a column",
+        "",
+        "Makes the rule depend on the outcome itself, which is exactly what is unknown"
+      ],
+      "lo": [
+        "LO2"
+      ],
+      "day": "day1",
+      "session": 4,
+      "level": "apply",
       "pool": "practice",
       "weight": 1
     }

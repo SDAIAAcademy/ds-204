@@ -1,158 +1,610 @@
 <section class="slide title" id="title" data-auto="title">
-  <aside class="notes">REPLACE: welcome; introduce yourself; one question to the room that calibrates the pace; the rhythm of the day</aside>
+  <aside class="notes"><p>Welcome. Ask who has trained a classifier and who has had a score questioned by a manager: this course is about the second experience. Rhythm of every session: about 25 minutes of concepts, one checkpoint, a 25-minute lab. Breaks are yours: press B.</p></aside>
 </section>
 
-<section class="slide" id="agenda" data-auto="agenda"></section>
+<section class="slide" id="agenda" data-auto="agenda">
+  <aside class="notes"><p>Four sessions, each ending in a lab that adds one line to a run log. By the end of today the log has four rungs and a number to beat.</p></aside>
+</section>
+
+<section class="slide" id="four-days">
+  <div class="kicker">The course</div>
+  <h2>Four days from an adviser's question to a model card</h2>
+  <div class="ladder" style="--n:4">
+    <div class="rung c-teal on"><b>Frame and baseline</b>Decision, constant, rules, linear, history<small>Day 1</small></div>
+    <div class="rung c-cyan off"><b>Trees and challengers</b>Boosted trees, a tuning budget, a paired decision<small>Day 2</small></div>
+    <div class="rung c-coral off"><b>Validation and leakage</b>Three splits, four kinds of leak, an audit<small>Day 3</small></div>
+    <div class="rung c-purple off"><b>Errors and documentation</b>Threshold, calibration, subgroups, model card<small>Day 4</small></div>
+  </div>
+  <p class="lead mt">Day 5 is yours: a tabular problem taken from framing to model card, defended live.</p>
+  <aside class="notes"><p>FN-105 showed a baseline, a held-out set and a threshold once, on 5,000 tickets. DS-201 gave you the bootstrap and intervals. Here those become habits on 45,000 rows: every model on the same folds, every run in a log, every difference with an interval. Deployment is not in this course: AE-205 and AE-305 take the model card of Day 4 as their starting point.</p></aside>
+</section>
+
+<section class="slide" id="case-sullam">
+  <div class="kicker">The case study</div>
+  <h2>Sullam Vocational Training Fund wants to offer support early</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>The fund</h4><p class="small mb0">A fictional fund that pays for programmes at 60 providers in 13 regions. 45,000 synthetic enrolments, 30,000 trainees, cohorts 2021 to 2025.</p></div>
+    <div class="card c-coral"><h4>The problem</h4><p class="small mb0">One enrolment in six ends without completion. A lost place costs SAR 9,000. The advisers can run 800 support plans a year.</p></div>
+    <div class="card c-purple"><h4>The model</h4><p class="small mb0">Mubakkir ranks trainees at the end of week 2 by the risk of not completing. You are Razan Al-Angari, the data scientist who builds it and defends its numbers.</p></div>
+  </div>
+  <div class="callout note mt"><b>Synthetic, and treated as personal data.</b> No row describes a real person or provider. Every lab handles the table as if it did.</div>
+  <aside class="notes"><p>People you will meet: Dr. Haya Al-Mogren, director of trainee support, decides whether Mubakkir is used. Ghassan Al-Fayez leads the advisers and owns the capacity and the costs. Maram Al-Rasheed is the data protection officer. Hamza Al-Babtain manages the providers. Loay Al-Kadi wrote a first notebook whose score is too good; you audit it on Day 3. Numbers from Lab 1.1: 16.7% of the 45,000 enrolments were not completed.</p></aside>
+</section>
+
+<section class="slide" id="setup-check">
+  <div class="kicker">Before session 1</div>
+  <h2>One notebook proves your setup</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li><b>In Colab:</b> open <code>00_setup_check.ipynb</code> from the course page and run all cells</li>
+      <li><b>On a laptop:</b> in <code>labs/</code>, run <code>uv sync</code>, then <code>uv run jupyter lab</code></li>
+      <li>It imports every library, reads the enrolments and prints its check marks</li>
+      <li>No key, no graphics processor, no model download</li>
+    </ul>
+    <div class="card c-teal"><h4>The pre-work</h4><p class="small mb0"><code>00_prework_pipelines_cv.ipynb</code>: two hours on pipelines and cross-validation with self-check questions. The supervised entry quiz follows it, without AI assistance.</p></div>
+  </div>
+  <aside class="notes"><p>Give the room five minutes. On a laptop the usual failure is a very long folder path on Windows: set UV_PROJECT_ENVIRONMENT to a short folder and run uv sync again. In Colab the first cell clones the repository and installs the requirements; a blocked network shows there. The entry quiz is proctored and its questions are not in the repository.</p></aside>
+</section>
 
 <!-- Session 1 -->
 
-<section class="slide section" id="s1" data-auto="section" data-session="1"></section>
-
-<section class="slide" id="s1-idea" data-lo="LO6">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
-  </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+<section class="slide section" id="s1" data-auto="section" data-session="1">
+  <aside class="notes"><p>The session has one message: nothing about the model is decided by the data scientist alone. The target, the unit and the moment come from the decision, and the decision belongs to the advisers.</p></aside>
 </section>
 
-<section class="slide" id="s1-steps" data-lo="LO6">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
+<section class="slide" id="decision-first" data-lo="LO6">
+  <div class="kicker">Start at the end</div>
+  <h2>A prediction is worth what the decision it changes is worth</h2>
   <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+    <div class="step c-teal"><b>1 · The decision</b>Which trainees does an adviser contact in week 3?</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>2 · The prediction</b>How likely is each trainee not to complete?</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>3 · The data</b>What is known about each enrolment at that moment?</div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <div class="callout warn mt"><b>What goes wrong.</b> Teams start at step 3: "we have a table, let us predict a column". The model then answers a question nobody asked, at a moment when nobody decides anything.</div>
+  <aside class="notes"><p>Ask the room: what would the advisers do differently with a perfect prediction? Here the answer is concrete: a different list of 800 names. If the answer to that question is "nothing", there is no project.</p></aside>
+</section>
+
+<section class="slide" id="four-lines" data-lo="LO6">
+  <div class="kicker">The framing</div>
+  <h2>Four lines fix the task before any code</h2>
+  <table class="t">
+    <tr><th>Line</th><th>For Mubakkir</th><th>What it rules out</th></tr>
+    <tr><td><b>Target</b></td><td><code>not_completed</code>: left without completing</td><td>A vague "risk"</td></tr>
+    <tr><td><b>Unit</b></td><td>One enrolment</td><td>One row per trainee</td></tr>
+    <tr><td><b>Prediction time</b></td><td>The end of week 2</td><td>Anything recorded later</td></tr>
+    <tr><td><b>Action</b></td><td>An adviser agrees a support plan in week 3</td><td>Removing a place</td></tr>
+  </table>
+  <p class="lead mt">Change one line and you have a different project with different data.</p>
+  <aside class="notes"><p>Walk the alternatives. A row per trainee mixes enrolments of different years and has no single moment. A prediction on the enrolment day reaches more trainees with less information: that is the stretch of Lab 1.1. A prediction in the last week changes nothing. The action line matters most for responsible use: a score that triggers support is a different thing from a score that triggers a penalty.</p></aside>
+</section>
+
+<section class="slide" id="recorded-when" data-lo="LO6 LO1">
+  <div class="kicker">The moment decides the columns</div>
+  <h2>Every column has a time at which it starts to exist</h2>
+  <table class="t small">
+    <tr><th>Recorded</th><th>Columns in the export</th><th>At the end of week 2</th></tr>
+    <tr><td>At registration</td><td><code>region</code>, <code>gender</code>, <code>education</code>, <code>aptitude_score</code>, <code>has_dependants</code></td><td>known</td></tr>
+    <tr><td>At enrolment</td><td><code>provider_id</code>, <code>programme</code>, <code>start_date</code>, <code>age</code>, <code>distance_km</code>, <code>stipend</code>, …</td><td>known</td></tr>
+    <tr><td>At the end of week 2</td><td><code>absences_w2</code></td><td>known, just</td></tr>
+    <tr class="hl"><td>At exit</td><td><code>not_completed</code>, <code>weeks_attended</code>, <code>exit_date</code>, <code>exit_reason</code></td><td>does not exist yet</td></tr>
+  </table>
+  <div class="callout tip mt"><b>Ask for the data dictionary first.</b> If nobody can say when a column is written, treat it as written at exit until proven otherwise.</div>
+  <aside class="notes"><p>The dictionary is data/columns.csv: 23 columns with the moment each is recorded. In most organisations this table does not exist and you build it by asking the people who own each screen. It is the single most useful document of a prediction project, and Day 3 uses it as an audit instrument.</p></aside>
+</section>
+
+<section class="slide" id="too-good-column" data-lo="LO1">
+  <div class="kicker">One column to distrust</div>
+  <h2>Weeks attended is the outcome, written in another unit</h2>
+  <div class="cols cols-2 mid">
+    <div class="stat center"><div class="big">21.9 · 7.7</div><div class="lbl">mean weeks attended: those who completed, and those who did not</div></div>
+    <ul class="bullets">
+      <li><code>weeks_attended</code> separates the classes almost by itself</li>
+      <li>A model given it would look brilliant on old data</li>
+      <li>At the end of week 2 it reads "2" for everyone</li>
+      <li>This is <b>target leakage</b>: Day 3 hunts four planted leaks</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>Numbers from Lab 1.1. Do not teach leakage here; plant the suspicion. The habit for today: a column recorded at exit may select the rows to study, and may never be a feature.</p></aside>
+</section>
+
+<section class="slide" id="population" data-lo="LO6">
+  <div class="kicker">Which rows</div>
+  <h2>A third of the non-completers leave before the model can see them</h2>
+  <div class="cols cols-2 mid">
+    <div class="bars">
+      <div class="row"><span>All 45,000 enrolments</span><div class="bar c-navy" style="--w:84%"></div><span class="val">16.7%</span></div>
+      <div class="row"><span>Still enrolled after week 2: 42,556</span><div class="bar c-teal" style="--w:60%"></div><span class="val">11.9%</span></div>
+      <div class="row"><span>Left in weeks 1 and 2: 2,444</span><div class="bar c-coral" style="--w:100%"></div><span class="val">100%</span></div>
+    </div>
+    <ul class="bullets">
+      <li>No support plan in week 3 can reach a trainee who has left</li>
+      <li>They leave the model's <b>population</b></li>
+      <li>Every score in the course is about the 42,556 scorable rows</li>
+      <li>The 2,444 are a limit to state, not to hide</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>Non-completion rates from Lab 1.1. 2,444 of the 7,500 or so non-completers, 32%, are gone by the end of week 2. Two consequences. The base rate that matters is 11.9%, not 16.7%. And a model that is perfect on its population still leaves a third of the problem untouched, which belongs in the model card.</p></aside>
+</section>
+
+<section class="slide" id="cost-of-errors" data-lo="LO6 LO5">
+  <div class="kicker">Two ways to be wrong</div>
+  <h2>The two errors do not cost the same</h2>
+  <table class="t">
+    <tr><th>Error</th><th>What happens</th><th class="num">Cost to the fund</th></tr>
+    <tr><td>Missed non-completer</td><td>Nobody called; the place is lost</td><td class="num">SAR 9,000</td></tr>
+    <tr><td>Needless support plan</td><td>An adviser's time went to a trainee who would have completed</td><td class="num">SAR 450</td></tr>
+  </table>
+  <div class="cols cols-2 mt">
+    <div class="card c-teal"><h4>Support is not a cure</h4><p class="small mb0">One supported non-completer in four then completes (the advisers' own figure).</p></div>
+    <div class="card c-coral"><h4>Break-even</h4><p class="small mb0">A plan pays when <i>p</i> × 0.25 × 9,000 &gt; 450: when the probability of not completing is above 0.20.</p></div>
+  </div>
+  <aside class="notes"><p>The figures belong to Ghassan Al-Fayez, in data/decision.json, not to the data scientist. Notice already: the base rate, 0.119, is below the break-even, 0.20, so supporting everyone loses money. And the costs leave out the cost to the trainee, which no table prices. Day 4 turns capacity and break-even into a threshold.</p></aside>
+</section>
+
+<section class="slide" id="capacity" data-lo="LO6">
+  <div class="kicker">The action has a size</div>
+  <h2>Capacity turns a probability into a list of 800 names</h2>
+  <div class="cols cols-2 mid">
+    <div class="stat center"><div class="big">8 in 100</div><div class="lbl">trainees a year can get a support plan: 800 plans for 6,800 to 10,100 scorable enrolments</div></div>
+    <ul class="bullets">
+      <li>The advisers do not ask "who is above 0.5?"</li>
+      <li>They ask "which 800 first?"</li>
+      <li>So the course scores <b>rankings</b>: average precision, and the share of non-completers on the list</li>
+      <li>Accuracy is never reported</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 1.1. Predicting "completes" for everyone is 88% accurate and finds nobody, which is why accuracy does not appear in this course. Recall at capacity is the number the advisers understand: of those who will not complete, how many are on our list?</p></aside>
+</section>
+
+<section class="slide" id="minimisation" data-lo="LO6">
+  <div class="kicker">Responsible use</div>
+  <h2>Known is not the same as justified</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>The purpose is narrow: decide whom to offer support</li>
+      <li><b>Data minimisation:</b> use only the personal data that purpose needs</li>
+      <li><code>gender</code> is known and left out of the model</li>
+      <li>It stays in the table to check the errors by group on Day 4</li>
+      <li><code>trainee_id</code> joins a history; it is never a feature</li>
+    </ul>
+    <div class="card c-purple"><h4>Who decides</h4><p class="small mb0">The data scientist proposes, with a reason per column. Maram Al-Rasheed, the data protection officer, signs. The framing sheet of Lab 1.1 is what she reads.</p></div>
+  </div>
+  <aside class="notes"><p>Minimisation is a principle of the Personal Data Protection Law; the course cites the law and does not restate its articles. Leaving a column out of the model does not make the model fair for that group: region and programme can stand in for it. That is why the column is kept for the error table of Lab 4.3. Sources: Personal Data Protection Law; SDAIA Principles of AI Ethics.</p></aside>
+</section>
+
+<section class="slide" id="check-framing" data-lo="LO6">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which framing serves the advisers?</h2>
+  <div class="quiz" data-type="single" data-lo="LO6">
+    <p class="lead">The advisers can agree 800 support plans a year, starting in week 3 of a programme. Which framing fits?</p>
+    <div class="opts">
+      <div class="opt" data-why="Takes the trainee as the unit: one trainee has several enrolments with different risks, and the adviser acts on one of them">One row per trainee: will this trainee ever leave a programme?</div>
+      <div class="opt" data-why="Puts the moment at exit: by then the place is lost and no support plan can change it">One row per enrolment, at exit: did the trainee complete?</div>
+      <div class="opt" data-why="Predicts a total for planning, which is a different decision: the advisers need names, not a count">One row per provider and year: how many trainees will leave?</div>
+      <div class="opt" data-ok>One row per enrolment, at the end of week 2: will the trainee not complete?</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The unit and the moment come from the action: one support plan per enrolment, agreed in week 3.</div>
+  </div>
+  <aside class="notes"><p>Answer: the fourth option. The provider forecast is a good project for Hamza Al-Babtain's team; say so, and say it is not this one.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-1-1" data-auto="lab" data-lab="1.1">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-tutor: an assistant may explain pandas syntax; the framing is the participant's. Watch for: participants who keep weeks_attended as a candidate because it is "in the table". The check of task 4 catches it. Task 4 has no single right wording for the reason; accept any that ties the column to the purpose. Nobody needs an earlier lab.</p></aside>
 </section>
 
 <!-- Session 2 -->
 
-<section class="slide section" id="s2" data-auto="section" data-session="2"></section>
-
-<section class="slide" id="s2-idea" data-lo="LO2">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
-  </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+<section class="slide section" id="s2" data-auto="section" data-session="2">
+  <aside class="notes"><p>The ladder is the spine of the course and of the capstone rubric. Today builds its first four rungs; Day 2 adds three.</p></aside>
 </section>
 
-<section class="slide" id="s2-steps" data-lo="LO2">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="why-ladder" data-lo="LO2">
+  <div class="kicker">Before any model</div>
+  <h2>A score means nothing until you know what no model scores</h2>
+  <div class="ladder" style="--n:5">
+    <div class="rung c-navy on"><b>Constant</b>The same score for everyone<small>Lab 1.2</small></div>
+    <div class="rung c-teal on"><b>Rules</b>Three lines an adviser could write<small>Lab 1.2</small></div>
+    <div class="rung c-cyan off"><b>Linear</b>A regularised logistic model<small>Labs 1.3, 1.4</small></div>
+    <div class="rung c-coral off"><b>Boosted trees</b>Defaults, then 20 trials<small>Labs 2.1, 2.2</small></div>
+    <div class="rung c-purple off"><b>Challenger</b>An automated tool<small>Lab 2.3</small></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <p class="lead mt">Each rung has to earn its extra complexity against the rung below.</p>
+  <aside class="notes"><p>You have built a majority baseline once, in FN-105. The ladder generalises it: every rung is the baseline of the next. Story to tell: a team reports an average precision of 0.30 to a director. Three rules on a card reach 0.31. Nobody had checked.</p></aside>
+</section>
+
+<section class="slide" id="identical-folds" data-lo="LO2 LO3">
+  <div class="kicker">The rule of the ladder</div>
+  <h2>Every rung is scored on the same five folds</h2>
+  <table class="t small">
+    <tr><th>Fold</th><th>Validates on</th><th class="num">Training rows</th><th class="num">Validation rows</th><th class="num">Base rate</th></tr>
+    <tr><td>1</td><td>2022, second half</td><td class="num">9,217</td><td class="num">3,902</td><td class="num">11.6%</td></tr>
+    <tr><td>2</td><td>2023, first half</td><td class="num">13,095</td><td class="num">4,266</td><td class="num">10.8%</td></tr>
+    <tr><td>3</td><td>2023, second half</td><td class="num">17,175</td><td class="num">4,326</td><td class="num">11.0%</td></tr>
+    <tr><td>4</td><td>2024, first half</td><td class="num">21,532</td><td class="num">4,649</td><td class="num">13.0%</td></tr>
+    <tr><td>5</td><td>2024, second half</td><td class="num">25,994</td><td class="num">4,627</td><td class="num">12.6%</td></tr>
+  </table>
+  <div class="callout note mt"><b>Cohort 2025 is closed.</b> 10,117 rows stay untouched until Day 4. Each fold trains on outcomes known before its half-year began; Day 3 explains why.</div>
+  <aside class="notes"><p>From Lab 1.2. Do not teach validation schemes here: the folds are simply the fund's, the same for every model, from U.folds(). Point at the base rates: they differ by fold, so a score on fold 4 cannot be compared with a score on fold 2. Models are compared fold by fold.</p></aside>
+</section>
+
+<section class="slide" id="run-log" data-lo="LO2">
+  <div class="kicker">The habit</div>
+  <h2>One line per run, never edited afterwards</h2>
+  <pre class="code s" data-file="artifacts/run_log.csv"><code class="language-plaintext">lab  rung         folds  mean_ap  spread  min_fold  max_fold  recall_at_capacity
+1.2  constant     5      0.1181   0.0098  0.1076    0.1301    0.0759
+1.2  three rules  5      0.3099   0.0125  0.2899    0.3233    0.2922</code></pre>
+  <ul class="bullets mt">
+    <li><b>Mean</b> over the folds, and the <b>spread</b> between them</li>
+    <li>The five fold scores themselves, for the paired comparison of Day 2</li>
+    <li>Seconds, features and a note: what a reviewer asks first</li>
+  </ul>
+  <aside class="notes"><p>The log is the evidence of the second course outcome and a line of the capstone rubric. The rule that a line is never edited matters more than the format: the runs that did not work are part of the record, and the number of runs is itself information about how much the final score was chosen.</p></aside>
+</section>
+
+<section class="slide" id="constant-floor" data-lo="LO2">
+  <div class="kicker">Rung 1</div>
+  <h2>The floor of average precision is the base rate, not 0.5</h2>
+  <div class="cols cols-2 mid">
+    <div class="stat center"><div class="big">0.118</div><div class="lbl">average precision of the same score for everyone, mean of five folds</div></div>
+    <ul class="bullets">
+      <li><b>Average precision:</b> precision averaged over every position where a non-completer is found</li>
+      <li>A ranking with no information has the base rate as its precision everywhere</li>
+      <li>ROC AUC is the score whose floor is 0.5</li>
+      <li>For a rare outcome and a short list, average precision is the stricter judge</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 1.2: the constant scores exactly the base rate on each fold, 0.108 to 0.130. Why average precision and not AUC: with 12% positives, AUC rewards ordering the 88% among themselves, which the advisers never look at. Sources: Saito and Rehmsmeier (2015).</p></aside>
+</section>
+
+<section class="slide" id="three-rules" data-lo="LO2">
+  <div class="kicker">Rung 2</div>
+  <h2>Three rules on a card already sort the trainees</h2>
+  <div class="cols cols-2 mid">
+    <div class="bars">
+      <div class="row"><span>No rule met: 25,487</span><div class="bar c-teal" style="--w:8%"></div><span class="val">6.1%</span></div>
+      <div class="row"><span>One rule: 5,767</span><div class="bar c-cyan" style="--w:31%"></div><span class="val">24.4%</span></div>
+      <div class="row"><span>Two rules: 1,097</span><div class="bar c-coral" style="--w:79%"></div><span class="val">62.0%</span></div>
+      <div class="row"><span>Three rules: 88</span><div class="bar c-purple" style="--w:100%"></div><span class="val">78.4%</span></div>
+    </div>
+    <ul class="bullets">
+      <li>Absent two days or more in the first two weeks</li>
+      <li>Aged 19 or under</li>
+      <li>Entry test below 38</li>
+      <li>Score: the number of rules met</li>
+    </ul>
+  </div>
+  <p class="lead mt">Average precision 0.310. With no learning, 29% of non-completers are on the advisers' list.</p>
+  <aside class="notes"><p>From Lab 1.2, non-completion rate by the number of rules met, on the development rows. The rules are the reference; participants write their own and many will do as well. A rule baseline has a second use: it is what the organisation would do without you, so it is the honest comparison for the value of the model.</p></aside>
+</section>
+
+<section class="slide" id="spread" data-lo="LO2">
+  <div class="kicker">Reading a rung</div>
+  <h2>The spread between folds is the yardstick for every gain</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Fold</th><th class="num">Constant</th><th class="num">Three rules</th></tr>
+      <tr><td>1</td><td class="num">0.116</td><td class="num">0.310</td></tr>
+      <tr><td>2</td><td class="num">0.108</td><td class="num">0.290</td></tr>
+      <tr><td>3</td><td class="num">0.110</td><td class="num">0.316</td></tr>
+      <tr><td>4</td><td class="num">0.130</td><td class="num">0.323</td></tr>
+      <tr><td>5</td><td class="num">0.126</td><td class="num">0.311</td></tr>
+      <tr class="hl"><td>Mean · spread</td><td class="num">0.118 · 0.010</td><td class="num">0.310 · 0.012</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>The rules win on all five folds</li>
+      <li>The gain, 0.19, is fifteen times the spread</li>
+      <li>A gain inside the spread is a question, not a result</li>
+      <li>Lab 2.4 answers such questions with an interval</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 1.2. The spread is the standard deviation of the five fold scores. It mixes two things, the noise of a finite validation set and real differences between half-years, and both are reasons not to trust a third decimal. DS-201 called this sampling variation.</p></aside>
+</section>
+
+<section class="slide" id="check-ladder" data-lo="LO2">
+  <div class="kicker">Checkpoint</div>
+  <h2>What does 0.30 mean?</h2>
+  <div class="quiz" data-type="single" data-lo="LO2">
+    <p class="lead">Loay reports that his model reaches an average precision of 0.30 on a split of his own. What is the right reply?</p>
+    <div class="opts">
+      <div class="opt" data-why="Reads average precision like accuracy: 0.30 is not 30% correct, and its floor here is 0.12, not 0.5">It is poor: the model is wrong 70% of the time</div>
+      <div class="opt" data-ok>It cannot be judged until it stands beside the constant and the rules on the same folds</div>
+      <div class="opt" data-why="Compares with the floor only: it beats a constant, but three rules on a card score 0.31 on the fund's folds">It is good: it is well above the base rate of 0.12</div>
+      <div class="opt" data-why="Treats a score as comparable across splits: a different split has different rows and a different base rate">It is slightly worse than the rules, which score 0.31</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A score is read against the rungs below it, and only on the same rows.</div>
+  </div>
+  <aside class="notes"><p>Answer: the second option. The fourth option is the instructive one: the numbers look comparable and are not, because the split differs. Two minutes.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-1-2" data-auto="lab" data-lab="1.2">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-tutor. Watch for: rules that use weeks_attended or exit_reason (the table still holds them; the lesson of Lab 1.1 applies), and rules computed from the validation rows' outcome. Any three sensible rules pass the check. The lab starts from the helper's table and folds; nobody needs Lab 1.1.</p></aside>
 </section>
 
 <!-- Session 3 -->
 
-<section class="slide section" id="s3" data-auto="section" data-session="3"></section>
-
-<section class="slide" id="s3-idea" data-lo="LO2">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
-  </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+<section class="slide section" id="s3" data-auto="section" data-session="3">
+  <aside class="notes"><p>The pre-work covered pipelines and cross-validation in general. This session applies them to the fund's table and adds the reason they matter: preparation is part of the model.</p></aside>
 </section>
 
-<section class="slide" id="s3-steps" data-lo="LO2">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="linear-first" data-lo="LO2">
+  <div class="kicker">Rung 3</div>
+  <h2>A linear model is the first model worth beating</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li><b>Logistic regression:</b> a weighted sum of the inputs, turned into a probability</li>
+      <li>Fits in seconds, on a laptop</li>
+      <li>Its probabilities are usually close to observed rates</li>
+      <li>Each weight can be read, with care</li>
+      <li>On tables with mostly additive effects it is hard to beat by much</li>
+    </ul>
+    <div class="card c-teal"><h4>What it cannot do alone</h4><p class="small mb0">It adds effects. "Absence matters, except for employer-sponsored trainees" is an interaction: someone has to write it in, or a tree has to find it. That is Day 2.</p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>FN-103 gave the mathematics: the log-odds are linear in the inputs. The practical point for a ladder: if a tuned boosted model beats this rung by less than the folds disagree, the organisation may prefer the model it can read. Keep that open; Day 2 measures it.</p></aside>
+</section>
+
+<section class="slide" id="pipeline" data-lo="LO2 LO1">
+  <div class="kicker">Preparation is part of the model</div>
+  <h2>A pipeline fits every preparation step on training rows only</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>Impute</b>Median, plus a "was missing" column</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>Encode</b>One column per category; rare ones share one</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>Scale</b>Mean 0, spread 1</div>
+    <div class="arrow">→</div>
+    <div class="step c-purple"><b>Model</b>Logistic regression</div>
+  </div>
+  <ul class="bullets mt">
+    <li>In each fold, <code>fit</code> sees the training rows; the validation rows only pass through <code>transform</code></li>
+    <li>15 columns become 101 model inputs</li>
+    <li>The entry test is missing for 14.2% of rows, and not at random: walk-in registrations skip it</li>
+  </ul>
+  <aside class="notes"><p>From Lab 1.3. The "was missing" column lets the model learn that a missing entry test means something, which here it does. A category seen fewer than 30 times in the training rows joins a shared column, and a provider never seen before lands there too: that matters in 2025, when eight providers open.</p></aside>
+</section>
+
+<section class="slide" id="pipeline-code" data-lo="LO2">
+  <div class="kicker">In code</div>
+  <h2>The whole rung is one object that can be fitted and scored</h2>
+  <pre class="code s" data-file="D1_3_logistic_pipeline.ipynb"><code class="language-python">numeric = Pipeline([("impute", SimpleImputer(strategy="median", add_indicator=True)),
+                    ("scale", StandardScaler())])
+categories = Pipeline([("fill", SimpleImputer(strategy="constant", fill_value="not recorded")),
+                       ("onehot", OneHotEncoder(handle_unknown="infrequent_if_exist",
+                                                min_frequency=30, sparse_output=False))])
+prepare = ColumnTransformer([("num", numeric, NUM), ("cat", categories, CAT)])
+model = Pipeline([("prepare", prepare),
+                  ("model", LogisticRegression(C=0.1, max_iter=2000))])</code></pre>
+  <div class="callout tip mt"><b>One object, one rule.</b> Whatever is inside the pipeline is refitted in every fold. Whatever you compute before it has seen every row.</div>
+  <aside class="notes"><p>This is the exercise of task 1; participants who did the pre-work write it in a few minutes. Demonstration: fit it on fold 5 and call model[:-1].transform on five validation rows to show the 101 columns.</p></aside>
+</section>
+
+<section class="slide" id="logistic-score" data-lo="LO2">
+  <div class="kicker">The rung, measured</div>
+  <h2>The logistic model wins on every fold, by far more than the spread</h2>
+  <div class="bars">
+    <div class="row"><span>Constant</span><div class="bar c-navy" style="--w:23%"></div><span class="val">0.118</span></div>
+    <div class="row"><span>Three rules</span><div class="bar c-teal" style="--w:62%"></div><span class="val">0.310</span></div>
+    <div class="row"><span>Logistic regression</span><div class="bar c-cyan" style="--w:100%"></div><span class="val">0.502</span></div>
+  </div>
+  <ul class="bullets mt">
+    <li>Fold scores 0.477 to 0.551; spread 0.031</li>
+    <li>The share of non-completers on the advisers' list rises from 29% to 40%</li>
+    <li>Fold 1, with the least training data, scores highest: folds differ in more than size</li>
+  </ul>
+  <aside class="notes"><p>From Lab 1.3: mean average precision over the five folds. The gain over the rules, 0.19, is six times the spread and has the same sign on every fold: a real step. Ask why fold 1 is highest although it trains on 9,217 rows; keep the answer open. Day 3 comes back to it: the table changes over the years.</p></aside>
+</section>
+
+<section class="slide" id="regularisation" data-lo="LO2">
+  <div class="kicker">One setting</div>
+  <h2>The penalty hardly matters here, and choosing it has a price</h2>
+  <div class="cols cols-2">
+    <table class="t">
+      <tr><th>C (inverse penalty)</th><th class="num">Mean</th><th class="num">Spread</th></tr>
+      <tr><td>0.003, strong penalty</td><td class="num">0.490</td><td class="num">0.025</td></tr>
+      <tr class="hl"><td>0.1</td><td class="num">0.502</td><td class="num">0.031</td></tr>
+      <tr><td>10, weak penalty</td><td class="num">0.502</td><td class="num">0.034</td></tr>
+    </table>
+    <ul class="bullets">
+      <li><b>Regularisation</b> pulls weights towards zero</li>
+      <li>With 20,000 rows and 101 inputs, only a very strong penalty costs anything</li>
+      <li>Picking C by these scores is tuning on the validation rows</li>
+      <li>Harmless for three values; Lab 2.2 does it properly for twenty</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 1.3. All three runs go into the log: the rule is every run, not the best run. The seed of tomorrow's idea: once you choose a setting by looking at the fold scores, those scores are no longer a clean estimate.</p></aside>
+</section>
+
+<section class="slide" id="what-pipeline-protects" data-lo="LO1 LO2">
+  <div class="kicker">What the pipeline protects</div>
+  <h2>The harm of preparing outside the folds depends on what the step has read</h2>
+  <table class="t">
+    <tr><th>Preparation</th><th class="num">Mean score</th><th>Verdict</th></tr>
+    <tr><td>Imputer and scaler inside each fold</td><td class="num">0.5021</td><td>the reference</td></tr>
+    <tr><td>Imputer and scaler fitted on all rows</td><td class="num">0.5022</td><td>wrong, and almost free</td></tr>
+    <tr><td>Provider rate from training rows</td><td class="num">0.5028</td><td>honest</td></tr>
+    <tr class="hl"><td>Provider rate from all rows</td><td class="num">0.5046</td><td>the gain is false</td></tr>
+  </table>
+  <div class="callout warn mt"><b>What goes wrong.</b> A step that never sees the outcome leaks little. A step built from the outcome (a rate per provider, a feature selection, a tuned setting) leaks in proportion to what it read.</div>
+  <aside class="notes"><p>From Lab 1.3, step 4. Be honest about the sizes: on 30,000 rows a median read from all rows moves the fourth decimal. The principle is not "the score explodes" but "you cannot know how much without redoing it properly", and the pipeline makes the question disappear. The larger versions of the same fault are on Day 3. Sources: scikit-learn user guide, Common pitfalls and recommended practices.</p></aside>
+</section>
+
+<section class="slide" id="coefficients" data-lo="LO2">
+  <div class="kicker">Reading the model</div>
+  <h2>A weight ranks what the model leans on, and proves nothing about causes</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Input (fold 5)</th><th class="num">Weight</th></tr>
+      <tr><td>Provider P23</td><td class="num">+0.93</td></tr>
+      <tr><td>Provider P38</td><td class="num">−0.82</td></tr>
+      <tr><td><code>absences_w2</code></td><td class="num">+0.75</td></tr>
+      <tr><td><code>aptitude_score</code></td><td class="num">−0.65</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>Per standard deviation of a scaled column, or per category, others held fixed</li>
+      <li>Providers differ a great deal: a finding for Hamza Al-Babtain, not a verdict</li>
+      <li>"Absence predicts leaving" is not "reducing absence prevents leaving"</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From Lab 1.3. Two cautions. A large provider weight may reflect who enrols there, not what the provider does. And the model was built to rank, so whether a support plan changes the outcome is a causal question it cannot answer; DS-205 is the course for that.</p></aside>
+</section>
+
+<section class="slide" id="check-pipeline" data-lo="LO1">
+  <div class="kicker">Checkpoint</div>
+  <h2>Where may the scaler be fitted?</h2>
+  <div class="quiz" data-type="single" data-lo="LO1">
+    <p class="lead">You score a logistic model on five folds. On which rows is the scaler of fold 3 fitted?</p>
+    <div class="opts">
+      <div class="opt" data-ok>On the training rows of fold 3 only, each time the pipeline is fitted</div>
+      <div class="opt" data-why="Fits once before splitting: the validation rows of every fold have then shaped their own preparation">On all development rows, once, before the folds are made</div>
+      <div class="opt" data-why="Fits on the rows being scored: at prediction time the model would need a batch of future rows to prepare one">On the validation rows of fold 3, so that they are scaled correctly</div>
+      <div class="opt" data-why="Uses the closed cohort: the holdout must stay untouched until the final check on Day 4">On the 2025 cohort, because it is the most recent</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Preparation is part of the model, and a model learns from training rows only.</div>
+  </div>
+  <aside class="notes"><p>Answer: the first option. If someone argues that the second option changed the score by only 0.0001 in the lab: correct, and the answer is the same. The habit is what protects you on the day the step is a provider rate.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-1-3" data-auto="lab" data-lab="1.3">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-tutor: scikit-learn syntax is exactly what an assistant is for. Watch for: a ColumnTransformer that forgets the categorical imputer (the encoder then fails on a missing education), and sparse output passed to the scaler. Step 4 is run, not written: give it its five minutes of reading. The lab reads the rules' fold scores from the reference log, so Lab 1.2 is not needed.</p></aside>
 </section>
 
 <!-- Session 4 -->
 
-<section class="slide section" id="s4" data-auto="section" data-session="4"></section>
-
-<section class="slide" id="s4-idea" data-lo="LO2">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
-  </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+<section class="slide section" id="s4" data-auto="section" data-session="4">
+  <aside class="notes"><p>The last rung of today adds information, not a model: what the fund already knows about a trainee who has enrolled before.</p></aside>
 </section>
 
-<section class="slide" id="s4-steps" data-lo="LO2">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="repeated-trainees" data-lo="LO2 LO3">
+  <div class="kicker">The structure of the table</div>
+  <h2>One trainee in three has more than one enrolment</h2>
+  <div class="cols cols-2 mid">
+    <div class="bars">
+      <div class="row"><span>One enrolment</span><div class="bar c-navy" style="--w:100%"></div><span class="val">19,500</span></div>
+      <div class="row"><span>Two</span><div class="bar c-teal" style="--w:36%"></div><span class="val">7,000</span></div>
+      <div class="row"><span>Three</span><div class="bar c-cyan" style="--w:13%"></div><span class="val">2,500</span></div>
+      <div class="row"><span>Four</span><div class="bar c-coral" style="--w:5%"></div><span class="val">1,000</span></div>
+    </div>
+    <ul class="bullets">
+      <li>30,000 trainees, 45,000 enrolments</li>
+      <li>The rows are <b>not independent</b>: a trainee carries habits and circumstances from one enrolment to the next</li>
+      <li>That is information for the model today</li>
+      <li>And a trap for validation on Day 3</li>
+    </ul>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>From Lab 1.4, trainees by number of enrolments. Ask what a returning trainee's earlier outcome should tell an adviser. Then ask the harder question: on which day did the fund learn that outcome?</p></aside>
+</section>
+
+<section class="slide" id="history-signal" data-lo="LO2">
+  <div class="kicker">What history says</div>
+  <h2>An earlier non-completion more than triples the rate</h2>
+  <div class="bars">
+    <div class="row"><span>No earlier non-completion: 40,262 rows</span><div class="bar c-teal" style="--w:19%"></div><span class="val">10.3%</span></div>
+    <div class="row"><span>One: 1,937 rows</span><div class="bar c-coral" style="--w:72%"></div><span class="val">38.9%</span></div>
+    <div class="row"><span>Two or more: 357 rows</span><div class="bar c-purple" style="--w:100%"></div><span class="val">54.3%</span></div>
+  </div>
+  <ul class="bullets mt">
+    <li><code>prior_enrolments</code>: earlier enrolments whose outcome was known</li>
+    <li><code>prior_noncompletions</code>: how many of those ended without completion</li>
+    <li>No rule of Lab 1.2 moves the rate as much as this one column</li>
+  </ul>
+  <aside class="notes"><p>From Lab 1.4, non-completion rate of the scorable rows by the number of earlier non-completions. The second and third groups are small: 2,294 rows of 42,556. A feature can be very strong and still matter for few people.</p></aside>
+</section>
+
+<section class="slide" id="known-outcome" data-lo="LO1 LO2">
+  <div class="kicker">The rule</div>
+  <h2>An earlier enrolment counts only once its outcome is known</h2>
+  <table class="t small">
+    <tr><th>One trainee</th><th>Starts</th><th>Ends</th><th>Outcome</th><th>Known when the April 2025 row is scored?</th></tr>
+    <tr><td>Culinary arts</td><td>January 2021</td><td>June 2021</td><td>completed</td><td>yes</td></tr>
+    <tr><td>Culinary arts</td><td>July 2021</td><td>July 2021</td><td>left</td><td>yes</td></tr>
+    <tr><td>Culinary arts</td><td>July 2024</td><td>July 2024</td><td>left</td><td>yes</td></tr>
+    <tr class="hl"><td>Electrical installation</td><td>April 2025</td><td>September 2025</td><td>?</td><td>this is the row to score</td></tr>
+  </table>
+  <div class="callout warn mt"><b>What goes wrong.</b> "Earlier" is read as "started earlier". 1,423 scorable rows have an earlier enrolment that was still running at the prediction time: its outcome is in the table and did not exist that day.</div>
+  <aside class="notes"><p>From Lab 1.4: the trainee printed in task 1, and the count of rows with an enrolment still running. The filter is on two dates: the exit date of the earlier record must be before the prediction date of the row being scored. A 36-week programme that started in January is still running when a July enrolment is scored.</p></aside>
+</section>
+
+<section class="slide" id="time-travel-test" data-lo="LO1">
+  <div class="kicker">A test, not a promise</div>
+  <h2>The time-travel test hides the future and checks that nothing changes</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · Pick a past date</b>For example 1 March 2023</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>2 · Compute twice</b>From all records, and from the records ended by that date</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>3 · Compare</b>For every row predicted before that date</div>
+  </div>
+  <ul class="bullets mt">
+    <li>A feature that reads the past only gives the same value both times</li>
+    <li>The "started earlier" version changes for about 90 rows at each date: it fails</li>
+    <li>The test checks the features, not the model, and takes seconds</li>
+  </ul>
+  <aside class="notes"><p>From Lab 1.4, where U.time_travel_test runs three dates. This is the tabular cousin of a unit test, and the capstone rubric rewards one. It proves that hiding later records does not change a feature. It does not prove the feature is useful, and it says nothing about the columns you did not build.</p></aside>
+</section>
+
+<section class="slide" id="history-gain" data-lo="LO2">
+  <div class="kicker">Rung 3, with history</div>
+  <h2>History helps on every fold, and only for those who have one</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Fold</th><th class="num">Logistic</th><th class="num">With history</th><th class="num">Gain</th></tr>
+      <tr><td>1</td><td class="num">0.551</td><td class="num">0.561</td><td class="num">+0.010</td></tr>
+      <tr><td>2</td><td class="num">0.484</td><td class="num">0.514</td><td class="num">+0.029</td></tr>
+      <tr><td>3</td><td class="num">0.514</td><td class="num">0.526</td><td class="num">+0.012</td></tr>
+      <tr><td>4</td><td class="num">0.477</td><td class="num">0.508</td><td class="num">+0.031</td></tr>
+      <tr><td>5</td><td class="num">0.485</td><td class="num">0.509</td><td class="num">+0.024</td></tr>
+      <tr class="hl"><td>Mean</td><td class="num">0.502</td><td class="num">0.523</td><td class="num">+0.021</td></tr>
+    </table>
+    <table class="t small">
+      <tr><th>Validation rows</th><th class="num">Without</th><th class="num">With</th></tr>
+      <tr><td>New to the fund: 14,455</td><td class="num">0.486</td><td class="num">0.485</td></tr>
+      <tr><td>Returning: 7,315</td><td class="num">0.522</td><td class="num">0.577</td></tr>
+    </table>
+  </div>
+  <aside class="notes"><p>From Lab 1.4. A gain of 0.021 is smaller than the spread of either model, 0.03, and yet it is positive on all five folds: the first example of why differences are compared as pairs. The second table is a limit for the model card: for a trainee new to the fund, the history columns are zero and the model is exactly as good as before.</p></aside>
+</section>
+
+<section class="slide" id="check-history" data-lo="LO1">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which history feature reads the future?</h2>
+  <div class="quiz" data-type="single" data-lo="LO1">
+    <p class="lead">Four candidate features for a row scored at the end of week 2. Which one fails the time-travel test?</p>
+    <div class="opts">
+      <div class="opt" data-why="Suspects a strong, legitimate feature: an enrolment that ended before the prediction date had a known outcome that day">The number of the trainee's enrolments that ended before the prediction date</div>
+      <div class="opt" data-why="Mistakes a registration fact for an outcome: the entry test is taken before the first enrolment">The trainee's entry test score</div>
+      <div class="opt" data-ok>The trainee's non-completion rate over all of their enrolments in the table</div>
+      <div class="opt" data-why="Confuses a week-2 fact with a later one: the register of the first two weeks exists on the prediction date">The trainee's days absent in the first two weeks of this programme</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> "All enrolments in the table" includes later ones and the row itself: their outcomes did not exist on the prediction date.</div>
+  </div>
+  <aside class="notes"><p>Answer: the third option. It is one of the four leaks planted in the table Loay prepared; Lab 3.3 finds it. Ask how it would behave in live use: for a new enrolment it would silently be computed from fewer records than in training.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-1-4" data-auto="lab" data-lab="1.4">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-tutor. The exercise of task 2 is the longest of the day: nine minutes. Typical problems: comparing start dates in place of the exit date (the tempting version of task 3), losing the row order after a merge, and counting the row itself. The check compares with the reference columns. Anyone who does not finish continues on the reference features, which U.modelling_table() returns from here on.</p></aside>
 </section>
+
+<!-- Close -->
 
 <section class="slide" id="wrap-up">
-  <div class="kicker">Day 1 · wrap-up</div>
+  <div class="kicker">Day 1</div>
   <h2>Three things to keep</h2>
   <div class="cols cols-3">
-    <div class="card c-teal"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-coral"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-purple"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
+    <div class="card c-teal"><h4>The decision frames the task</h4><p class="small mb0">Target, unit, prediction time, action. They fix the rows (42,556 of 45,000) and the columns (nothing recorded at exit).</p></div>
+    <div class="card c-cyan"><h4>A ladder with a log</h4><p class="small mb0">Constant 0.118, three rules 0.310, logistic 0.502, with history 0.523. Same folds, every run logged, spread beside every mean.</p></div>
+    <div class="card c-coral"><h4>The past only</h4><p class="small mb0">Preparation inside the folds; history from records whose outcome was known; a test that fails when a feature reads the future.</p></div>
   </div>
+  <aside class="notes"><p>Ask: which of today's four rungs would you show Dr. Haya Al-Mogren first? The three rules: she can read them, and they are the comparison that gives every later number its meaning.</p></aside>
 </section>
 
-<section class="slide dark" id="next" data-label="Next">
+<section class="slide dark" id="next">
   <div class="kicker">Next</div>
-  <h2>Day 2: Trees and challengers</h2>
-  <p class="lead">REPLACE: what participants prepare before then; unfinished labs can be finished at home</p>
-  <aside class="notes">REPLACE: accounts, installs or reading participants need before the next unit</aside>
+  <h1>Day 2 · Trees and challengers</h1>
+  <p class="lead">The number to beat is 0.523. Tomorrow: boosted trees, a budget of 20 trials, an automated challenger, and an interval that says whether a gain is real.</p>
+  <ul class="bullets">
+    <li>Keep <code>artifacts/run_log.csv</code>: tomorrow adds three rungs</li>
+    <li>Guess now: by how much will tuned boosted trees beat 0.523?</li>
+  </ul>
+  <aside class="notes"><p>Write the guesses down and keep them. Day 2 starts from the reference log, so nobody who struggled today starts behind.</p></aside>
 </section>

@@ -1,0 +1,28 @@
+{
+ "__frame__": {
+  "columns": [
+   "rows",
+   "base_rate",
+   "ap_without_history",
+   "ap_with_history"
+  ],
+  "index": [
+   "new to the fund",
+   "returning"
+  ],
+  "data": [
+   [
+    14455.0,
+    0.1112417848,
+    0.4857293299,
+    0.4853992051
+   ],
+   [
+    7315.0,
+    0.1327409433,
+    0.5218816258,
+    0.5774505342
+   ]
+  ]
+ }
+}

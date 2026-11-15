@@ -9,7 +9,7 @@
     "en": "Machine Learning for Tabular Data: Baselines and Validation",
     "ar": "تعلم الآلة للبيانات الجدولية: خطوط الأساس والتحقق من الصحة"
   },
-  "tagline": "REPLACE: one line under the title: what participants can do after the course",
+  "tagline": "Take a tabular prediction from the decision it serves to a model card: a logged baseline ladder, validation that mirrors use, a leakage audit, a threshold that fits capacity and errors by subgroup with intervals",
   "description": "Participants predict which trainees of a fictional vocational training fund are likely not to complete, so that advisers can offer support early. On synthetic enrolment data with repeated trainees and cohorts, they climb a baseline ladder to tuned gradient-boosted trees, test an automated or pretrained challenger, choose validation that mirrors use, audit for leakage, set a threshold, break errors down by subgroup and write a model card. Deployment is left to AE-205 and AE-305.",
   "track": "data-science",
   "level": 200,
@@ -69,8 +69,8 @@
     }
   ],
   "case_study": {
-    "name": "REPLACE: the name of the fictional organisation every lab works on",
-    "summary": "REPLACE: two sentences on the case study and its synthetic data"
+    "name": "Sullam Vocational Training Fund",
+    "summary": "Sullam Vocational Training Fund is a fictional fund that pays for vocational programmes at 60 training providers in 13 regions. Participants work on 45,000 synthetic enrolments of 30,000 trainees over five yearly cohorts to build Mubakkir, a score that at the end of week 2 puts the trainees most likely not to complete on an adviser's list. All data are synthetic, written with a fixed seed, with repeated trainees, cohort drift, four planted leaks and registers that under-record absence in two regions."
   },
   "format": "intensive",
   "format_note": "Intensive: 4 teaching days of four sessions and a capstone day, with guided pre-work and a tracked follow-up task",
@@ -92,68 +92,173 @@
         {
           "title": "A prediction serves a decision",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "State the target, the unit and the prediction time from the decision a score serves",
+            "Separate the columns known at the prediction time from those recorded at exit",
+            "Compute the break-even probability from the cost of each error"
           ],
           "lo": [
             "LO6"
           ],
           "lab": {
             "id": "1.1",
-            "title": "Write target, unit, prediction time and adviser action for the question",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "Frame the non-completion question",
+            "summary": "Write target, unit, prediction time and adviser action for the question, keep the rows that can be scored, mark the columns known at that time and price the two errors.",
             "minutes": 25,
-            "href": "D1_1_write_target_unit.ipynb"
-          }
+            "href": "D1_1_frame.ipynb",
+            "steps": [
+              {
+                "text": "Read the export and its data dictionary",
+                "minutes": 4
+              },
+              {
+                "text": "Write target, unit, prediction time and adviser action",
+                "minutes": 6
+              },
+              {
+                "text": "Keep the rows that can be scored",
+                "minutes": 4
+              },
+              {
+                "text": "Mark the columns known at the end of week 2",
+                "minutes": 6
+              },
+              {
+                "text": "Price the two errors: the break-even probability",
+                "minutes": 5
+              }
+            ],
+            "stretch": "Frame the same question on the enrolment day: what is gained and what is lost"
+          },
+          "summary": "The decision comes first: target, unit, prediction time, the action a score triggers and what each error costs."
         },
         {
           "title": "The baseline ladder",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Explain why every model is scored on the same folds and logged",
+            "Score a constant predictor and say what its average precision is",
+            "Write a three-rule baseline and read its score and fold spread"
           ],
           "lo": [
             "LO2"
           ],
           "lab": {
             "id": "1.2",
-            "title": "Score a constant predictor and a three-rule baseline; log both",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "A constant and three rules",
+            "summary": "Score a constant predictor and a three-rule baseline on the fund's five folds and log both: the first two rungs of the ladder.",
             "minutes": 25,
-            "href": "D1_2_score_constant_predictor.ipynb"
-          }
+            "href": "D1_2_baselines.ipynb",
+            "steps": [
+              {
+                "text": "Load the folds; read the base rate of each",
+                "minutes": 4
+              },
+              {
+                "text": "Score the constant predictor",
+                "minutes": 5
+              },
+              {
+                "text": "Write the three-rule baseline and score it",
+                "minutes": 8
+              },
+              {
+                "text": "Log both runs",
+                "minutes": 4
+              },
+              {
+                "text": "Read the log: the number to beat",
+                "minutes": 4
+              }
+            ],
+            "stretch": "A fourth rule from the provider's past non-completion rate"
+          },
+          "summary": "A ladder of models on identical folds, with a log: the constant predictor, then rules an adviser could write."
         },
         {
           "title": "Linear models first",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Build a pipeline that imputes, encodes and scales inside each fold",
+            "Fit a regularised logistic model and log its score and fold spread",
+            "Read the largest coefficients and say what they do not prove"
           ],
           "lo": [
             "LO2"
           ],
           "lab": {
             "id": "1.3",
-            "title": "Fit a regularised logistic model in a pipeline; log score and spread",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "A logistic model in a pipeline",
+            "summary": "Fit a regularised logistic model in a pipeline on the same folds, log score and spread, try three strengths and see what the pipeline protects.",
             "minutes": 25,
-            "href": "D1_3_fit_regularised_logistic.ipynb"
-          }
+            "href": "D1_3_logistic_pipeline.ipynb",
+            "steps": [
+              {
+                "text": "Build the pipeline: impute, encode, scale, model",
+                "minutes": 7
+              },
+              {
+                "text": "Score it on the five folds and log the run",
+                "minutes": 5
+              },
+              {
+                "text": "Try three regularisation strengths; log each",
+                "minutes": 5
+              },
+              {
+                "text": "Prepare outside the folds and compare",
+                "minutes": 5
+              },
+              {
+                "text": "Read the largest coefficients",
+                "minutes": 3
+              }
+            ],
+            "stretch": "Add one interaction by hand and log it"
+          },
+          "summary": "The first model that learns: a regularised logistic model inside a pipeline fitted on training rows only."
         },
         {
           "title": "Features from history",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Explain why an earlier enrolment counts only when its outcome was known",
+            "Build two history features from records that ended before the prediction time",
+            "Run a time-travel test that fails when a feature reads the future"
           ],
           "lo": [
             "LO2"
           ],
           "lab": {
             "id": "1.4",
-            "title": "Add two history features from past records only; pass a time-travel test",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "Two history features",
+            "summary": "Add two history features from past records only, pass a time-travel test and log what they add to the logistic rung.",
             "minutes": 25,
-            "href": "D1_4_add_two_history.ipynb"
-          }
+            "href": "D1_4_history_features.ipynb",
+            "steps": [
+              {
+                "text": "Follow one trainee through the records",
+                "minutes": 3
+              },
+              {
+                "text": "Write the two history features from past records only",
+                "minutes": 9
+              },
+              {
+                "text": "Run the time-travel test",
+                "minutes": 5
+              },
+              {
+                "text": "Rescore the logistic model with them; log the run",
+                "minutes": 5
+              },
+              {
+                "text": "Compare new and returning trainees",
+                "minutes": 3
+              }
+            ],
+            "stretch": "A third feature: days since the last exit"
+          },
+          "summary": "A trainee's earlier enrolments are the strongest new information, if they are read from the past only."
         }
-      ]
+      ],
+      "subtitle": "From the advisers' question to a number every later model has to beat"
     },
     {
       "id": "day2",
@@ -164,68 +269,173 @@
         {
           "title": "Gradient-boosted trees",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Describe how boosting adds small trees to correct the errors so far",
+            "Compare training and validation scores and read the gap",
+            "Read importance scores and name two of their limits"
           ],
           "lo": [
             "LO2"
           ],
           "lab": {
             "id": "2.1",
-            "title": "Train boosted trees with defaults; compare training and validation scores",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "Boosted trees with defaults",
+            "summary": "Train boosted trees with defaults, compare training and validation scores on the fund's folds and log the rung.",
             "minutes": 25,
-            "href": "D2_1_train_boosted_trees.ipynb"
-          }
+            "href": "D2_1_boosted_defaults.ipynb",
+            "steps": [
+              {
+                "text": "Fit with defaults on one fold: training against validation",
+                "minutes": 5
+              },
+              {
+                "text": "Score the five folds and log the run",
+                "minutes": 5
+              },
+              {
+                "text": "Follow both scores as trees are added",
+                "minutes": 7
+              },
+              {
+                "text": "Set the rung beside the logistic model",
+                "minutes": 4
+              },
+              {
+                "text": "Read two kinds of importance",
+                "minutes": 4
+              }
+            ],
+            "stretch": "Stop adding trees early, without touching the validation fold"
+          },
+          "summary": "Boosted trees with the library's defaults: what they fit, what they memorise, and what importance scores can and cannot say."
         },
         {
           "title": "Tuning under a budget",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Name the settings of boosted trees that are worth a budget",
+            "Run a random search whose choices are made on inner folds",
+            "Report the gain over defaults with its fold spread and its cost in time"
           ],
           "lo": [
             "LO2"
           ],
           "lab": {
             "id": "2.2",
-            "title": "Run a 20-trial search in nested folds and record the gain",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "Twenty trials in nested folds",
+            "summary": "Run a 20-trial search in nested folds, record the gain over defaults and see how far the inner score flatters the choice.",
             "minutes": 25,
-            "href": "D2_2_run_20_trial.ipynb"
-          }
+            "href": "D2_2_nested_search.ipynb",
+            "steps": [
+              {
+                "text": "Read the search space and the budget",
+                "minutes": 3
+              },
+              {
+                "text": "Write the search over inner folds",
+                "minutes": 8
+              },
+              {
+                "text": "Run it inside each outer fold",
+                "minutes": 6
+              },
+              {
+                "text": "Log the tuned rung; record the gain",
+                "minutes": 4
+              },
+              {
+                "text": "Compare inner and outer scores",
+                "minutes": 4
+              }
+            ],
+            "stretch": "Spend 40 trials: what does the second half of the budget buy?"
+          },
+          "summary": "A budget of 20 trials, spent inside each training part so that the reported score is not the one that chose the settings."
         },
         {
           "title": "Automated and pretrained challengers",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Describe what an automated tabular tool and a tabular foundation model each do",
+            "Check a challenger's licence and where the data would be sent before using it",
+            "Run a challenger on the same folds and the same time budget as the champion"
           ],
           "lo": [
             "LO4"
           ],
           "lab": {
             "id": "2.3",
-            "title": "Run a challenger on the same folds and time budget",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "A challenger on equal terms",
+            "summary": "Run an automated challenger on the same five folds with the time budget the tuned search used, and log it beside the champion.",
             "minutes": 25,
-            "href": "D2_3_run_challenger_same.ipynb"
-          }
+            "href": "D2_3_challenger.ipynb",
+            "steps": [
+              {
+                "text": "Read the challenger configuration and its licence",
+                "minutes": 3
+              },
+              {
+                "text": "Write the function that runs it on one fold",
+                "minutes": 8
+              },
+              {
+                "text": "Run the five folds on the same time budget",
+                "minutes": 7
+              },
+              {
+                "text": "Log the run; read what it built",
+                "minutes": 4
+              },
+              {
+                "text": "Set the two rows of the log side by side",
+                "minutes": 3
+              }
+            ],
+            "stretch": "Give the challenger the fund's inner split in place of its own"
+          },
+          "summary": "An automated challenger, and what to check before a pretrained one: its licence, where the data goes, and a contest on equal terms."
         },
         {
           "title": "Is the challenger better",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Explain why fold scores of two models are compared as pairs",
+            "Compute the mean paired difference with an interval",
+            "Decide against a minimum effect stated in advance, in one line"
           ],
           "lo": [
             "LO4"
           ],
           "lab": {
             "id": "2.4",
-            "title": "Compute the paired fold difference with an interval and decide",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "The paired difference and the decision",
+            "summary": "Compute the paired fold difference between champion and challenger with an interval, check it with a paired bootstrap and write the one-line decision.",
             "minutes": 25,
-            "href": "D2_4_compute_paired_fold.ipynb"
-          }
+            "href": "D2_4_paired_difference.ipynb",
+            "steps": [
+              {
+                "text": "Line up the fold scores of the two models",
+                "minutes": 3
+              },
+              {
+                "text": "Compute the paired differences and their mean",
+                "minutes": 4
+              },
+              {
+                "text": "Put a t interval on the mean difference",
+                "minutes": 6
+              },
+              {
+                "text": "Check it with a paired bootstrap over rows",
+                "minutes": 7
+              },
+              {
+                "text": "Write the decision in one line",
+                "minutes": 5
+              }
+            ],
+            "stretch": "The same comparison between the champion and the logistic rung"
+          },
+          "summary": "Two models scored on the same folds give paired differences: an interval on their mean, and a decision stated before looking."
         }
-      ]
+      ],
+      "subtitle": "Boosted trees, a fixed tuning budget, an automated challenger and a paired decision"
     },
     {
       "id": "day3",
@@ -236,68 +446,173 @@
         {
           "title": "The split decides the score",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Choose the split that mirrors how a model will be used",
+            "Implement random, grouped and time-ordered splits on the same rows",
+            "Explain each gap between the three scores from the structure of the data"
           ],
           "lo": [
             "LO3"
           ],
           "lab": {
             "id": "3.1",
-            "title": "Score one model under random, grouped and time-ordered splits",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "One model, three splits",
+            "summary": "Score one model under random, grouped and time-ordered splits, measure how far the random split overstates and explain each gap.",
             "minutes": 25,
-            "href": "D3_1_score_one_model.ipynb"
-          }
+            "href": "D3_1_three_splits.ipynb",
+            "steps": [
+              {
+                "text": "Build the three splits on the same rows",
+                "minutes": 5
+              },
+              {
+                "text": "Score the same model under each",
+                "minutes": 7
+              },
+              {
+                "text": "Explain the grouped gap: new and returning trainees",
+                "minutes": 4
+              },
+              {
+                "text": "Explain the time gap: remove one feature and rescore",
+                "minutes": 5
+              },
+              {
+                "text": "Write the gap table with one sentence per gap",
+                "minutes": 4
+              }
+            ],
+            "stretch": "A model that memorises: does the grouped gap grow?"
+          },
+          "summary": "The same model scores differently under random, grouped and time-ordered splits, and each gap has a cause you can name."
         },
         {
           "title": "Kinds of leakage",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Distinguish target leakage, future information, group or duplicate contamination and preparation leakage",
+            "Identify the kind of leak from a description of how the data were collected",
+            "Match each case to the validation scheme its use requires"
           ],
           "lo": [
             "LO1"
           ],
           "lab": {
             "id": "3.2",
-            "title": "Classify six leaks from other projects by type",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "Six leaks from other projects",
+            "summary": "Classify six leaks from other projects by type, name the validation scheme each case needs and check the table against the reference.",
             "minutes": 25,
-            "href": "D3_2_classify_six_leaks.ipynb"
-          }
+            "href": "D3_2_six_leaks.ipynb",
+            "steps": [
+              {
+                "text": "Read the six cases and how their data were collected",
+                "minutes": 5
+              },
+              {
+                "text": "Name the kind of leak in each",
+                "minutes": 8
+              },
+              {
+                "text": "Name the validation scheme each needs",
+                "minutes": 6
+              },
+              {
+                "text": "Check the table; read the explanations",
+                "minutes": 3
+              },
+              {
+                "text": "Write the question that would have caught each",
+                "minutes": 3
+              }
+            ],
+            "stretch": "Add a seventh case from your own work"
+          },
+          "summary": "Four kinds of leakage, each with the question that catches it, practised on cases from other sectors."
         },
         {
           "title": "Hunting planted leaks",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Use the time each column is recorded to find features written after the outcome",
+            "Find duplicated rows that sit on both sides of a split",
+            "Use importance scores to choose which features to question first"
           ],
           "lo": [
             "LO1"
           ],
           "lab": {
             "id": "3.3",
-            "title": "Find four planted leaks with timestamps, duplicates and importance scores",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "Four planted leaks",
+            "summary": "Find four planted leaks in a received feature table with timestamps, duplicates and importance scores, removing one at a time with the score before and after.",
             "minutes": 25,
-            "href": "D3_3_find_four_planted.ipynb"
-          }
+            "href": "D3_3_leak_hunt.ipynb",
+            "steps": [
+              {
+                "text": "Score the received table as it came",
+                "minutes": 4
+              },
+              {
+                "text": "Timestamps: when is each column written?",
+                "minutes": 5
+              },
+              {
+                "text": "Duplicates: the same enrolment under two keys",
+                "minutes": 5
+              },
+              {
+                "text": "Importance scores: question the top features",
+                "minutes": 7
+              },
+              {
+                "text": "Write the audit note: before and after each removal",
+                "minutes": 4
+              }
+            ],
+            "stretch": "Rebuild the provider rate from past cohorts only"
+          },
+          "summary": "Three instruments for an audit: when each column is written, whether rows repeat, and which features carry the score."
         },
         {
           "title": "Reading someone else's notebook",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Read a notebook in the order split, preparation, tuning, metric",
+            "List the faults that make a reported score untrustworthy",
+            "Measure which fault moves the score most by repairing one at a time"
           ],
           "lo": [
             "LO1"
           ],
           "lab": {
             "id": "3.4",
-            "title": "List what makes a colleague's notebook score untrustworthy",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "A colleague's notebook",
+            "summary": "List what makes a colleague's notebook score untrustworthy, check the list, repair the faults one at a time and write the review note.",
             "minutes": 25,
-            "href": "D3_4_list_what_makes.ipynb"
-          }
+            "href": "D3_4_colleague_notebook.ipynb",
+            "steps": [
+              {
+                "text": "Run the notebook as it is; read the reported number",
+                "minutes": 3
+              },
+              {
+                "text": "Read the code and mark what you find",
+                "minutes": 9
+              },
+              {
+                "text": "Check your list against the reference",
+                "minutes": 3
+              },
+              {
+                "text": "Repair one fault at a time and rescore",
+                "minutes": 6
+              },
+              {
+                "text": "Write a five-line review note",
+                "minutes": 4
+              }
+            ],
+            "stretch": "Rewrite the notebook as one pipeline scored on the fund's folds"
+          },
+          "summary": "Reviewing a notebook you did not write: an order to read it in, and the things that make its headline number untrustworthy."
         }
-      ]
+      ],
+      "subtitle": "The split that mirrors use, the four kinds of leakage and how to audit a score"
     },
     {
       "id": "day4",
@@ -308,80 +623,185 @@
         {
           "title": "Thresholds for rare outcomes",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Read precision and recall off a precision-recall curve for a rare outcome",
+            "Choose a threshold that fits the advisers' capacity and report its precision and recall",
+            "Explain what happens to a fixed threshold when the next cohort differs"
           ],
           "lo": [
             "LO5"
           ],
           "lab": {
             "id": "4.1",
-            "title": "Pick a threshold on the precision-recall curve that fits adviser capacity",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "A threshold that fits capacity",
+            "summary": "Pick a threshold on the precision-recall curve that fits adviser capacity, compare it with 0.5 and with break-even, and test it on the held-out cohort.",
             "minutes": 25,
-            "href": "D4_1_pick_threshold_precision.ipynb"
-          }
+            "href": "D4_1_threshold_capacity.ipynb",
+            "steps": [
+              {
+                "text": "Draw the precision-recall curve of the validation cohort",
+                "minutes": 4
+              },
+              {
+                "text": "Find the threshold that fits 800 support plans",
+                "minutes": 6
+              },
+              {
+                "text": "Compare with 0.5 and with the break-even probability",
+                "minutes": 5
+              },
+              {
+                "text": "Apply the threshold to the held-out cohort",
+                "minutes": 6
+              },
+              {
+                "text": "Decide: a fixed threshold or a fixed list length",
+                "minutes": 4
+              }
+            ],
+            "stretch": "An interval for the precision at the chosen threshold"
+          },
+          "summary": "A score becomes a decision at a threshold. For a rare outcome the threshold comes from capacity and costs, never from 0.5."
         },
         {
           "title": "Calibration",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Compare expected and observed rates by decile and read a reliability plot",
+            "Calibrate a model on rows it was not trained on, with sigmoid and isotonic methods",
+            "Explain why a weighted model ranks well and still cannot be read as a probability"
           ],
           "lo": [
             "LO5"
           ],
           "lab": {
             "id": "4.2",
-            "title": "Calibrate the boosted model; compare expected and observed by decile",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "Calibrate and compare by decile",
+            "summary": "Calibrate the boosted model, compare expected and observed rates by decile before and after, and see where the 2025 cohort moves the calibration.",
             "minutes": 25,
-            "href": "D4_2_calibrate_boosted_model.ipynb"
-          }
+            "href": "D4_2_calibration.ipynb",
+            "steps": [
+              {
+                "text": "Expected against observed by decile, as delivered",
+                "minutes": 5
+              },
+              {
+                "text": "Fit sigmoid and isotonic calibrators on the validation cohort",
+                "minutes": 6
+              },
+              {
+                "text": "Compare by decile on the held-out cohort",
+                "minutes": 6
+              },
+              {
+                "text": "Look at the providers that opened in 2025",
+                "minutes": 4
+              },
+              {
+                "text": "Write the calibration line of the model card",
+                "minutes": 4
+              }
+            ],
+            "stretch": "Calibrate inside the time-ordered folds"
+          },
+          "summary": "A calibrated score can be read as a probability. Calibration is measured by decile, repaired on unseen rows and lost again under drift."
         },
         {
           "title": "Errors by subgroup",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Compare the training data with the eligible population by region, age band and gender",
+            "Report held-out error rates by subgroup with intervals that reflect slice size",
+            "Relate each finding to a bias type of the SDAIA AI Bias Reference Guide and to one action"
           ],
           "lo": [
             "LO5"
           ],
           "lab": {
             "id": "4.3",
-            "title": "Break errors down by region, gender and age band with intervals",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "Errors by region, gender and age band",
+            "summary": "Break held-out errors down by region, gender and age band with intervals, check who is represented and name the bias type behind each finding.",
             "minutes": 25,
-            "href": "D4_3_break_errors_down.ipynb"
-          }
+            "href": "D4_3_subgroup_errors.ipynb",
+            "steps": [
+              {
+                "text": "Compare the training data with the eligible population",
+                "minutes": 5
+              },
+              {
+                "text": "Miss rate and precision by region, with intervals",
+                "minutes": 7
+              },
+              {
+                "text": "The same by gender and by age band",
+                "minutes": 5
+              },
+              {
+                "text": "Decide which gaps the intervals support",
+                "minutes": 4
+              },
+              {
+                "text": "Name the bias type and one action per finding",
+                "minutes": 4
+              }
+            ],
+            "stretch": "The same table by provider: how many slices can carry an interval?"
+          },
+          "summary": "The model ranks people, so its errors are harms to people: who is represented, who is missed, and how sure a small slice lets you be."
         },
         {
           "title": "The model card",
           "outcomes": [
-            "REPLACE: what a participant can do after this session"
+            "Assemble a model card from measured results",
+            "State the limits of the validation and the uses the model is not for",
+            "Prepare the hand-over a deployment team needs and frame the capstone problem"
           ],
           "lo": [
             "LO6"
           ],
           "lab": {
             "id": "4.4",
-            "title": "Draft the model card and choose the capstone problem",
-            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "title": "The model card and the capstone problem",
+            "summary": "Draft the model card of Mubakkir from the measured results, write its limits and hand-over list, and choose and frame the capstone problem.",
             "minutes": 25,
-            "href": "D4_4_draft_model_card.ipynb"
-          }
+            "href": "D4_4_model_card.ipynb",
+            "steps": [
+              {
+                "text": "Collect the measured numbers",
+                "minutes": 4
+              },
+              {
+                "text": "Fill the card: use, data, validation, results, subgroups",
+                "minutes": 8
+              },
+              {
+                "text": "Write the limits and the human-decision statement",
+                "minutes": 5
+              },
+              {
+                "text": "List what the deployment team needs",
+                "minutes": 3
+              },
+              {
+                "text": "Choose the capstone problem and write its framing",
+                "minutes": 5
+              }
+            ],
+            "stretch": "Exchange cards with a neighbour: one question each"
+          },
+          "summary": "The model card is the hand-over: what the model is for, how it was validated, where it fails and what it must never decide."
         }
-      ]
+      ],
+      "subtitle": "Where to cut the ranking, whether its probabilities hold, for whom it fails, and what to write down"
     },
     {
       "id": "capstone",
       "kind": "capstone",
-      "title": "Capstone project presentations",
+      "title": "Capstone: a validated tabular model and its defence",
       "deck": "slides/capstone.html",
-      "subtitle": "REPLACE: the catalog gives 8 minutes for each presentation and nothing about questions; decide whether the questions are inside those minutes, set capstone.talk_minutes and capstone.qa_minutes in course.json and the timers of the now-presenting slide, and remove this line"
+      "subtitle": "Each participant defends a tabular model from framing to model card in eight minutes, including one change the assessor asks for"
     }
   ],
   "capstone": {
     "summary": "A tabular problem from a shortlist of synthetic and public cases taken from framing to model card, in a public repository whose README reports the baseline ladder, validation, leakage audit, threshold, subgroup errors and a paired comparison; eight-minute defence",
-    "submission": "REPLACE: what participants submit and how: a public repository link, or a shared folder for a course without code",
+    "submission": "A link to a public GitHub repository: the code with a fixed seed and a lock file, the run log, the leakage audit, the subgroup results and the model card, and a README that reports the baseline ladder, the validation scheme, the leakage audit, the threshold, errors by subgroup and a paired comparison; prompts and agent transcripts are committed with it",
     "talk_minutes": 8,
     "rubric": [
       {
@@ -445,6 +865,138 @@
       "examples": [
         "Fairlearn",
         "grouped metrics written in pandas"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "group": "National references",
+      "items": [
+        {
+          "title": "Principles of AI Ethics (SDAIA)",
+          "url": "https://sdaia.gov.sa/en/SDAIA/about/Documents/ai-principles.pdf"
+        },
+        {
+          "title": "AI Bias Reference Guide, first edition (SDAIA, May 2026)",
+          "url": "https://sdaia.gov.sa/en/MediaCenter/KnowledgeCenter/ResearchLibrary/EN-AI-BIAS.pdf"
+        },
+        {
+          "title": "Personal Data Protection Law (SDAIA)",
+          "url": "https://sdaia.gov.sa/en/SDAIA/about/Documents/PersonalDataProtectionLaw.pdf"
+        },
+        {
+          "title": "Implementing Regulation of the Personal Data Protection Law (SDAIA)",
+          "url": "https://sdaia.gov.sa/en/SDAIA/about/Documents/ImplementingRegulationPersonalDataProtectionLaw.pdf"
+        }
+      ]
+    },
+    {
+      "group": "Validation, pipelines and leakage",
+      "items": [
+        {
+          "title": "scikit-learn user guide: Cross-validation: evaluating estimator performance",
+          "url": "https://scikit-learn.org/stable/modules/cross_validation.html"
+        },
+        {
+          "title": "scikit-learn user guide: Common pitfalls and recommended practices",
+          "url": "https://scikit-learn.org/stable/common_pitfalls.html"
+        },
+        {
+          "title": "scikit-learn user guide: Pipelines and composite estimators",
+          "url": "https://scikit-learn.org/stable/modules/compose.html"
+        },
+        {
+          "title": "scikit-learn example: Nested versus non-nested cross-validation",
+          "url": "https://scikit-learn.org/stable/auto_examples/model_selection/plot_nested_cross_validation_iris.html"
+        },
+        {
+          "title": "Kapoor and Narayanan (2023). Leakage and the reproducibility crisis in machine-learning-based science",
+          "url": "https://arxiv.org/abs/2207.07048"
+        }
+      ]
+    },
+    {
+      "group": "Models and challengers",
+      "items": [
+        {
+          "title": "LightGBM documentation: Parameters tuning",
+          "url": "https://lightgbm.readthedocs.io/en/stable/Parameters-Tuning.html"
+        },
+        {
+          "title": "Grinsztajn, Oyallon and Varoquaux (2022). Why do tree-based models still outperform deep learning on tabular data?",
+          "url": "https://arxiv.org/abs/2207.08815"
+        },
+        {
+          "title": "Bergstra and Bengio (2012). Random search for hyper-parameter optimization",
+          "url": "https://www.jmlr.org/papers/v13/bergstra12a.html"
+        },
+        {
+          "title": "AutoGluon documentation: Tabular essentials",
+          "url": "https://auto.gluon.ai/stable/tutorials/tabular/tabular-essentials.html"
+        },
+        {
+          "title": "Hollmann and others (2025). Accurate predictions on small data with a tabular foundation model",
+          "url": "https://www.nature.com/articles/s41586-024-08328-6"
+        },
+        {
+          "title": "TabPFN repository: licence and usage terms (Prior Labs)",
+          "url": "https://github.com/PriorLabs/TabPFN"
+        }
+      ]
+    },
+    {
+      "group": "Thresholds, calibration and importance",
+      "items": [
+        {
+          "title": "scikit-learn user guide: Probability calibration",
+          "url": "https://scikit-learn.org/stable/modules/calibration.html"
+        },
+        {
+          "title": "scikit-learn user guide: Tuning the decision threshold for class prediction",
+          "url": "https://scikit-learn.org/stable/modules/classification_threshold.html"
+        },
+        {
+          "title": "scikit-learn user guide: Permutation feature importance",
+          "url": "https://scikit-learn.org/stable/modules/permutation_importance.html"
+        },
+        {
+          "title": "Saito and Rehmsmeier (2015). The precision-recall plot is more informative than the ROC plot when evaluating binary classifiers on imbalanced datasets",
+          "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0118432"
+        }
+      ]
+    },
+    {
+      "group": "Subgroups and documentation",
+      "items": [
+        {
+          "title": "Mitchell and others (2019). Model cards for model reporting",
+          "url": "https://arxiv.org/abs/1810.03993"
+        },
+        {
+          "title": "Fairlearn user guide: Assessment (MetricFrame)",
+          "url": "https://fairlearn.org/main/user_guide/assessment/index.html"
+        },
+        {
+          "title": "SciPy manual: proportion_ci, confidence intervals for a proportion (Wilson method)",
+          "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats._result_classes.BinomTestResult.proportion_ci.html"
+        }
+      ]
+    },
+    {
+      "group": "Public tables for the capstone",
+      "items": [
+        {
+          "title": "UCI Machine Learning Repository: Predict Students' Dropout and Academic Success",
+          "url": "https://archive.ics.uci.edu/dataset/697/predict+students+dropout+and+academic+success"
+        },
+        {
+          "title": "UCI Machine Learning Repository: Bank Marketing",
+          "url": "https://archive.ics.uci.edu/dataset/222/bank+marketing"
+        },
+        {
+          "title": "UCI Machine Learning Repository: Default of Credit Card Clients",
+          "url": "https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients"
+        }
       ]
     }
   ]

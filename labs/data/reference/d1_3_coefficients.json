@@ -1,0 +1,25 @@
+{
+ "__series__": {
+  "name": null,
+  "index": [
+   "provider_id_P23",
+   "provider_id_P38",
+   "provider_id_P14",
+   "absences_w2",
+   "provider_id_P01",
+   "aptitude_score",
+   "provider_id_P37",
+   "provider_id_P11"
+  ],
+  "data": [
+   0.9323646752,
+   -0.8169750725,
+   -0.8095949661,
+   0.7533756302,
+   0.7320471509,
+   -0.6525158449,
+   0.62115762,
+   -0.5882431085
+  ]
+ }
+}

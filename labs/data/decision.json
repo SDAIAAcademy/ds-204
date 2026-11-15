@@ -1,0 +1,10 @@
+{
+ "owner": "Ghassan Al-Fayez, lead adviser",
+ "action": "An adviser contacts the trainee in week 3 and agrees a support plan",
+ "prediction_time": "the end of week 2 of the programme",
+ "adviser_capacity_per_year": 800,
+ "cost_of_one_support_plan_sar": 450,
+ "cost_of_one_lost_place_sar": 9000,
+ "share_of_supported_non_completers_who_then_complete": 0.25,
+ "note": "The score puts a trainee on an adviser's list. It never decides eligibility, funding or a place."
+}
