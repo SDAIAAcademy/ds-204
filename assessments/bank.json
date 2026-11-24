@@ -182,9 +182,9 @@
       "prompt": "A library network groups its 900 members with k-means (k = 3) on two columns: loans a year (5 to 819) and the share of loans that are e-books (0 to 0.93). The three segments have mean loans of 45, 132 and 322, and mean e-book shares of 0.38, 0.37 and 0.33. What do you conclude?",
       "options": [
         "Members hardly differ in how much they read e-books",
-        "The segments measure loans only: scale both columns and cluster again",
+        "Only loans shaped the segments: scale both columns and run again",
         "Three segments are too few: raise k until the e-book share differs",
-        "The segments are sound, because k-means made each one as tight as it could"
+        "The segments are sound: k-means made each one as tight as it could"
       ],
       "correct": [
         1

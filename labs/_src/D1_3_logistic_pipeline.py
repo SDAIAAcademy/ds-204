@@ -242,7 +242,7 @@ U.check(separation.loc["absences_w2", "scaled"] > 2 * separation.loc["absences_w
 # Unscaled, the distance between two trainees is a distance in test points and kilometres, so the segments are
 # cut along those two columns and age plays no part. Scaled, each column counts in its own standard deviations,
 # and a segment of frequent absentees appears. The non-completion rate is read **after** the segments are made:
-# it describes them, it did not shape them. Two cautions: a long tail (`distance_km` reaches 250) can still take
+# it describes them, it did not shape them. Two cautions: a long tail (a few trainees live very far away) can still take
 # a segment of its own after scaling; and if a segment ever becomes a model input, its scaler and centres are
 # fitted inside the pipeline, on training rows only.
 

@@ -453,7 +453,7 @@ model = Pipeline([("prepare", prepare),
   <h2>k-means groups rows by distance, so the units decide what counts</h2>
   <div class="cols cols-2">
     <ul class="bullets">
-      <li>No outcome: each row joins the nearest of <i>k</i> centres, each centre moves to its rows' mean, repeat</li>
+      <li>Unsupervised clustering: no outcome. In k-means each row joins the nearest of <i>k</i> centres, each centre moves to its rows' mean, repeat</li>
       <li>"Nearest" is Euclidean distance over the columns given</li>
       <li>A segment is a description: read its means before naming it</li>
     </ul>
@@ -464,7 +464,7 @@ model = Pipeline([("prepare", prepare),
       <tr><td>Share who complete</td><td class="num">0.837</td><td class="num">0.594</td><td class="num">0.059</td></tr>
     </table>
   </div>
-  <div class="callout warn mt"><b>Read the last column.</b> Staff is 99.4% of the distance between A and B. After scaling each column to spread 1, it is 24%.</div>
+  <div class="callout warn mt"><b>Read the last column.</b> Staff is 99.4% of the squared distance between A and B. After scaling each column to spread 1, it is 24%.</div>
   <aside class="notes"><p>A parallel example, not the lab: 240 synthetic employers that sponsor trainees of the fund, written by the course's script segments_example.py. Ask the room first: are A and B alike? On what they sponsor and how their trainees fare, they are opposites; in raw units the distance says they differ mostly in head count. Scaled, the squared gaps are 3.74, 8.26 and 3.37.</p></aside>
 </section>
 
@@ -485,7 +485,7 @@ model = Pipeline([("prepare", prepare),
       <tr><td>Staff 635</td><td class="num">28.1</td><td class="num">0.57</td><td class="num">48</td></tr>
     </table>
   </div>
-  <div class="callout tip mt"><b>How to tell.</b> Segments that differ in one column only, the one with the largest units, measured units, not kinds. Scale, run again and compare the two tables.</div>
+  <div class="callout tip mt"><b>How to tell.</b> When segments differ in one column only, the one with the largest units, the run measured units, not kinds. Scale, run again and compare the two tables.</div>
   <aside class="notes"><p>Same 240 employers, same k and seed. The script planted three kinds of sponsor: the scaled run recovers them exactly (adjusted Rand index 1.00), the unscaled run not at all (0.01). Three cautions. Scaling gives every column an equal say, so leave out columns that should not shape the segments. A long tail can still claim a segment of its own after scaling. And if a segment ever becomes a model input, its scaler and centres are fitted inside the pipeline, on training rows only, as the checkpoint says. Choose k by trying a few and keeping segments an adviser could act on. The stretch of Lab 1.3 does this on the trainees.</p></aside>
 </section>
 
