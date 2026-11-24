@@ -334,7 +334,6 @@
   <div class="cols cols-2">
     <ul class="bullets">
       <li><b>Logistic regression:</b> a weighted sum of the inputs, turned into a probability</li>
-      <li>Fits in seconds, on a laptop</li>
       <li>Its probabilities are usually close to observed rates</li>
       <li>Each weight can be read, with care</li>
       <li>On tables with mostly additive effects it is hard to beat by much</li>
@@ -376,7 +375,7 @@ prepare = ColumnTransformer([("num", numeric, NUM), ("cat", categories, CAT)])
 model = Pipeline([("prepare", prepare),
                   ("model", LogisticRegression(C=0.1, max_iter=2000))])</code></pre>
   <div class="callout tip mt"><b>One object, one rule.</b> Whatever is inside the pipeline is refitted in every fold. Whatever you compute before it has seen every row.</div>
-  <aside class="notes"><p>This is the exercise of task 1; participants who did the pre-work write it in a few minutes. Demonstration: fit it on fold 5 and call model[:-1].transform on five validation rows to show the 101 columns.</p></aside>
+  <aside class="notes"><p>This is the exercise of task 1; participants who did the pre-work write it in a few minutes. Keep this slide short: the code is in the lab.</p></aside>
 </section>
 
 <section class="slide" id="logistic-score" data-lo="LO2">
@@ -447,6 +446,47 @@ model = Pipeline([("prepare", prepare),
     </ul>
   </div>
   <aside class="notes"><p>From Lab 1.3. Two cautions. A large provider weight may reflect who enrols there, not what the provider does. And the model was built to rank, so whether a support plan changes the outcome is a causal question it cannot answer; DS-205 is the course for that.</p></aside>
+</section>
+
+<section class="slide" id="segments-kmeans" data-lo="LO2">
+  <div class="kicker">Segments without a target</div>
+  <h2>k-means groups rows by distance, so the units decide what counts</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>No outcome: each row joins the nearest of <i>k</i> centres, each centre moves to its rows' mean, repeat</li>
+      <li>"Nearest" is Euclidean distance over the columns given</li>
+      <li>A segment is a description: read its means before naming it</li>
+    </ul>
+    <table class="t small">
+      <tr><th>Two sponsoring employers</th><th class="num">A</th><th class="num">B</th><th class="num">Squared gap</th></tr>
+      <tr><td>Staff</td><td class="num">454</td><td class="num">815</td><td class="num">130,321</td></tr>
+      <tr><td>Trainees a year</td><td class="num">1</td><td class="num">29</td><td class="num">784</td></tr>
+      <tr><td>Share who complete</td><td class="num">0.837</td><td class="num">0.594</td><td class="num">0.059</td></tr>
+    </table>
+  </div>
+  <div class="callout warn mt"><b>Read the last column.</b> Staff is 99.4% of the distance between A and B. After scaling each column to spread 1, it is 24%.</div>
+  <aside class="notes"><p>A parallel example, not the lab: 240 synthetic employers that sponsor trainees of the fund, written by the course's script segments_example.py. Ask the room first: are A and B alike? On what they sponsor and how their trainees fare, they are opposites; in raw units the distance says they differ mostly in head count. Scaled, the squared gaps are 3.74, 8.26 and 3.37.</p></aside>
+</section>
+
+<section class="slide" id="kmeans-units" data-lo="LO2">
+  <div class="kicker">Scale, then compare</div>
+  <h2>Unscaled, the segments split on staff alone; scaled, they find kinds of sponsor</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Unscaled, k = 3</th><th class="num">Trainees a year</th><th class="num">Complete</th><th class="num">Employers</th></tr>
+      <tr><td>Staff 406</td><td class="num">10.8</td><td class="num">0.78</td><td class="num">86</td></tr>
+      <tr><td>Staff 634</td><td class="num">10.8</td><td class="num">0.79</td><td class="num">112</td></tr>
+      <tr><td>Staff 883</td><td class="num">14.2</td><td class="num">0.74</td><td class="num">42</td></tr>
+    </table>
+    <table class="t small">
+      <tr><th>Scaled, k = 3</th><th class="num">Trainees a year</th><th class="num">Complete</th><th class="num">Employers</th></tr>
+      <tr><td>Staff 579</td><td class="num">3.0</td><td class="num">0.90</td><td class="num">116</td></tr>
+      <tr><td>Staff 597</td><td class="num">13.7</td><td class="num">0.73</td><td class="num">76</td></tr>
+      <tr><td>Staff 635</td><td class="num">28.1</td><td class="num">0.57</td><td class="num">48</td></tr>
+    </table>
+  </div>
+  <div class="callout tip mt"><b>How to tell.</b> Segments that differ in one column only, the one with the largest units, measured units, not kinds. Scale, run again and compare the two tables.</div>
+  <aside class="notes"><p>Same 240 employers, same k and seed. The script planted three kinds of sponsor: the scaled run recovers them exactly (adjusted Rand index 1.00), the unscaled run not at all (0.01). Three cautions. Scaling gives every column an equal say, so leave out columns that should not shape the segments. A long tail can still claim a segment of its own after scaling. And if a segment ever becomes a model input, its scaler and centres are fitted inside the pipeline, on training rows only, as the checkpoint says. Choose k by trying a few and keeping segments an adviser could act on. The stretch of Lab 1.3 does this on the trainees.</p></aside>
 </section>
 
 <section class="slide" id="check-pipeline" data-lo="LO1">

@@ -32,6 +32,16 @@ scores vary a little between machines; the decisions do not.
 | Paper registers in Jazan and Najran that under-record early absences | Lab 4.3 |
 | Under-representation of trainees of 35 and over, of some regions and of women | Lab 4.3, task 1 |
 
+## Lab 1.3, stretch: segments with k-means
+
+Four columns of the 32,439 development rows (`age`, `aptitude_score`, `distance_km`, `absences_w2`), four
+segments. Share of the total variance: aptitude 0.557, distance 0.380, age 0.062, absence 0.002. Separation of
+the segment means in standard deviations, unscaled against scaled: age 0.05 and 1.81, aptitude 2.68 and 1.19,
+distance 2.84 and 2.75, absence 0.59 and 2.16. Unscaled, the segments are cut by aptitude and distance (non-
+completion 0.04 to 0.23); scaled, a segment of 4,079 frequent absentees (1.95 days absent) appears, with non-
+completion 0.40, and a segment of older trainees (mean age 31.5). The rates are read after the segments are
+made. The worked example of the slides and the practice question come from `_tools/segments_example.py`.
+
 ## Lab 3.1
 
 Random 0.521, grouped 0.520, grouped with history hidden 0.500, time-ordered 0.525. The random split does **not**

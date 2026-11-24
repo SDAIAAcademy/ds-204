@@ -20,7 +20,7 @@
 # - [ ] 3 · Try three regularisation strengths; log each (5')
 # - [ ] 4 · Prepare outside the folds and compare (5')
 # - [ ] 5 · Read the largest coefficients (3')
-# - [ ] ✱ Stretch · Add one interaction by hand and log it
+# - [ ] ✱ Stretch · Add one interaction by hand and log it; then find segments with k-means, unscaled and scaled
 
 # %%
 import os, sys, subprocess
@@ -40,6 +40,7 @@ sys.path.insert(0, os.getcwd())
 import numpy as np
 import pandas as pd
 import sullam as U
+from sklearn.cluster import KMeans
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
@@ -187,10 +188,63 @@ U.save("D1_3_logistic.md", "# Lab 1.3: the logistic rung\n\n" + line + "\n\n" + 
 # against the rest, **with the other inputs held fixed**. It ranks what the model leans on. It does not say that
 # changing the column would change the outcome.
 #
-# ## ✱ Stretch · Add one interaction by hand and log it
+# ## ✱ Stretch · Add one interaction by hand and log it; then find segments with k-means, unscaled and scaled
 #
 # The rule of Lab 1.2 worked on absence. Does absence mean the same for everyone? Add one column by hand,
 # `absences_w2` times an indicator for `enrolled_via == "employer"`, and log the run. Keep the answer for Day 2.
+#
+# **Then: segments without a target.** The advisers ask whether the trainees fall into a few kinds that could
+# each get their own kind of support. k-means answers without reading the outcome: it puts each trainee with
+# the nearest of `k` centres, by Euclidean distance over the columns you give it. Use four columns known at the
+# end of week 2: `age`, `aptitude_score`, `distance_km`, `absences_w2` (development rows; a missing value is
+# filled with the column's median, which is fine for a description).
+#
+# ✏️ **Exercise** · Write `segments(scale)`: four segments with `KMeans(n_clusters=4, n_init=10, random_state=0)`,
+# on the columns as they are, or after `StandardScaler` when `scale` is true. Return one label per row.
+
+# %%
+SEG = ["age", "aptitude_score", "distance_km", "absences_w2"]
+Xseg = dev[SEG].fillna(dev[SEG].median())
+print("share of the total variance, by column:", (Xseg.var() / Xseg.var().sum()).round(4).to_dict())
+
+
+def segments(scale: bool) -> np.ndarray:
+    # BEGIN SOLUTION
+    X = StandardScaler().fit_transform(Xseg) if scale else Xseg.to_numpy()
+    return KMeans(n_clusters=4, n_init=10, random_state=0).fit_predict(X)
+    # END SOLUTION
+
+
+def describe(labels: np.ndarray) -> pd.DataFrame:
+    """Mean of each column per segment, its size, and the non-completion rate read afterwards."""
+    p = Xseg.assign(trainees=1, not_completed=dev[U.TARGET]).groupby(labels).agg(
+        {**{c: "mean" for c in SEG}, "trainees": "sum", "not_completed": "mean"})
+    return p.sort_values("not_completed").reset_index(drop=True)
+
+
+try:
+    found = {name: describe(segments(scale)) for name, scale in (("unscaled", False), ("scaled", True))}
+except NotImplementedError:
+    found = U.reference("d1_3_segments")
+# how far apart the segment means lie, in standard deviations of each column
+separation = pd.DataFrame({name: (p[SEG].max() - p[SEG].min()) / Xseg.std() for name, p in found.items()})
+U.keep("d1_3_segments", found)
+for name, p in found.items():
+    print(f"\n{name}\n", p.round(2))
+print("\nseparation of the segment means, in standard deviations\n", separation.round(2))
+U.check(separation.loc["age", "unscaled"] < 0.2 < 1 < separation.loc["age", "scaled"],
+        "unscaled, age plays no part in the segments; scaled, it does")
+U.check(separation.loc["absences_w2", "scaled"] > 2 * separation.loc["absences_w2", "unscaled"],
+        "scaled, absence separates the segments at least twice as far")
+
+# %% [markdown]
+# 🔍 **Look at** the variance shares first: aptitude and distance hold almost all of it, absence almost none.
+# Unscaled, the distance between two trainees is a distance in test points and kilometres, so the segments are
+# cut along those two columns and age plays no part. Scaled, each column counts in its own standard deviations,
+# and a segment of frequent absentees appears. The non-completion rate is read **after** the segments are made:
+# it describes them, it did not shape them. Two cautions: a long tail (`distance_km` reaches 250) can still take
+# a segment of its own after scaling; and if a segment ever becomes a model input, its scaler and centres are
+# fitted inside the pipeline, on training rows only.
 
 # %% [markdown]
 # ## Checkpoint

@@ -1,0 +1,171 @@
+{
+ "employers": {
+  "n": 240,
+  "describe": {
+   "staff": {
+    "count": 240.0,
+    "mean": 595.871,
+    "std": 186.705,
+    "min": 114.0,
+    "25%": 450.75,
+    "50%": 580.0,
+    "75%": 724.25,
+    "max": 1183.0
+   },
+   "trainees_per_year": {
+    "count": 240.0,
+    "mean": 11.404,
+    "std": 9.744,
+    "min": 1.0,
+    "25%": 3.0,
+    "50%": 11.0,
+    "75%": 15.0,
+    "max": 31.0
+   },
+   "completed_share": {
+    "count": 240.0,
+    "mean": 0.778,
+    "std": 0.132,
+    "min": 0.511,
+    "25%": 0.704,
+    "50%": 0.768,
+    "75%": 0.896,
+    "max": 0.988
+   }
+  },
+  "variance_share": {
+   "staff": 0.997283,
+   "trainees_per_year": 0.002717,
+   "completed_share": 1e-06
+  },
+  "pair": {
+   "a": {
+    "staff": 454.0,
+    "trainees_per_year": 1.0,
+    "completed_share": 0.837
+   },
+   "b": {
+    "staff": 815.0,
+    "trainees_per_year": 29.0,
+    "completed_share": 0.594
+   },
+   "squared_differences": {
+    "staff": 130321.0,
+    "trainees_per_year": 784.0,
+    "completed_share": 0.059049
+   },
+   "scaled_squared_differences": {
+    "staff": 3.7385386734144195,
+    "trainees_per_year": 8.256705990311962,
+    "completed_share": 3.3729648722293453
+   }
+  },
+  "unscaled": [
+   {
+    "staff": 406.093,
+    "trainees_per_year": 10.767,
+    "completed_share": 0.783,
+    "n": 86
+   },
+   {
+    "staff": 633.866,
+    "trainees_per_year": 10.848,
+    "completed_share": 0.787,
+    "n": 112
+   },
+   {
+    "staff": 883.143,
+    "trainees_per_year": 14.19,
+    "completed_share": 0.742,
+    "n": 42
+   }
+  ],
+  "scaled": [
+   {
+    "staff": 634.688,
+    "trainees_per_year": 28.146,
+    "completed_share": 0.566,
+    "n": 48
+   },
+   {
+    "staff": 596.671,
+    "trainees_per_year": 13.711,
+    "completed_share": 0.729,
+    "n": 76
+   },
+   {
+    "staff": 579.284,
+    "trainees_per_year": 2.966,
+    "completed_share": 0.897,
+    "n": 116
+   }
+  ],
+  "agreement_with_kinds": {
+   "unscaled": 0.011,
+   "scaled": 1.0
+  }
+ },
+ "library_members": {
+  "n": 900,
+  "describe": {
+   "loans_per_year": {
+    "count": 900.0,
+    "mean": 78.258,
+    "std": 73.453,
+    "min": 5.0,
+    "25%": 33.0,
+    "50%": 56.0,
+    "75%": 97.25,
+    "max": 819.0
+   },
+   "ebook_share": {
+    "count": 900.0,
+    "mean": 0.373,
+    "std": 0.283,
+    "min": 0.0,
+    "25%": 0.13,
+    "50%": 0.24,
+    "75%": 0.67,
+    "max": 0.93
+   }
+  },
+  "unscaled": [
+   {
+    "loans_per_year": 44.66,
+    "ebook_share": 0.38,
+    "n": 638
+   },
+   {
+    "loans_per_year": 131.76,
+    "ebook_share": 0.37,
+    "n": 223
+   },
+   {
+    "loans_per_year": 322.03,
+    "ebook_share": 0.33,
+    "n": 39
+   }
+  ],
+  "scaled": [
+   {
+    "loans_per_year": 62.14,
+    "ebook_share": 0.15,
+    "n": 488
+   },
+   {
+    "loans_per_year": 267.71,
+    "ebook_share": 0.31,
+    "n": 68
+   },
+   {
+    "loans_per_year": 63.68,
+    "ebook_share": 0.7,
+    "n": 344
+   }
+  ],
+  "agreement_with_kinds": {
+   "unscaled": -0.005,
+   "scaled": 0.845
+  }
+ }
+}

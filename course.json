@@ -3,7 +3,7 @@
   "engine": "1",
   "id": "ds-204",
   "code": "DS-204",
-  "version": "2027.1.0",
+  "version": "2027.2.0",
   "lang": "en",
   "title": {
     "en": "Machine Learning for Tabular Data: Baselines and Validation",
@@ -211,7 +211,7 @@
                 "minutes": 3
               }
             ],
-            "stretch": "Add one interaction by hand and log it"
+            "stretch": "Add one interaction by hand and log it; then find segments with k-means, unscaled and scaled"
           },
           "summary": "The first model that learns: a regularised logistic model inside a pipeline fitted on training rows only."
         },
