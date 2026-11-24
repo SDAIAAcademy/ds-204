@@ -36,9 +36,9 @@
   },
   "6": {
     "kind": "target",
-    "scheme": "grouped",
+    "scheme": "grouped+time",
     "why_kind": "The antibiotic is ordered because a doctor already suspects the infection: the column records the doctor's answer to the question the model is asked. It is also taken from the whole stay, not the first six hours.",
-    "why_scheme": "The model will meet patients who are not in the data, and patients repeat in the table: all admissions of a patient stay on one side.",
+    "why_scheme": "The model will meet patients who are not in the data, at hospitals that open next year. Patients repeat in the table, so all admissions of a patient stay on one side, and the validation admissions come after the training ones.",
     "question": "Would a person who already knew the outcome be the one filling in this column?"
   }
 }

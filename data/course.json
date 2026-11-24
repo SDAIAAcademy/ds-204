@@ -2,9 +2,9 @@
   "v": 1,
   "engine": "1.0.0",
   "build": {
-    "at": "2026-11-15T16:02:38Z",
-    "version": "2027.1.0",
-    "commit": "6acdecd"
+    "at": "2026-11-24T15:40:40Z",
+    "version": "2027.2.0",
+    "commit": "4d099a9"
   },
   "lang": "en",
   "dir": "ltr",
@@ -15,7 +15,7 @@
   "course": {
     "id": "ds-204",
     "code": "DS-204",
-    "version": "2027.1.0",
+    "version": "2027.2.0",
     "title": "Machine Learning for Tabular Data: Baselines and Validation",
     "tagline": "Take a tabular prediction from the decision it serves to a model card: a logged baseline ladder, validation that mirrors use, a leakage audit, a threshold that fits capacity and errors by subgroup with intervals",
     "description": "Participants predict which trainees of a fictional vocational training fund are likely not to complete, so that advisers can offer support early. On synthetic enrolment data with repeated trainees and cohorts, they climb a baseline ladder to tuned gradient-boosted trees, test an automated or pretrained challenger, choose validation that mirrors use, audit for leakage, set a threshold, break errors down by subgroup and write a model card. Deployment is left to AE-205 and AE-305.",
@@ -238,7 +238,7 @@
                   "minutes": 3
                 }
               ],
-              "stretch": "Add one interaction by hand and log it"
+              "stretch": "Add one interaction by hand and log it; then find segments with k-means, unscaled and scaled"
             }
           },
           {

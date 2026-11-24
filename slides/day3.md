@@ -1,7 +1,7 @@
 ---
 course: "Machine Learning for Tabular Data: Baselines and Validation"
 code: "DS-204"
-version: "2027.1.0"
+version: "2027.2.0"
 deck: "day3"
 day: 3
 language: "en"
@@ -214,8 +214,8 @@ All four give a score in validation that the model cannot repeat in use.
 *Kind 1*
 
 - Recorded when the outcome happens: `exit_reason`, `weeks_attended`
-- A consequence of the outcome: calls from the collections team after a missed payment
-- Someone's answer to the same question: an antibiotic ordered because the doctor suspects the infection
+- A consequence of the outcome: a cancellation fee, in a table that predicts which bookings are cancelled
+- Someone's answer to the same question: a specialist referral written because the doctor suspects the condition
 
 - **The question.** When is this column written, and by whom? Would a person who already knew the outcome be the one filling it in?
 

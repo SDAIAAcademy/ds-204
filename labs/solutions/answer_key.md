@@ -25,12 +25,22 @@ scores vary a little between machines; the decisions do not.
 | Planted | Where it shows |
 |---|---|
 | Columns recorded at exit: `weeks_attended`, `exit_date`, `exit_reason` | Lab 1.1 (the data dictionary), Lab 3.3 |
-| Trainees who repeat (28% of trainees have more than one row) | Labs 1.4 and 3.1 |
+| Trainees who repeat (35% of all trainees have more than one row; 28% within the development rows) | Labs 1.4 and 3.1 |
 | Outcomes that take 12 to 36 weeks to exist | The fold rule "due to end" (Lab 3.1, slide "due-to-end") |
 | A fund that changes: provider quality drifts, an employer mandate, a stipend rule, blended delivery | The ageing table of Lab 3.1; the new providers of Lab 4.2 |
 | Eight providers that open in 2025 | Lab 4.2, task 4 |
 | Paper registers in Jazan and Najran that under-record early absences | Lab 4.3 |
 | Under-representation of trainees of 35 and over, of some regions and of women | Lab 4.3, task 1 |
+
+## Lab 1.3, stretch: segments with k-means
+
+Four columns of the 32,439 development rows (`age`, `aptitude_score`, `distance_km`, `absences_w2`), four
+segments. Share of the total variance: aptitude 0.557, distance 0.380, age 0.062, absence 0.002. Separation of
+the segment means in standard deviations, unscaled against scaled: age 0.05 and 1.81, aptitude 2.68 and 1.19,
+distance 2.84 and 2.75, absence 0.59 and 2.16. Unscaled, the segments are cut by aptitude and distance (non-
+completion 0.04 to 0.23); scaled, a segment of 4,079 frequent absentees (1.95 days absent) appears, with non-
+completion 0.40, and a segment of older trainees (mean age 31.5). The rates are read after the segments are
+made. The worked example of the slides and the practice question come from `_tools/segments_example.py`.
 
 ## Lab 3.1
 
@@ -48,10 +58,11 @@ and 0.462 under the grouped one. No gap opens, because seven trainees in ten hav
 | 3 Dates | preparation | random |
 | 4 Appointments | future | time |
 | 5 Claims | group (duplicates) | grouped |
-| 6 Infection | target | grouped |
+| 6 Infection | target | grouped+time |
 
 Accept a reasoned second kind: case 6 is also future information (the column covers the whole stay); case 5
-can be argued as time-ordered after the copies are removed.
+can be argued as time-ordered after the copies are removed; case 6 as grouped alone, if the participant argues that the
+new hospitals' patients are the only change that matters.
 
 ## Lab 3.3: the four planted leaks of `data/received_table.csv.gz`
 

@@ -1,7 +1,7 @@
 ---
 course: "Machine Learning for Tabular Data: Baselines and Validation"
 code: "DS-204"
-version: "2027.1.0"
+version: "2027.2.0"
 language: "en"
 view: "trainee"
 source: "https://sdaiaacademy.github.io/ds-204/index.html"
@@ -9,7 +9,7 @@ source: "https://sdaiaacademy.github.io/ds-204/index.html"
 
 # Machine Learning for Tabular Data: Baselines and Validation
 
-تعلم الآلة للبيانات الجدولية: خطوط الأساس والتحقق من الصحة
+تعلّم الآلة للبيانات الجدولية: خطوط الأساس والتحقق من الصحة
 
 Data Science Track · 4 teaching days + capstone day · 26 hours · Level 200
 
@@ -220,4 +220,4 @@ A tabular problem from a shortlist of synthetic and public cases taken from fram
 
 SDAIA Academy · Data Science Track · Machine Learning for Tabular Data: Baselines and Validation
 
-Course version 2027.1.0 · engine 1.0.0 · built 2026-11-15 · commit 6acdecd
+Course version 2027.2.0 · engine 1.0.0 · built 2026-11-24 · commit 4d099a9

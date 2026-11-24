@@ -6,7 +6,7 @@
     "code": "DS-204",
     "title": "Machine Learning for Tabular Data: Baselines and Validation",
     "lang": "en",
-    "version": "2027.1.0"
+    "version": "2027.2.0"
   },
   "questions": [
     {
@@ -752,6 +752,36 @@
       "day": 1,
       "session": 3,
       "level": "apply",
+      "pool": "practice",
+      "weight": 1,
+      "timer": 30
+    },
+    {
+      "id": "q-ladder-kmeans-units",
+      "type": "single",
+      "prompt": "A library network groups its 900 members with k-means (k = 3) on two columns: loans a year (5 to 819) and the share of loans that are e-books (0 to 0.93). The three segments have mean loans of 45, 132 and 322, and mean e-book shares of 0.38, 0.37 and 0.33. What do you conclude?",
+      "options": [
+        "Members hardly differ in how much they read e-books",
+        "Only loans shaped the segments: scale both columns and run again",
+        "Three segments are too few: raise k until the e-book share differs",
+        "The segments are sound: k-means made each one as tight as it could"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "Loans run into the hundreds and the share stays between 0 and 1, so the Euclidean distance is almost all loans: the segments differ in loans and not in e-book use. Scaled, the same members split into print readers (e-book share 0.15), heavy e-book readers (0.70) and a small group of very frequent borrowers.",
+      "misconceptions": [
+        "Reads the segment means as the data: the share itself runs from 0 to 0.93, the segments simply ignored it",
+        "",
+        "Treats a problem of units as a problem of k: more segments still cut along loans first",
+        "Takes the tightest segments for the right ones: they are tightest for a distance that is nearly all loans"
+      ],
+      "lo": [
+        "LO2"
+      ],
+      "day": 1,
+      "session": 3,
+      "level": "analyze",
       "pool": "practice",
       "weight": 1,
       "timer": 30

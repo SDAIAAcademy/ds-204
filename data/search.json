@@ -2,9 +2,9 @@
   "v": 1,
   "engine": "1.0.0",
   "build": {
-    "at": "2026-11-15T16:02:38Z",
-    "version": "2027.1.0",
-    "commit": "6acdecd"
+    "at": "2026-11-24T15:40:40Z",
+    "version": "2027.2.0",
+    "commit": "4d099a9"
   },
   "lang": "en",
   "dir": "ltr",
@@ -249,7 +249,7 @@
       "n": 27,
       "session": 3,
       "title": "A linear model is the first model worth beating",
-      "text": "Rung 3 A linear model is the first model worth beating Logistic regression: a weighted sum of the inputs, turned into a probability Fits in seconds, on a laptop Its probabilities are usually close to observed rates Each weight can be read, with care On tables with mostly additive effects it is hard to beat by much What it cannot do alone It adds effects. \"Absence matters, except for employer-sponsored trainees\" is an interaction: someone has to write it in, or a tree has to find it. That is Day 2.",
+      "text": "Rung 3 A linear model is the first model worth beating Logistic regression: a weighted sum of the inputs, turned into a probability Its probabilities are usually close to observed rates Each weight can be read, with care On tables with mostly additive effects it is hard to beat by much What it cannot do alone It adds effects. \"Absence matters, except for employer-sponsored trainees\" is an interaction: someone has to write it in, or a tree has to find it. That is Day 2.",
       "href": "../slides/day1.html#linear-first"
     },
     {
@@ -308,8 +308,26 @@
     },
     {
       "deck": "day1",
-      "id": "check-pipeline",
+      "id": "segments-kmeans",
       "n": 34,
+      "session": 3,
+      "title": "k-means groups rows by distance, so the units decide what counts",
+      "text": "Segments without a target k-means groups rows by distance, so the units decide what counts Unsupervised clustering: no outcome. In k-means each row joins the nearest of k centres, each centre moves to its rows' mean, repeat \"Nearest\" is Euclidean distance over the columns given A segment is a description: read its means before naming it Two sponsoring employers A B Squared gap Staff 454 815 130,321 Trainees a year 1 29 784 Share who complete 0.837 0.594 0.059 Read the last column. Staff is 99.4% of the squared distance between A and B. After scaling each column to spread 1, it is 24%.",
+      "href": "../slides/day1.html#segments-kmeans"
+    },
+    {
+      "deck": "day1",
+      "id": "kmeans-units",
+      "n": 35,
+      "session": 3,
+      "title": "Unscaled, the segments split on staff alone; scaled, they find kinds of sponsor",
+      "text": "Scale, then compare Unscaled, the segments split on staff alone; scaled, they find kinds of sponsor Unscaled, k = 3 Trainees a year Complete Employers Staff 406 10.8 0.78 86 Staff 634 10.8 0.79 112 Staff 883 14.2 0.74 42 Scaled, k = 3 Trainees a year Complete Employers Staff 579 3.0 0.90 116 Staff 597 13.7 0.73 76 Staff 635 28.1 0.57 48 How to tell. When segments differ in one column only, the one with the largest units, the run measured units, not kinds. Scale, run again and compare the two tables.",
+      "href": "../slides/day1.html#kmeans-units"
+    },
+    {
+      "deck": "day1",
+      "id": "check-pipeline",
+      "n": 36,
       "session": 3,
       "title": "Where may the scaler be fitted?",
       "text": "Checkpoint Where may the scaler be fitted? You score a logistic model on five folds. On which rows is the scaler of fold 3 fitted? On the training rows of fold 3 only, each time the pipeline is fitted On all development rows, once, before the folds are made On the validation rows of fold 3, so that they are scaled correctly On the 2025 cohort, because it is the most recent",
@@ -318,16 +336,16 @@
     {
       "deck": "day1",
       "id": "lab-1-3",
-      "n": 35,
+      "n": 37,
       "session": 3,
       "title": "A logistic model in a pipeline",
-      "text": "Lab 1.3 · 25 min A logistic model in a pipeline Fit a regularised logistic model in a pipeline on the same folds, log score and spread, try three strengths and see what the pipeline protects. D1_3_logistic_pipeline.ipynb Build the pipeline: impute, encode, scale, model 7 min Score it on the five folds and log the run 5 min Try three regularisation strengths; log each 5 min Prepare outside the folds and compare 5 min Read the largest coefficients 3 min ✱ Stretch: Add one interaction by hand and log it",
+      "text": "Lab 1.3 · 25 min A logistic model in a pipeline Fit a regularised logistic model in a pipeline on the same folds, log score and spread, try three strengths and see what the pipeline protects. D1_3_logistic_pipeline.ipynb Build the pipeline: impute, encode, scale, model 7 min Score it on the five folds and log the run 5 min Try three regularisation strengths; log each 5 min Prepare outside the folds and compare 5 min Read the largest coefficients 3 min ✱ Stretch: Add one interaction by hand and log it; then find segments with k-means, unscaled and scaled",
       "href": "../slides/day1.html#lab-1-3"
     },
     {
       "deck": "day1",
       "id": "s4",
-      "n": 36,
+      "n": 38,
       "session": 4,
       "title": "Features from history",
       "text": "Session 4 Features from history Explain why an earlier enrolment counts only when its outcome was known Build two history features from records that ended before the prediction time Run a time-travel test that fails when a feature reads the future 04",
@@ -336,7 +354,7 @@
     {
       "deck": "day1",
       "id": "repeated-trainees",
-      "n": 37,
+      "n": 39,
       "session": 4,
       "title": "One trainee in three has more than one enrolment",
       "text": "The structure of the table One trainee in three has more than one enrolment One enrolment 19,500 Two 7,000 Three 2,500 Four 1,000 30,000 trainees, 45,000 enrolments The rows are not independent: a trainee carries habits and circumstances from one enrolment to the next That is information for the model today And a trap for validation on Day 3",
@@ -345,7 +363,7 @@
     {
       "deck": "day1",
       "id": "history-signal",
-      "n": 38,
+      "n": 40,
       "session": 4,
       "title": "An earlier non-completion more than triples the rate",
       "text": "What history says An earlier non-completion more than triples the rate No earlier non-completion: 40,262 rows 10.3% One: 1,937 rows 38.9% Two or more: 357 rows 54.3% prior_enrolments: earlier enrolments whose outcome was known prior_noncompletions: how many of those ended without completion No rule of Lab 1.2 moves the rate as much as this one column",
@@ -354,7 +372,7 @@
     {
       "deck": "day1",
       "id": "known-outcome",
-      "n": 39,
+      "n": 41,
       "session": 4,
       "title": "An earlier enrolment counts only once its outcome is known",
       "text": "The rule An earlier enrolment counts only once its outcome is known One trainee Starts Ends Outcome Known when the April 2025 row is scored? Culinary arts January 2021 June 2021 completed yes Culinary arts July 2021 July 2021 left yes Culinary arts July 2024 July 2024 left yes Electrical installation April 2025 September 2025 ? this is the row to score What goes wrong. \"Earlier\" is read as \"started earlier\". 1,423 scorable rows have an earlier enrolment that was still running at the prediction time: its outcome is in the table and did not exist that day.",
@@ -363,7 +381,7 @@
     {
       "deck": "day1",
       "id": "time-travel-test",
-      "n": 40,
+      "n": 42,
       "session": 4,
       "title": "The time-travel test hides the future and checks that nothing changes",
       "text": "A test, not a promise The time-travel test hides the future and checks that nothing changes 1 · Pick a past date For example 1 March 2023 → 2 · Compute twice From all records, and from the records ended by that date → 3 · Compare For every row predicted before that date A feature that reads the past only gives the same value both times The \"started earlier\" version changes for about 90 rows at each date: it fails The test checks the features, not the model, and takes seconds",
@@ -372,7 +390,7 @@
     {
       "deck": "day1",
       "id": "history-gain",
-      "n": 41,
+      "n": 43,
       "session": 4,
       "title": "History helps on every fold, and only for those who have one",
       "text": "Rung 3, with history History helps on every fold, and only for those who have one Fold Logistic With history Gain 1 0.545 0.557 +0.012 2 0.483 0.514 +0.031 3 0.515 0.530 +0.016 4 0.477 0.509 +0.031 5 0.486 0.512 +0.026 Mean 0.501 0.524 +0.023 Validation rows Without With New to the fund: 14,455 0.484 0.484 Returning: 7,315 0.523 0.579",
@@ -381,7 +399,7 @@
     {
       "deck": "day1",
       "id": "check-history",
-      "n": 42,
+      "n": 44,
       "session": 4,
       "title": "Which history feature reads the future?",
       "text": "Checkpoint Which history feature reads the future? Four candidate features for a row scored at the end of week 2. Which one fails the time-travel test? The number of the trainee's enrolments that ended before the prediction date The trainee's entry test score The trainee's non-completion rate over all of their enrolments in the table The trainee's days absent in the first two weeks of this programme",
@@ -390,7 +408,7 @@
     {
       "deck": "day1",
       "id": "lab-1-4",
-      "n": 43,
+      "n": 45,
       "session": 4,
       "title": "Two history features",
       "text": "Lab 1.4 · 25 min Two history features Add two history features from past records only, pass a time-travel test and log what they add to the logistic rung. D1_4_history_features.ipynb Follow one trainee through the records 3 min Write the two history features from past records only 9 min Run the time-travel test 5 min Rescore the logistic model with them; log the run 5 min Compare new and returning trainees 3 min ✱ Stretch: A third feature: days since the last exit",
@@ -399,7 +417,7 @@
     {
       "deck": "day1",
       "id": "wrap-up",
-      "n": 44,
+      "n": 46,
       "session": 4,
       "title": "Three things to keep",
       "text": "Day 1 Three things to keep The decision frames the task Target, unit, prediction time, action. They fix the rows (42,556 of 45,000) and the columns (nothing recorded at exit). A ladder with a log Constant 0.118, three rules 0.310, logistic 0.501, with history 0.524. Same folds, every run logged, spread beside every mean. The past only Preparation inside the folds; history from records whose outcome was known; a test that fails when a feature reads the future.",
@@ -408,7 +426,7 @@
     {
       "deck": "day1",
       "id": "next",
-      "n": 45,
+      "n": 47,
       "session": 4,
       "title": "Day 2 · Trees and challengers",
       "text": "Next Day 2 · Trees and challengers The number to beat is 0.524. Tomorrow: boosted trees, a budget of 20 trials, an automated challenger, and an interval that says whether a gain is real. Keep artifacts/run_log.csv: tomorrow adds three rungs Guess now: by how much will tuned boosted trees beat 0.524?",
@@ -951,7 +969,7 @@
       "n": 18,
       "session": 2,
       "title": "Target leakage: the column knows the answer",
-      "text": "Kind 1 Target leakage: the column knows the answer Recorded when the outcome happens: exit_reason, weeks_attended A consequence of the outcome: calls from the collections team after a missed payment Someone's answer to the same question: an antibiotic ordered because the doctor suspects the infection The question When is this column written, and by whom? Would a person who already knew the outcome be the one filling it in? What goes wrong. The model looks brilliant and the top feature is one nobody questioned because it \"obviously matters\".",
+      "text": "Kind 1 Target leakage: the column knows the answer Recorded when the outcome happens: exit_reason, weeks_attended A consequence of the outcome: a cancellation fee, in a table that predicts which bookings are cancelled Someone's answer to the same question: a specialist referral written because the doctor suspects the condition The question When is this column written, and by whom? Would a person who already knew the outcome be the one filling it in? What goes wrong. The model looks brilliant and the top feature is one nobody questioned because it \"obviously matters\".",
       "href": "../slides/day3.html#target-leak"
     },
     {

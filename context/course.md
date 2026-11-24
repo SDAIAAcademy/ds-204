@@ -1,7 +1,7 @@
 ---
 course: "Machine Learning for Tabular Data: Baselines and Validation"
 code: "DS-204"
-version: "2027.1.0"
+version: "2027.2.0"
 scope: "course"
 language: "en"
 view: "trainee"
@@ -352,7 +352,6 @@ Score a constant predictor and a three-rule baseline on the fund's five folds an
 *Rung 3*
 
 - **Logistic regression:** a weighted sum of the inputs, turned into a probability
-- Fits in seconds, on a laptop
 - Its probabilities are usually close to observed rates
 - Each weight can be read, with care
 - On tables with mostly additive effects it is hard to beat by much
@@ -447,6 +446,40 @@ model = Pipeline([("prepare", prepare),
 - Providers differ a great deal: a finding for Hamza Al-Babtain, not a verdict
 - "Absence predicts leaving" is not "reducing absence prevents leaving"
 
+#### [day1#segments-kmeans] k-means groups rows by distance, so the units decide what counts
+
+*Segments without a target*
+
+- Unsupervised clustering: no outcome. In k-means each row joins the nearest of *k* centres, each centre moves to its rows' mean, repeat
+- "Nearest" is Euclidean distance over the columns given
+- A segment is a description: read its means before naming it
+
+| Two sponsoring employers | A | B | Squared gap |
+| --- | --- | --- | --- |
+| Staff | 454 | 815 | 130,321 |
+| Trainees a year | 1 | 29 | 784 |
+| Share who complete | 0.837 | 0.594 | 0.059 |
+
+> **Read the last column.** Staff is 99.4% of the squared distance between A and B. After scaling each column to spread 1, it is 24%.
+
+#### [day1#kmeans-units] Unscaled, the segments split on staff alone; scaled, they find kinds of sponsor
+
+*Scale, then compare*
+
+| Unscaled, k = 3 | Trainees a year | Complete | Employers |
+| --- | --- | --- | --- |
+| Staff 406 | 10.8 | 0.78 | 86 |
+| Staff 634 | 10.8 | 0.79 | 112 |
+| Staff 883 | 14.2 | 0.74 | 42 |
+
+| Scaled, k = 3 | Trainees a year | Complete | Employers |
+| --- | --- | --- | --- |
+| Staff 579 | 3.0 | 0.90 | 116 |
+| Staff 597 | 13.7 | 0.73 | 76 |
+| Staff 635 | 28.1 | 0.57 | 48 |
+
+> **How to tell.** When segments differ in one column only, the one with the largest units, the run measured units, not kinds. Scale, run again and compare the two tables.
+
 #### [day1#check-pipeline] Where may the scaler be fitted?
 
 *Checkpoint*
@@ -471,7 +504,7 @@ Fit a regularised logistic model in a pipeline on the same folds, log score and 
 - [ ] Try three regularisation strengths; log each (5 min)
 - [ ] Prepare outside the folds and compare (5 min)
 - [ ] Read the largest coefficients (3 min)
-- [ ] ✱ Stretch: Add one interaction by hand and log it
+- [ ] ✱ Stretch: Add one interaction by hand and log it; then find segments with k-means, unscaled and scaled
 
 ### Session 4: Features from history
 
@@ -1321,8 +1354,8 @@ All four give a score in validation that the model cannot repeat in use.
 *Kind 1*
 
 - Recorded when the outcome happens: `exit_reason`, `weeks_attended`
-- A consequence of the outcome: calls from the collections team after a missed payment
-- Someone's answer to the same question: an antibiotic ordered because the doctor suspects the infection
+- A consequence of the outcome: a cancellation fee, in a table that predicts which bookings are cancelled
+- Someone's answer to the same question: a specialist referral written because the doctor suspects the condition
 
 - **The question.** When is this column written, and by whom? Would a person who already knew the outcome be the one filling it in?
 
